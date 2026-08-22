@@ -55,28 +55,28 @@ h1, h2, h3, h4, h5, h6,
 }
 
 /* ---------- Header ---------- */
-.figr-header {
+.dsk-header {
   background: #ffffff;
   border-bottom: 1px solid var(--border);
   display: flex;
   flex-direction: column;
 }
 
-.figr-header-top {
+.dsk-header-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 18px;
 }
 
-.figr-plugin-name {
+.dsk-plugin-name {
   font-weight: 700;
   font-size: 14px;
   color: var(--text);
   letter-spacing: -0.02em;
 }
 
-.figr-header-actions {
+.dsk-header-actions {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -95,7 +95,7 @@ h1, h2, h3, h4, h5, h6,
 }
 .figr-icon-btn:hover { background: #f4f4f6; color: #000000; }
 
-.figr-header-nav {
+.dsk-header-nav {
   display: flex;
   align-items: center;
   gap: 28px;
@@ -103,7 +103,7 @@ h1, h2, h3, h4, h5, h6,
   border-top: 1px solid var(--border);
 }
 
-.figr-nav-tab {
+.dsk-nav-tab {
   background: transparent;
   border: none;
   color: #666666;
@@ -115,12 +115,12 @@ h1, h2, h3, h4, h5, h6,
   transition: all 0.2s ease;
 }
 
-.figr-nav-tab:hover { color: #000000; }
-.figr-nav-tab.active {
+.dsk-nav-tab:hover { color: #000000; }
+.dsk-nav-tab.active {
   color: #000000;
   font-weight: 700;
 }
-.figr-nav-tab.active::after {
+.dsk-nav-tab.active::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -132,14 +132,14 @@ h1, h2, h3, h4, h5, h6,
 }
 
 /* ---------- Main Layout ---------- */
-.figr-app-shell {
+.dsk-app-shell {
   display: flex;
   flex-direction: column;
   height: 800px;
   background: var(--bg);
 }
 
-.figr-main-content {
+.dsk-main-content {
   flex: 1;
   display: flex;
   overflow: hidden;
@@ -423,7 +423,7 @@ h1, h2, h3, h4, h5, h6,
 }
 
 /* ---------- Bottom Fixed Bar ---------- */
-.figr-bottom-bar {
+.dsk-bottom-bar {
   position: fixed;
   bottom: 0;
   left: 0;

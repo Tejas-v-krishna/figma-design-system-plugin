@@ -50,9 +50,9 @@ export default function App() {
   }, []);
 
   return (
-    <div className="figr-app-shell">
+    <div className="dsk-app-shell">
       <Header />
-      <main className="figr-main-content">
+      <main className="dsk-main-content">
         {lastError && (
           <div className="error-banner">
             <span>{lastError}</span>

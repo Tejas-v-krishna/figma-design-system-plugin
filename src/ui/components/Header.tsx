@@ -9,11 +9,11 @@ export const Header: React.FC = () => {
   const setImportOpen = useStore((s) => s.setImportOpen);
 
   return (
-    <header className="figr-header">
-      <div className="figr-header-top">
-        <span className="figr-plugin-name">Design System Kit</span>
+    <header className="dsk-header">
+      <div className="dsk-header-top">
+        <span className="dsk-plugin-name">Design System Kit</span>
 
-        <div className="figr-header-actions">
+        <div className="dsk-header-actions">
           <button
             className="figr-icon-btn"
             title="Import a palette"
@@ -33,21 +33,21 @@ export const Header: React.FC = () => {
         </div>
       </div>
 
-      <nav className="figr-header-nav">
+      <nav className="dsk-header-nav">
         <button
-          className={`figr-nav-tab ${view === 'set-tokens' || view === 'brand' || view === 'typography' ? 'active' : ''}`}
+          className={`dsk-nav-tab ${view === 'set-tokens' || view === 'brand' || view === 'typography' ? 'active' : ''}`}
           onClick={() => setView('set-tokens')}
         >
           Set Tokens
         </button>
         <button
-          className={`figr-nav-tab ${view === 'build-components' || view === 'components' ? 'active' : ''}`}
+          className={`dsk-nav-tab ${view === 'build-components' || view === 'components' ? 'active' : ''}`}
           onClick={() => setView('build-components')}
         >
           Build Components
         </button>
         <button
-          className={`figr-nav-tab ${view === 'code' || view === 'export' ? 'active' : ''}`}
+          className={`dsk-nav-tab ${view === 'code' || view === 'export' ? 'active' : ''}`}
           onClick={() => setView('code')}
         >
           Code

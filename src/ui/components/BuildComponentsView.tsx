@@ -86,7 +86,7 @@ export const BuildComponentsView: React.FC = () => {
         })}
       </div>
 
-      <footer className="figr-bottom-bar">
+      <footer className="dsk-bottom-bar">
         <div className="figr-credits-badge">
           <span>{selectedSet.size} components selected</span>
         </div>

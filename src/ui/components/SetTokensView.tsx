@@ -554,7 +554,7 @@ export const SetTokensView: React.FC = () => {
         {renderContent()}
       </main>
 
-      <footer className="figr-bottom-bar">
+      <footer className="dsk-bottom-bar">
         <div className="figr-split-action">
           <button className="figr-primary-btn" onClick={() => startGeneration(tokenCategory)}>
             Create {tokenCategory} variables in <span className="figma-icon">❖</span>
