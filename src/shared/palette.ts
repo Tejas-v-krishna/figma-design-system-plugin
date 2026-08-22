@@ -70,20 +70,57 @@ export function parsePalette(text: string): ParseResult {
   }
 
   // List form: "#2563EB, neutral #64748B" or "primary: #2563EB" etc.
+  //
+  // Splitting on whitespace before matching labels means a label and its hex
+  // often arrive as two separate tokens ("primary:" then "#2563EB"), so a label
+  // is remembered until the next hex rather than having to sit in the same
+  // token as its value. Without that, every spaced form advertised above fell
+  // through to the bare branch and the hex was assigned to the wrong role.
   const tokens = trimmed.split(/[\s,;]+/).filter(Boolean);
   const out: ParsedPalette = {};
   let bareIdx = 0;
+  let pendingKey: keyof ParsedPalette | undefined;
+
   for (const tok of tokens) {
-    const labeled = tok.match(/^([a-zA-Z]+)[:=](.+)$/);
-    if (labeled) {
-      const mapped = KEY_MAP[labeled[1].toLowerCase()];
-      const hex = normalizeHex(labeled[2]);
+    // "primary:#2563EB" / "primary=#2563EB" — label and value in one token.
+    const inline = /^([a-zA-Z]+)[:=](.+)$/.exec(tok);
+    if (inline) {
+      const [, label = '', value = ''] = inline;
+      const mapped = KEY_MAP[label.toLowerCase()];
+      const hex = normalizeHex(value);
       if (mapped && hex) out[mapped] = hex;
-    } else {
-      const hex = normalizeHex(tok);
-      if (hex && bareIdx < BARE_ORDER.length) out[BARE_ORDER[bareIdx++]] = hex;
+      pendingKey = undefined;
+      continue;
+    }
+
+    // "primary:" or a bare "primary" — a label waiting for the next hex.
+    const bareLabel = /^([a-zA-Z]+)[:=]?$/.exec(tok);
+    if (bareLabel) {
+      const label = bareLabel[1] ?? '';
+      pendingKey = KEY_MAP[label.toLowerCase()];
+      continue;
+    }
+
+    const hex = normalizeHex(tok);
+    if (!hex) continue;
+
+    if (pendingKey) {
+      out[pendingKey] = hex;
+      pendingKey = undefined;
+      continue;
+    }
+
+    // Unlabeled hexes fill the roles in order, skipping any already claimed by
+    // a label so an explicit "error #DC2626" is not overwritten later.
+    while (bareIdx < BARE_ORDER.length) {
+      const key = BARE_ORDER[bareIdx++];
+      if (key && out[key] === undefined) {
+        out[key] = hex;
+        break;
+      }
     }
   }
+
   if (Object.keys(out).length === 0) return { error: 'No valid #rrggbb colors found.' };
   return { config: out };
 }
