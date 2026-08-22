@@ -5,7 +5,7 @@
 // and the exporter need, and keeping it pure means the exporter works on a fresh
 // plugin open (when the token cache is empty), the dev harness can produce real
 // output outside Figma, and the whole thing is unit-testable.
-import { DesignTokens, GenerationConfig } from './types';
+import { DesignTokens, EffectsIntensity, GenerationConfig } from './types';
 import { generateSemanticColors } from './color-utils';
 import {
   generateTypographyTokens,
@@ -15,11 +15,18 @@ import {
   generateStrokeTokens,
 } from './typography-utils';
 
-/** Which elevation steps each intensity setting keeps. */
-const SHADOW_INTENSITY: Record<string, string[] | 'all'> = {
+/**
+ * Which elevation steps each intensity setting keeps.
+ *
+ * Deliberately `Partial`: the key comes from a config that may have been
+ * persisted by an older build, so a value this map no longer knows about has to
+ * be survivable. Falling through to the medium set beats dropping every shadow.
+ */
+const MEDIUM_SHADOW_STEPS = ['E0', 'E1', 'E2', 'E3'];
+const SHADOW_INTENSITY: Partial<Record<EffectsIntensity, string[] | 'all'>> = {
   none: [],
   subtle: ['E0', 'E1'],
-  medium: ['E0', 'E1', 'E2', 'E3'],
+  medium: MEDIUM_SHADOW_STEPS,
   strong: 'all',
 };
 
@@ -55,7 +62,7 @@ export function buildTokens(config: GenerationConfig): DesignTokens {
   }
 
   const allShadows = generateShadowTokens();
-  const allowed = SHADOW_INTENSITY[config.effectsIntensity] ?? SHADOW_INTENSITY.medium;
+  const allowed = SHADOW_INTENSITY[config.effectsIntensity] ?? MEDIUM_SHADOW_STEPS;
   const shadows = allowed === 'all' ? allShadows : allShadows.filter((s) => allowed.includes(s.name));
 
   const spacing = generateSpacingTokens(config.baseSpacing);

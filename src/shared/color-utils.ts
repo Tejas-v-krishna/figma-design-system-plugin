@@ -255,6 +255,18 @@ export function interpolateOklchStops(
   return stops;
 }
 
+/**
+ * Colour of the nth stop in a generated ramp.
+ *
+ * interpolateOklchStops always returns the length it was asked for, but reading
+ * a fixed index cannot prove that, and a stop that did come back missing must
+ * not put `undefined` into a Figma paint — that throws inside setFill. The
+ * fallback keeps the gradient renderable with a slightly flatter ramp.
+ */
+function stopColor(stops: GradientStop[], index: number, fallback: string): string {
+  return stops[index]?.color ?? fallback;
+}
+
 export function generateGradientsForColor(baseHex: string): GradientPreset[] {
   const baseOklch = toOklch(baseHex) || { mode: 'oklch', l: 0.5, c: 0.1, h: 0 };
 
@@ -299,9 +311,9 @@ export function generateGradientsForColor(baseHex: string): GradientPreset[] {
   const glassEnd = formatHex(clampChroma(pickSecondColorOklch(baseHex, 'glass'), 'oklch'))!;
   const glassOklchStops = interpolateOklchStops(baseHex, glassEnd, 3);
   const glassStops: GradientStop[] = [
-    { color: glassOklchStops[0].color, opacity: 1, position: 0 },
-    { color: glassOklchStops[1].color, opacity: 0.82, position: 0.5 },
-    { color: glassOklchStops[2].color, opacity: 0.35, position: 1 },
+    { color: stopColor(glassOklchStops, 0, baseHex), opacity: 1, position: 0 },
+    { color: stopColor(glassOklchStops, 1, baseHex), opacity: 0.82, position: 0.5 },
+    { color: stopColor(glassOklchStops, 2, glassEnd), opacity: 0.35, position: 1 },
   ];
 
   const presets: {
