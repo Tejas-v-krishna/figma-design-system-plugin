@@ -178,7 +178,7 @@ export async function generateDesignSystem(
     try {
       await build();
     } catch (err) {
-      console.error(`[figr] page "${label}" failed to generate:`, err);
+      console.error(`[design-system-kit] page "${label}" failed to generate:`, err);
     }
   };
 
