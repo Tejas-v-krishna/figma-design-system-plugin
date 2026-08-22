@@ -467,13 +467,20 @@ export const SetTokensView: React.FC = () => {
                                       title: `${g.name} - Stop ${idx + 1}`,
                                       onChange: (newHex) => {
                                         setCustomStops((prev) => {
-                                          const existing = prev[g.id]
-                                            ? [...prev[g.id]]
-                                            : g.stops.map((s) => s.color);
+                                          const existing = [...(prev[g.id] ?? g.stops.map((s) => s.color))];
                                           existing[idx] = newHex;
+                                          // Re-derive the midpoint when an end
+                                          // stop moves, so a 3-stop ramp stays
+                                          // an even ramp. Skipped if the
+                                          // interpolator comes back short —
+                                          // better a stale midpoint than
+                                          // undefined in a gradient.
                                           if (existing.length === 3 && (idx === 0 || idx === 2)) {
-                                            const oklchMid = interpolateOklchStops(existing[0], existing[2], 3)[1].color;
-                                            existing[1] = oklchMid;
+                                            const [from, , to] = existing;
+                                            if (from && to) {
+                                              const mid = interpolateOklchStops(from, to, 3)[1]?.color;
+                                              if (mid) existing[1] = mid;
+                                            }
                                           }
                                           return { ...prev, [g.id]: existing };
                                         });
