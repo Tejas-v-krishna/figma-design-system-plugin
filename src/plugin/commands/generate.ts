@@ -31,6 +31,7 @@ import { colorShade, radiusPx, shadow } from '../utils/tokenAccess';
 import { setLastTokens } from '../utils/tokensStore';
 import { generateComponents } from '../utils/factory';
 import { createVariables, VariableMap, emptyVariableMap } from '../utils/variables';
+import { BoardContext, TOKEN_BOARD_BUILDERS, TokenBoardTarget } from '../utils/boards';
 
 export type { GenerationProgress };
 
@@ -919,85 +920,33 @@ async function createTokensPage(page: PageNode, tokens: DesignTokens, config: Ge
   await buildColorSystemBoard(page, tokens, config, styleMap, varMap);
 
   const foundations = figma.createFrame();
-  foundations.name = 'Typography & Spacing Foundations';
+  foundations.name = 'Foundations';
   foundations.layoutMode = 'VERTICAL';
-  foundations.itemSpacing = 40;
-  foundations.paddingTop = 40;
-  foundations.paddingBottom = 80;
-  foundations.paddingLeft = 40;
-  foundations.paddingRight = 40;
-  foundations.fills = [{ type: 'SOLID', color: hexToRgb('#F8FAFC') }];
+  foundations.primaryAxisSizingMode = 'AUTO';
+  foundations.counterAxisSizingMode = 'AUTO';
+  foundations.itemSpacing = 60;
+  foundations.fills = [];
   foundations.clipsContent = false;
-  foundations.y = 1200;
+  // Sits below whatever the colour board actually produced. The previous
+  // hardcoded y = 1200 overlapped it as soon as the palette grew.
+  foundations.y = bottomOf(page) + 80;
   page.appendChild(foundations);
 
-  sectionTitle(foundations, 'Typography', config.fontFamily.heading);
-  const typeFrame = figma.createFrame();
-  typeFrame.name = 'Typography';
-  typeFrame.layoutMode = 'VERTICAL';
-  typeFrame.itemSpacing = 10;
-  typeFrame.fills = [];
-  for (const t of tokens.typography) {
-    const specimen = figma.createText();
-    specimen.fontName = resolveFont(t.fontFamily, t.fontWeight);
-    specimen.fontSize = Math.min(28, Math.max(14, t.fontSize));
-    specimen.characters = `${t.name} — ${t.fontSize}px`;
-    specimen.lineHeight = { value: t.lineHeight, unit: 'PIXELS' };
-    specimen.fills = [{ type: 'SOLID', color: hexToRgb('#0F172A') }];
-    const key = textStyleKey(t.name);
-    if (styleMap.text[key]) specimen.textStyleId = styleMap.text[key];
-    typeFrame.appendChild(specimen);
-  }
-  foundations.appendChild(typeFrame);
-
-  sectionTitle(foundations, 'Spacing', config.fontFamily.heading);
-  const spaceFrame = figma.createFrame();
-  spaceFrame.name = 'Spacing';
-  spaceFrame.layoutMode = 'HORIZONTAL';
-  spaceFrame.itemSpacing = 12;
-  spaceFrame.fills = [];
-  for (const s of tokens.spacing.slice(0, 10)) {
-    const bar = figma.createRectangle();
-    bar.resize(Math.max(4, s.value), 48);
-    bar.cornerRadius = 4;
-    bar.fills = [{ type: 'SOLID', color: hexToRgb(tokens.colors.primary.shades['500']) }];
-    spaceFrame.appendChild(bar);
-  }
-  foundations.appendChild(spaceFrame);
-
-  sectionTitle(foundations, 'Border Radius', config.fontFamily.heading);
-  const radiusFrame = figma.createFrame();
-  radiusFrame.name = 'BorderRadius';
-  radiusFrame.layoutMode = 'HORIZONTAL';
-  radiusFrame.itemSpacing = 16;
-  radiusFrame.fills = [];
-  for (const r of tokens.borderRadius) {
-    const box = figma.createRectangle();
-    box.resize(64, 64);
-    box.cornerRadius = Math.min(9999, r.px);
-    box.fills = [{ type: 'SOLID', color: hexToRgb(tokens.colors.information.shades['500']) }];
-    radiusFrame.appendChild(box);
-  }
-  foundations.appendChild(radiusFrame);
-
-  if (tokens.shadows.length) {
-    sectionTitle(foundations, 'Elevation', config.fontFamily.heading);
-    const shadowFrame = figma.createFrame();
-    shadowFrame.name = 'Elevation';
-    shadowFrame.layoutMode = 'HORIZONTAL';
-    shadowFrame.itemSpacing = 24;
-    shadowFrame.fills = [];
-    for (const sh of tokens.shadows) {
-      const card = figma.createRectangle();
-      card.resize(80, 80);
-      card.cornerRadius = 12;
-      card.fills = [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }];
-      setEffect(card, sh, effectStyleKey(sh.name), styleMap, varMap);
-      shadowFrame.appendChild(card);
-    }
-    foundations.appendChild(shadowFrame);
+  // Same builders the per-category buttons use, so a single "Create spacing
+  // variables" run and a full generate produce identical boards.
+  const ctx: BoardContext = { tokens, config, styleMap, varMap };
+  for (const target of TOKEN_BOARD_ORDER) {
+    if (target === 'effects' && !tokens.shadows.length) continue;
+    foundations.appendChild(await TOKEN_BOARD_BUILDERS[target](ctx));
   }
 }
+
+/** Bottom edge of the lowest node on a page, or 0 when it's empty. */
+function bottomOf(page: PageNode): number {
+  return page.children.reduce((max, node) => Math.max(max, node.y + node.height), 0);
+}
+
+const TOKEN_BOARD_ORDER: TokenBoardTarget[] = ['typography', 'spacing', 'radius', 'stroke', 'effects'];
 
 function createPatternsPage(page: PageNode, tokens: DesignTokens, config: GenerationConfig, styleMap: StyleMap, varMap: VariableMap): void {
   const root = figma.createFrame();
