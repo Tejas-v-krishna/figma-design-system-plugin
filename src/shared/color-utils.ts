@@ -173,6 +173,43 @@ import { converter, interpolate, fixupHueShorter, clampChroma, formatHex, Oklch 
 
 const toOklch = converter('oklch');
 
+/** An OKLCH colour with every channel present, so arithmetic on it needs no guards. */
+export interface SolidOklch {
+  mode: 'oklch';
+  l: number;
+  c: number;
+  h: number;
+}
+
+const OKLCH_FALLBACK: SolidOklch = { mode: 'oklch', l: 0.5, c: 0.1, h: 0 };
+
+/**
+ * Fill in the channels culori leaves out.
+ *
+ * `h` is genuinely optional in an OKLCH colour: chroma 0 is achromatic, so
+ * culori omits the hue rather than inventing one, and every grey in a neutral
+ * ramp arrives here that way. `l` and `c` are always present. Normalising once
+ * here is what lets the two dozen arithmetic sites below read `base.h` directly
+ * instead of repeating `?? 0` — and repeating it on `l` and `c` as well, which
+ * only looked like caution.
+ */
+function fillOklch(color: Oklch): SolidOklch {
+  return { mode: 'oklch', l: color.l, c: color.c, h: color.h ?? 0 };
+}
+
+/**
+ * Parse a hex to OKLCH with every channel filled in.
+ *
+ * culori returns undefined for a string it cannot parse, which is reachable:
+ * hexes reach this module from imported token files and from free-text input,
+ * not only from our own generators. An unparseable colour falls back to a
+ * mid-lightness low-chroma grey so the gradient still renders.
+ */
+function solidOklch(hex: string): SolidOklch {
+  const parsed = toOklch(hex);
+  return parsed ? fillOklch(parsed) : OKLCH_FALLBACK;
+}
+
 export type GradientOklchMode = 'mono' | 'analogous' | 'analogous-cool' | 'tonal' | 'complement' | 'radial' | 'glass';
 
 /**
@@ -182,11 +219,11 @@ export type GradientOklchMode = 'mono' | 'analogous' | 'analogous-cool' | 'tonal
 export function pickSecondColorOklch(
   baseHex: string,
   mode: GradientOklchMode = 'analogous'
-): { mode: 'oklch'; l: number; c: number; h: number } {
-  const base = toOklch(baseHex) || { mode: 'oklch', l: 0.5, c: 0.1, h: 0 };
-  let l = base.l ?? 0.5;
-  let c = base.c ?? 0.1;
-  let h = base.h ?? 0;
+): SolidOklch {
+  const base = solidOklch(baseHex);
+  let l = base.l;
+  let c = base.c;
+  let h = base.h;
 
   switch (mode) {
     case 'mono':
@@ -230,14 +267,16 @@ export function interpolateOklchStops(
   color2: string | Oklch,
   numStops: number = 3
 ): GradientStop[] {
-  const c1 = typeof color1 === 'string' ? (toOklch(color1) || { mode: 'oklch', l: 0.5, c: 0.1, h: 0 }) : color1;
-  const c2 = typeof color2 === 'string' ? (toOklch(color2) || { mode: 'oklch', l: 0.5, c: 0.1, h: 0 }) : color2;
-
-  const oklch1: Oklch = { mode: 'oklch', l: c1.l, c: c1.c ?? 0, h: c1.h ?? 0 };
-  const oklch2: Oklch = { mode: 'oklch', l: c2.l, c: c2.c ?? 0, h: c2.h ?? 0 };
+  const oklch1 = typeof color1 === 'string' ? solidOklch(color1) : fillOklch(color1);
+  const oklch2 = typeof color2 === 'string' ? solidOklch(color2) : fillOklch(color2);
 
   const interpolator = interpolate([oklch1, oklch2], 'oklch', {
-    h: { fixup: fixupHueShorter } as any,
+    // Shortest-path hue only. The empty l/c entries are there because culori's
+    // override type requires an entry per channel; culori itself treats an
+    // entry with no `fixup` as "leave this channel alone".
+    l: {},
+    c: {},
+    h: { fixup: fixupHueShorter },
   });
 
   const stops: GradientStop[] = [];
@@ -268,11 +307,11 @@ function stopColor(stops: GradientStop[], index: number, fallback: string): stri
 }
 
 export function generateGradientsForColor(baseHex: string): GradientPreset[] {
-  const baseOklch = toOklch(baseHex) || { mode: 'oklch', l: 0.5, c: 0.1, h: 0 };
+  const { l: bl, c: bc, h: bh } = solidOklch(baseHex);
 
   // 1. Monochromatic Silk (0° hue shift, lightness transition in OKLCH)
-  const monoLight = clampChroma({ mode: 'oklch', l: clamp((baseOklch.l ?? 0.5) + 0.18, 0.15, 0.95), c: baseOklch.c ?? 0, h: baseOklch.h ?? 0 }, 'oklch');
-  const monoDark = clampChroma({ mode: 'oklch', l: clamp((baseOklch.l ?? 0.5) - 0.22, 0.1, 0.9), c: (baseOklch.c ?? 0) * 1.05, h: baseOklch.h ?? 0 }, 'oklch');
+  const monoLight = clampChroma({ mode: 'oklch', l: clamp(bl + 0.18, 0.15, 0.95), c: bc, h: bh }, 'oklch');
+  const monoDark = clampChroma({ mode: 'oklch', l: clamp(bl - 0.22, 0.1, 0.9), c: bc * 1.05, h: bh }, 'oklch');
   const monoStops = interpolateOklchStops(formatHex(monoLight)!, formatHex(monoDark)!, 3);
 
   // 2. Analogous Sunset (+20° OKLCH hue shift)
@@ -284,27 +323,27 @@ export function generateGradientsForColor(baseHex: string): GradientPreset[] {
   const analogousCoolStops = interpolateOklchStops(baseHex, analogousCoolColor, 3);
 
   // 4. Radial Focus Glow (Center highlight to dark depth in OKLCH)
-  const radialCenter = formatHex(clampChroma({ mode: 'oklch', l: clamp((baseOklch.l ?? 0.5) + 0.16, 0.2, 0.95), c: (baseOklch.c ?? 0) * 0.95, h: baseOklch.h ?? 0 }, 'oklch'))!;
+  const radialCenter = formatHex(clampChroma({ mode: 'oklch', l: clamp(bl + 0.16, 0.2, 0.95), c: bc * 0.95, h: bh }, 'oklch'))!;
   const radialOuter = formatHex(clampChroma(pickSecondColorOklch(baseHex, 'radial'), 'oklch'))!;
   const radialStops = interpolateOklchStops(radialCenter, radialOuter, 3);
 
   // 5. Pastel Velvet (Soft 3-stop OKLCH pastel transition with low chroma)
-  const pastelStart = formatHex(clampChroma({ mode: 'oklch', l: 0.82, c: 0.08, h: (baseOklch.h ?? 0) }, 'oklch'))!;
-  const pastelEnd = formatHex(clampChroma({ mode: 'oklch', l: 0.72, c: 0.12, h: ((baseOklch.h ?? 0) + 35) % 360 }, 'oklch'))!;
+  const pastelStart = formatHex(clampChroma({ mode: 'oklch', l: 0.82, c: 0.08, h: bh }, 'oklch'))!;
+  const pastelEnd = formatHex(clampChroma({ mode: 'oklch', l: 0.72, c: 0.12, h: (bh + 35) % 360 }, 'oklch'))!;
   const pastelStops = interpolateOklchStops(pastelStart, pastelEnd, 3);
 
   // 6. Royal Satin (Balanced OKLCH hue & lightness transfer)
-  const royalStart = formatHex(clampChroma({ mode: 'oklch', l: clamp((baseOklch.l ?? 0.5) + 0.06, 0.15, 0.9), c: (baseOklch.c ?? 0), h: ((baseOklch.h ?? 0) - 15 + 360) % 360 }, 'oklch'))!;
-  const royalEnd = formatHex(clampChroma({ mode: 'oklch', l: clamp((baseOklch.l ?? 0.5) - 0.1, 0.12, 0.85), c: (baseOklch.c ?? 0), h: ((baseOklch.h ?? 0) + 30) % 360 }, 'oklch'))!;
+  const royalStart = formatHex(clampChroma({ mode: 'oklch', l: clamp(bl + 0.06, 0.15, 0.9), c: bc, h: (bh - 15 + 360) % 360 }, 'oklch'))!;
+  const royalEnd = formatHex(clampChroma({ mode: 'oklch', l: clamp(bl - 0.1, 0.12, 0.85), c: bc, h: (bh + 30) % 360 }, 'oklch'))!;
   const royalStops = interpolateOklchStops(royalStart, royalEnd, 3);
 
   // 7. Aurora Flow (Fluid 3-stop OKLCH wave)
-  const auroraEnd = formatHex(clampChroma({ mode: 'oklch', l: clamp((baseOklch.l ?? 0.5) + 0.08, 0.15, 0.92), c: (baseOklch.c ?? 0) * 1.1, h: ((baseOklch.h ?? 0) + 45) % 360 }, 'oklch'))!;
+  const auroraEnd = formatHex(clampChroma({ mode: 'oklch', l: clamp(bl + 0.08, 0.15, 0.92), c: bc * 1.1, h: (bh + 45) % 360 }, 'oklch'))!;
   const auroraStops = interpolateOklchStops(baseHex, auroraEnd, 3);
 
   // 8. Twilight Spotlight (Radial OKLCH pulse)
-  const twilightCenter = formatHex(clampChroma({ mode: 'oklch', l: clamp((baseOklch.l ?? 0.5) + 0.14, 0.2, 0.95), c: (baseOklch.c ?? 0), h: ((baseOklch.h ?? 0) + 20) % 360 }, 'oklch'))!;
-  const twilightOuter = formatHex(clampChroma({ mode: 'oklch', l: clamp((baseOklch.l ?? 0.5) - 0.25, 0.1, 0.8), c: (baseOklch.c ?? 0) * 0.9, h: ((baseOklch.h ?? 0) - 25 + 360) % 360 }, 'oklch'))!;
+  const twilightCenter = formatHex(clampChroma({ mode: 'oklch', l: clamp(bl + 0.14, 0.2, 0.95), c: bc, h: (bh + 20) % 360 }, 'oklch'))!;
+  const twilightOuter = formatHex(clampChroma({ mode: 'oklch', l: clamp(bl - 0.25, 0.1, 0.8), c: bc * 0.9, h: (bh - 25 + 360) % 360 }, 'oklch'))!;
   const twilightStops = interpolateOklchStops(twilightCenter, twilightOuter, 3);
 
   // 9. Glassmorphic Fade (Translucent UI card gradient in OKLCH)
