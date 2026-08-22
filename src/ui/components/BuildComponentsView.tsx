@@ -49,7 +49,8 @@ export const BuildComponentsView: React.FC = () => {
       </div>
 
       <p className="figr-components-desc">
-        Discover our production-ready UI components, expertly crafted to align with your unique design style.
+        Pick the components to generate. Each one is built from your tokens, so
+        colors, type, radius and elevation match the system you configured.
       </p>
 
       <div className="figr-components-count">
