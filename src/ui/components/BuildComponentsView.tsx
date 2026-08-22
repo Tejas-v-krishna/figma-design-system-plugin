@@ -2,7 +2,7 @@ import React from 'react';
 import { useStore } from '../store';
 import { COMPONENT_DEFINITIONS } from '../../shared/component-definitions';
 import { countComponentsFor } from '../../shared/variant-count';
-import { Search, Globe, CheckCircle, ChevronUp } from 'lucide-react';
+import { Search, CheckSquare, XSquare, CheckCircle, ChevronUp } from 'lucide-react';
 
 export const BuildComponentsView: React.FC = () => {
   const search = useStore((s) => s.componentSearch);
@@ -10,8 +10,10 @@ export const BuildComponentsView: React.FC = () => {
   const config = useStore((s) => s.config);
   const toggleComponent = useStore((s) => s.toggleComponent);
   const startGeneration = useStore((s) => s.startGeneration);
+  const selectAll = useStore((s) => s.selectAll);
 
   const selectedSet = new Set(config.componentsToGenerate);
+  const allSelected = selectedSet.size === COMPONENT_DEFINITIONS.length;
 
   const filteredComponents = COMPONENT_DEFINITIONS.filter((comp) =>
     comp.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -36,9 +38,13 @@ export const BuildComponentsView: React.FC = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <button className="figr-secondary-btn">
-          <Globe size={15} />
-          Edit Global Components
+        <button
+          className="figr-secondary-btn"
+          onClick={() => selectAll(!allSelected)}
+          title={allSelected ? 'Deselect every component' : 'Select every component'}
+        >
+          {allSelected ? <XSquare size={15} /> : <CheckSquare size={15} />}
+          {allSelected ? 'Clear all' : `Select all ${COMPONENT_DEFINITIONS.length}`}
         </button>
       </div>
 
