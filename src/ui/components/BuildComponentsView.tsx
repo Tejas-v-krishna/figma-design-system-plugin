@@ -26,8 +26,8 @@ export const BuildComponentsView: React.FC = () => {
     countComponentsFor(comp, config.options);
 
   return (
-    <div className="figr-build-components-container">
-      <div className="figr-components-top-bar">
+    <div className="dsk-build-components-container">
+      <div className="dsk-components-top-bar">
         <div className="dsk-search-wrapper">
           <Search size={16} className="dsk-search-icon" />
           <input
@@ -48,16 +48,16 @@ export const BuildComponentsView: React.FC = () => {
         </button>
       </div>
 
-      <p className="figr-components-desc">
+      <p className="dsk-components-desc">
         Pick the components to generate. Each one is built from your tokens, so
         colors, type, radius and elevation match the system you configured.
       </p>
 
-      <div className="figr-components-count">
+      <div className="dsk-components-count">
         Showing All {filteredComponents.length} Components
       </div>
 
-      <div className="figr-components-grid">
+      <div className="dsk-components-grid">
         {filteredComponents.map((comp) => {
           const isSelected = selectedSet.has(comp.name);
           const variants = getVariantCount(comp);
@@ -65,19 +65,19 @@ export const BuildComponentsView: React.FC = () => {
           return (
             <div
               key={comp.name}
-              className={`figr-component-card ${isSelected ? 'selected' : ''}`}
+              className={`dsk-component-card ${isSelected ? 'selected' : ''}`}
               onClick={() => toggleComponent(comp.name, !isSelected)}
             >
-              <div className="figr-card-preview">
+              <div className="dsk-card-preview">
                 {/* SVG Illustration Placeholder / Component Preview Box */}
-                <div className="figr-card-preview-inner">
-                  <span className="figr-preview-text">{comp.name[0]}</span>
+                <div className="dsk-card-preview-inner">
+                  <span className="dsk-preview-text">{comp.name[0]}</span>
                 </div>
-                {isSelected && <CheckCircle size={18} className="figr-card-check" />}
+                {isSelected && <CheckCircle size={18} className="dsk-card-check" />}
               </div>
-              <div className="figr-card-info">
-                <span className="figr-card-title">{comp.name}</span>
-                <span className="figr-card-variants">
+              <div className="dsk-card-info">
+                <span className="dsk-card-title">{comp.name}</span>
+                <span className="dsk-card-variants">
                   {variants} {variants === 1 ? 'variant' : 'variants'}
                 </span>
               </div>
@@ -87,7 +87,7 @@ export const BuildComponentsView: React.FC = () => {
       </div>
 
       <footer className="dsk-bottom-bar">
-        <div className="figr-credits-badge">
+        <div className="dsk-selection-count">
           <span>{selectedSet.size} components selected</span>
         </div>
 

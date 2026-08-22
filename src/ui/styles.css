@@ -297,14 +297,14 @@ h1, h2, h3, h4, h5, h6,
 }
 
 /* ---------- Build Components Layout ---------- */
-.figr-build-components-container {
+.dsk-build-components-container {
   flex: 1;
   padding: 20px 24px;
   overflow-y: auto;
   padding-bottom: 80px;
 }
 
-.figr-components-top-bar {
+.dsk-components-top-bar {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -350,27 +350,27 @@ h1, h2, h3, h4, h5, h6,
 }
 .dsk-secondary-btn:hover { background: #303030; }
 
-.figr-components-desc {
+.dsk-components-desc {
   color: #888;
   font-size: 13px;
   margin-bottom: 16px;
   line-height: 1.4;
 }
 
-.figr-components-count {
+.dsk-components-count {
   font-weight: 600;
   color: #fff;
   font-size: 14px;
   margin-bottom: 16px;
 }
 
-.figr-components-grid {
+.dsk-components-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 16px;
 }
 
-.figr-component-card {
+.dsk-component-card {
   background: #242424;
   border: 1px solid #333;
   border-radius: 10px;
@@ -378,10 +378,10 @@ h1, h2, h3, h4, h5, h6,
   cursor: pointer;
   transition: border-color 0.15s, transform 0.1s;
 }
-.figr-component-card:hover { border-color: #555; }
-.figr-component-card.selected { border-color: var(--accent); background: #202b36; }
+.dsk-component-card:hover { border-color: #555; }
+.dsk-component-card.selected { border-color: var(--accent); background: #202b36; }
 
-.figr-card-preview {
+.dsk-card-preview {
   background: #ffffff;
   border-radius: 6px;
   height: 110px;
@@ -392,32 +392,32 @@ h1, h2, h3, h4, h5, h6,
   margin-bottom: 8px;
 }
 
-.figr-card-preview-inner {
+.dsk-card-preview-inner {
   color: #333;
   font-size: 32px;
   font-weight: 700;
 }
 
-.figr-card-check {
+.dsk-card-check {
   position: absolute;
   top: 6px;
   right: 6px;
   color: var(--accent);
 }
 
-.figr-card-info {
+.dsk-card-info {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.figr-card-title {
+.dsk-card-title {
   font-weight: 600;
   color: #fff;
   font-size: 13px;
 }
 
-.figr-card-variants {
+.dsk-card-variants {
   color: #888;
   font-size: 11px;
 }
@@ -438,7 +438,7 @@ h1, h2, h3, h4, h5, h6,
   z-index: 100;
 }
 
-.figr-credits-badge {
+.dsk-selection-count {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1437,16 +1437,16 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   transform: scale(0.97) !important;
 }
 
-.figr-component-card {
+.dsk-component-card {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-.figr-component-card:hover {
+.dsk-component-card:hover {
   transform: translateY(-3px) scale(1.02) !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
 }
 
-.figr-component-card:active {
+.dsk-component-card:active {
   transform: scale(0.97) !important;
 }
 
