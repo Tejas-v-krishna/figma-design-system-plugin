@@ -68,22 +68,41 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
       await handleScan();
       break;
     case 'LOAD_CONFIG':
-      try {
-        const saved = await figma.clientStorage.getAsync('figr.config');
-        if (saved) figma.ui.postMessage({ type: 'PERSISTED_CONFIG', payload: saved });
-      } catch {
-        /* storage unavailable — UI keeps defaults */
-      }
+      await loadConfig();
       break;
     case 'SAVE_CONFIG':
       try {
-        await figma.clientStorage.setAsync('figr.config', msg.payload);
+        await figma.clientStorage.setAsync(CONFIG_KEY, msg.payload);
       } catch {
         /* storage unavailable — non-fatal */
       }
       break;
   }
 };
+
+const CONFIG_KEY = 'dsk.config';
+/** Pre-rename key. Read once so existing users don't lose their saved config. */
+const LEGACY_CONFIG_KEY = 'figr.config';
+
+async function loadConfig(): Promise<void> {
+  try {
+    const saved = await figma.clientStorage.getAsync(CONFIG_KEY);
+    if (saved) {
+      figma.ui.postMessage({ type: 'PERSISTED_CONFIG', payload: saved });
+      return;
+    }
+    // Nothing under the current key: migrate anything stored under the old one,
+    // then drop it so this only happens once.
+    const legacy = await figma.clientStorage.getAsync(LEGACY_CONFIG_KEY);
+    if (legacy) {
+      await figma.clientStorage.setAsync(CONFIG_KEY, legacy);
+      await figma.clientStorage.deleteAsync(LEGACY_CONFIG_KEY);
+      figma.ui.postMessage({ type: 'PERSISTED_CONFIG', payload: legacy });
+    }
+  } catch {
+    /* storage unavailable — UI keeps defaults */
+  }
+}
 
 async function handleGenerateColorExtensions(payload: { hex: string; name?: string; config?: any; customStops?: Record<string, string[]> }) {
   try {
