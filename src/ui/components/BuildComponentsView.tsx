@@ -1,6 +1,7 @@
 import React from 'react';
 import { useStore } from '../store';
 import { COMPONENT_DEFINITIONS } from '../../shared/component-definitions';
+import { countComponentsFor } from '../../shared/variant-count';
 import { Search, Globe, CheckCircle, ChevronUp } from 'lucide-react';
 
 export const BuildComponentsView: React.FC = () => {
@@ -17,13 +18,10 @@ export const BuildComponentsView: React.FC = () => {
     comp.category.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Variant count calculator for preview display
-  const getVariantCount = (comp: typeof COMPONENT_DEFINITIONS[0]) => {
-    const v = comp.variants.length || 1;
-    const s = comp.sizes.length || 1;
-    const st = comp.states.length || 1;
-    return v * s * st * 4; // Multiplied by combinations
-  };
+  // How many components each card will actually produce. The rule lives in
+  // shared/ so this can't drift from what the factory does.
+  const getVariantCount = (comp: typeof COMPONENT_DEFINITIONS[0]) =>
+    countComponentsFor(comp, config.options);
 
   return (
     <div className="figr-build-components-container">
@@ -72,7 +70,9 @@ export const BuildComponentsView: React.FC = () => {
               </div>
               <div className="figr-card-info">
                 <span className="figr-card-title">{comp.name}</span>
-                <span className="figr-card-variants">{variants} Variants</span>
+                <span className="figr-card-variants">
+                  {variants} {variants === 1 ? 'variant' : 'variants'}
+                </span>
               </div>
             </div>
           );
