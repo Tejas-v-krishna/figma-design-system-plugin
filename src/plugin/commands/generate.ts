@@ -1575,5 +1575,100 @@ export async function generateColorExtensions(
     shadesBoard.appendChild(row);
   }
 
+  // --- SEPARATE BOARD 2: GRADIENTS BOARD ---
+  // The UI previews these gradients and the message that triggers this command
+  // is named "shades & gradients", but the board itself was never built. Nine
+  // OKLCH presets come from generateGradientsForColor(); convert each to a
+  // Figma GradientPaint and lay them out to match the shades board.
+  const gradients = generateGradientsForColor(baseHex);
 
+  const gradientsBoard = figma.createFrame();
+  gradientsBoard.name = gradientsBoardName;
+  gradientsBoard.layoutMode = 'VERTICAL';
+  gradientsBoard.primaryAxisSizingMode = 'AUTO';
+  gradientsBoard.counterAxisSizingMode = 'AUTO';
+  gradientsBoard.counterAxisAlignItems = 'MIN';
+  gradientsBoard.itemSpacing = 24;
+  gradientsBoard.paddingTop = 56;
+  gradientsBoard.paddingBottom = 56;
+  gradientsBoard.paddingLeft = 56;
+  gradientsBoard.paddingRight = 56;
+  gradientsBoard.fills = [{ type: 'SOLID', color: hexToRgb('#FAFAFA') }];
+  gradientsBoard.cornerRadius = 25;
+  gradientsBoard.clipsContent = false;
+  gradientsBoard.x = 0;
+  gradientsBoard.y = startY + shadesBoard.height + 60;
+  colorPage.appendChild(gradientsBoard);
+
+  const gradientsHeroHeader = await createBlackHeroBox(
+    'Gradients',
+    `${displayTitle} Gradients`,
+    'Nine gradients derived from your base color in OKLCH, so every blend stays perceptually even with no gray dead zones through the midpoint.',
+    [
+      {
+        label: 'Monochromatic',
+        desc: 'A single hue moving through lightness — the safest choice for large surfaces and backgrounds.',
+      },
+      {
+        label: 'Analogous',
+        desc: 'Neighbouring hues blended warm or cool, for gradients with more life than a monochrome ramp.',
+      },
+      {
+        label: 'Radial',
+        desc: 'A luminous focal point falling off into depth, useful for spotlights and hero sections.',
+      },
+      {
+        label: 'Translucent',
+        desc: 'Stops that fade in opacity, intended for glassmorphic overlays stacked over content.',
+      },
+    ],
+    952
+  );
+  gradientsBoard.appendChild(gradientsHeroHeader);
+
+  for (let i = 0; i < gradients.length; i += 2) {
+    const row = figma.createFrame();
+    row.name = `Gradients Row ${Math.floor(i / 2) + 1}`;
+    row.layoutMode = 'HORIZONTAL';
+    row.primaryAxisSizingMode = 'AUTO';
+    row.counterAxisSizingMode = 'AUTO';
+    row.itemSpacing = 24;
+    row.fills = [];
+
+    for (let j = i; j < Math.min(i + 2, gradients.length); j++) {
+      const preset = applyCustomStops(gradients[j], customGradientStops);
+      // A gradient card is dark-on-light only when its own stops are light.
+      const light = preset.stops.every((s) => isLightColorHex(s.color));
+      const card = await buildCustomCard(
+        preset.name,
+        preset.description,
+        preset.stops.map((s) => s.color.toUpperCase()).join(' → '),
+        [convertGradientToFigmaPaint(preset)],
+        gradients.length - i > 1 ? 464 : 952,
+        220,
+        light
+      );
+      row.appendChild(card);
+    }
+
+    gradientsBoard.appendChild(row);
+  }
+}
+
+/**
+ * Overlay caller-supplied hex stops onto a generated preset, keeping each
+ * stop's position and opacity. Lets the UI hand-tune a gradient without
+ * reimplementing the OKLCH derivation. Presets with no override pass through.
+ */
+function applyCustomStops(
+  preset: GradientPreset,
+  overrides?: Record<string, string[]>
+): GradientPreset {
+  const custom = overrides?.[preset.id];
+  if (!custom || custom.length === 0) return preset;
+
+  return {
+    ...preset,
+    stops: preset.stops.map((stop, i) => (i < custom.length ? { ...stop, color: custom[i] } : stop)),
+  };
 }
