@@ -1,7 +1,8 @@
 import React from 'react';
 import { useStore, ExportFormat } from '../store';
-import { Code, Copy, Check } from 'lucide-react';
+import { Code, Copy, Check, Download } from 'lucide-react';
 import { copyText } from '../clipboard';
+import { downloadText, fileNameFor } from '../download';
 
 export const CodeExportView: React.FC = () => {
   const exportFormat = useStore((s) => s.exportFormat);
@@ -11,7 +12,7 @@ export const CodeExportView: React.FC = () => {
   const exportBusy = useStore((s) => s.exportBusy);
 
   const [copied, setCopied] = React.useState(false);
-  const [copyError, setCopyError] = React.useState<string | null>(null);
+  const [notice, setNotice] = React.useState<string | null>(null);
 
   const formats: { key: ExportFormat; label: string }[] = [
     { key: 'json', label: 'Design Tokens JSON' },
@@ -32,9 +33,19 @@ export const CodeExportView: React.FC = () => {
     // refused still showed a checkmark and the user pasted stale content.
     void copyText(exportResult).then((ok) => {
       setCopied(ok);
-      setCopyError(ok ? null : 'Copy was blocked. Select the code and press Ctrl+C.');
+      setNotice(ok ? null : 'Copy was blocked. Select the code and press Ctrl+C.');
       if (ok) setTimeout(() => setCopied(false), 2000);
     });
+  };
+
+  const handleDownload = () => {
+    if (!exportResult) return;
+    const name = fileNameFor(exportFormat);
+    setNotice(
+      downloadText(exportResult, name)
+        ? null
+        : 'Saving the file was blocked. Copy the code instead.',
+    );
   };
 
   return (
@@ -66,14 +77,20 @@ export const CodeExportView: React.FC = () => {
           <div className="dsk-code-block-wrapper">
             <div className="dsk-code-block-header">
               <span>{exportFormat.toUpperCase()} Export Output</span>
-              <button className="dsk-copy-btn" onClick={handleCopy}>
-                {copied ? <Check size={14} /> : <Copy size={14} />}
-                {copied ? 'Copied!' : 'Copy Code'}
-              </button>
+              <div className="dsk-code-block-actions">
+                <button className="dsk-copy-btn" onClick={handleDownload}>
+                  <Download size={14} />
+                  Save file
+                </button>
+                <button className="dsk-copy-btn" onClick={handleCopy}>
+                  {copied ? <Check size={14} /> : <Copy size={14} />}
+                  {copied ? 'Copied!' : 'Copy Code'}
+                </button>
+              </div>
             </div>
-            {copyError && (
+            {notice && (
               <p className="dsk-copy-error" role="status">
-                {copyError}
+                {notice}
               </p>
             )}
             <pre className="dsk-code-block">{exportResult}</pre>

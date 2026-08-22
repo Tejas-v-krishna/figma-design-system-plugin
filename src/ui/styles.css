@@ -589,6 +589,12 @@ h1, h2, h3, h4, h5, h6,
   color: #888;
 }
 
+.dsk-code-block-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .dsk-copy-btn {
   background: transparent;
   border: none;
@@ -598,6 +604,23 @@ h1, h2, h3, h4, h5, h6,
   display: flex;
   align-items: center;
   gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.dsk-copy-btn:hover { background: rgba(255, 255, 255, 0.06); }
+
+/* Shown when a clipboard write or a file save is refused by the sandbox. It is
+   a fallback instruction, not decoration, so it sits inline above the code
+   rather than in a toast that can be missed. */
+.dsk-copy-error {
+  margin: 0;
+  padding: 7px 12px;
+  background: rgba(248, 113, 113, 0.09);
+  border-bottom: 1px solid rgba(248, 113, 113, 0.22);
+  color: #fca5a5;
+  font-size: 11.5px;
+  line-height: 1.45;
+  text-align: left;
 }
 
 .dsk-code-block {
