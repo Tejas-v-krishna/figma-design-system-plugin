@@ -25,9 +25,14 @@
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 }
 
+/* No !important on the font here. A plugin iframe is its own document with only
+   this stylesheet in it, so there is nothing to out-rank — and `*` marked
+   !important beat every more specific rule, including .code-box and .hex, which
+   meant the exported-code panes and hex fields rendered in the UI sans face
+   instead of the monospace they ask for. */
 * {
   box-sizing: border-box;
-  font-family: var(--font-ui) !important;
+  font-family: var(--font-ui);
 }
 
 html, body {
@@ -35,7 +40,7 @@ html, body {
   padding: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-ui) !important;
+  font-family: var(--font-ui);
   font-size: 13px;
   letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
@@ -48,7 +53,7 @@ h1, h2, h3, h4, h5, h6,
 .figr-top-tab.active,
 .figr-primary-btn,
 .figr-sidebar-item.active {
-  font-family: var(--font-ui) !important;
+  font-family: var(--font-ui);
   letter-spacing: -0.03em;
 }
 
