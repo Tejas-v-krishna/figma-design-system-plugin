@@ -127,6 +127,13 @@ h1, h2, h3, h4, h5, h6,
   color: var(--text-dim);
 }
 
+.figr-plugin-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
 .figr-header-actions {
   display: flex;
   align-items: center;

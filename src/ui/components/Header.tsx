@@ -1,34 +1,34 @@
 import React from 'react';
 import { useStore } from '../store';
-import { Headphones, HelpCircle, ChevronDown } from 'lucide-react';
+import { Settings2, Palette } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const view = useStore((s) => s.view);
   const setView = useStore((s) => s.setView);
+  const setOptionsOpen = useStore((s) => s.setOptionsOpen);
+  const setImportOpen = useStore((s) => s.setImportOpen);
 
   return (
     <header className="figr-header">
-      <div className="figr-top-announcement-banner">
-        <span>Try Figr AI (your design agent that understands your product)</span>
-        <span className="banner-arrow">→</span>
-      </div>
-
       <div className="figr-header-top">
-        <div className="figr-project-selector">
-          <div className="figr-avatar-badge">TK</div>
-          <span className="figr-project-title">Untitled</span>
-          <ChevronDown size={14} className="figr-project-chevron" />
-        </div>
+        <span className="figr-plugin-name">Design System Kit</span>
 
         <div className="figr-header-actions">
-          <button className="figr-icon-btn" title="Support">
-            <Headphones size={16} />
+          <button
+            className="figr-icon-btn"
+            title="Import a palette"
+            aria-label="Import a palette"
+            onClick={() => setImportOpen(true)}
+          >
+            <Palette size={16} />
           </button>
-          <button className="figr-icon-btn" title="Help & Docs">
-            <HelpCircle size={16} />
-          </button>
-          <button className="figr-pro-btn">
-            Go Pro
+          <button
+            className="figr-icon-btn"
+            title="Generation options"
+            aria-label="Generation options"
+            onClick={() => setOptionsOpen(true)}
+          >
+            <Settings2 size={16} />
           </button>
         </div>
       </div>
