@@ -1,15 +1,25 @@
 // FIGR Design System - Token export command
 import { getLastTokens } from '../utils/tokensStore';
-import { DesignTokens } from '../../shared/types';
+import { buildTokens } from './generate';
+import { DesignTokens, GenerationConfig } from '../../shared/types';
 
 export type ExportFormat = 'json' | 'css' | 'tailwind' | 'dtcg';
 
-export function exportTokens(format: ExportFormat): string {
+/**
+ * Serialize the design system's tokens.
+ *
+ * tokensStore holds tokens in a module-level variable that dies with the plugin
+ * sandbox, so on a fresh open there is nothing cached and export used to throw
+ * "No design system has been generated yet" even when the user's config was
+ * right there in the panel. Tokens are derived deterministically from config, so
+ * fall back to rebuilding them instead of failing.
+ */
+export function exportTokens(format: ExportFormat, config?: GenerationConfig): string {
   const last = getLastTokens();
-  if (!last) {
-    throw new Error('No design system has been generated yet. Generate one first, then export.');
+  const tokens = last ? last.tokens : config ? buildTokens(config) : null;
+  if (!tokens) {
+    throw new Error('No tokens to export. Configure a design system in the panel first.');
   }
-  const { tokens } = last;
   switch (format) {
     case 'css':
       return toCss(tokens);

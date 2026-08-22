@@ -363,7 +363,10 @@ export const useStore = create<UIState>((set, get) => ({
   },
   requestExport: (format) => {
     set({ exportBusy: true, exportResult: null, exportError: null });
-    postToPlugin({ type: 'EXPORT_TOKENS', payload: format });
+    // Send the config too: the plugin sandbox loses its token cache on every
+    // reopen, and tokens are derivable from config, so this makes export work
+    // without forcing a generate first.
+    postToPlugin({ type: 'EXPORT_TOKENS', payload: { format, config: get().config } });
   },
   requestScan: () => {
     set({ scanBusy: true, scanResult: null, scanError: null });

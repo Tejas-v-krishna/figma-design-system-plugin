@@ -211,7 +211,12 @@ export async function generateDesignSystem(
 
 // ---------------- tokens ----------------
 
-function buildTokens(config: GenerationConfig): DesignTokens {
+/**
+ * Derive the full token set from a config. Pure — no Figma API calls — so the
+ * export command can rebuild tokens from the UI's config when nothing has been
+ * generated in this plugin session yet.
+ */
+export function buildTokens(config: GenerationConfig): DesignTokens {
   const colors = generateSemanticColors({
     primary: config.primaryColor,
     secondary: config.secondaryColor,

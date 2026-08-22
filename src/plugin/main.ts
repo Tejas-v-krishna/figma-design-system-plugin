@@ -134,12 +134,14 @@ async function handleGenerate(config: any) {
   }
 }
 
-async function handleExport(format: ExportFormat) {
+async function handleExport(payload: { format: ExportFormat; config?: any }) {
   try {
-    const tokens = await exportTokens(format);
+    // The config travels with the request so export still works on a fresh
+    // plugin open, before anything has been generated in this session.
+    const tokens = exportTokens(payload.format, payload.config);
     figma.ui.postMessage({
       type: 'EXPORT_COMPLETE',
-      payload: { success: true, tokens, format },
+      payload: { success: true, tokens, format: payload.format },
     });
   } catch (error: any) {
     figma.ui.postMessage({
