@@ -32,9 +32,10 @@ function rgbToHsl(r: number, g: number, b: number) {
 function rgbToHsv(r: number, g: number, b: number) {
   r /= 255; g /= 255; b /= 255;
   const max = Math.max(r, g, b), min = Math.min(r, g, b);
-  let h = 0, s = 0, v = max;
+  const v = max;
+  let h = 0;
   const d = max - min;
-  s = max === 0 ? 0 : d / max;
+  const s = max === 0 ? 0 : d / max;
 
   if (max !== min) {
     switch (max) {
