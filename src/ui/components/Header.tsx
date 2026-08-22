@@ -52,6 +52,12 @@ export const Header: React.FC = () => {
         >
           Code
         </button>
+        <button
+          className={`dsk-nav-tab ${view === 'scan' ? 'active' : ''}`}
+          onClick={() => setView('scan')}
+        >
+          Audit
+        </button>
       </nav>
     </header>
   );

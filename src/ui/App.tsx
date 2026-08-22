@@ -5,6 +5,7 @@ import { Header } from './components/Header';
 import { SetTokensView } from './components/SetTokensView';
 import { BuildComponentsView } from './components/BuildComponentsView';
 import { CodeExportView } from './components/CodeExportView';
+import { AuditView } from './components/AuditView';
 import { GeneratingOverlay } from './components/Generating';
 import { SuccessOverlay } from './components/Success';
 import { ImportPaletteModal } from './components/ImportPaletteModal';
@@ -62,6 +63,7 @@ export default function App() {
         {(view === 'set-tokens' || view === 'brand' || view === 'typography') && <SetTokensView />}
         {(view === 'build-components' || view === 'components') && <BuildComponentsView />}
         {(view === 'code' || view === 'export') && <CodeExportView />}
+        {view === 'scan' && <AuditView />}
       </main>
 
       {overlay === 'generating' && <GeneratingOverlay />}
