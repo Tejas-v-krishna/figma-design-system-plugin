@@ -122,6 +122,20 @@ const COMPONENT_DEFS: ComponentDef[] = [
  * primitive / semantic / component name so the factory and composed pages can
  * bind fills by key. No-ops (empty map) when the option is off.
  */
+/**
+ * Mode id of a freshly created collection.
+ *
+ * createVariableCollection always returns one mode, but reading modes[0]
+ * directly cannot prove it. Throwing a named error here beats letting
+ * `undefined` reach setValueForMode, which fails with a message that mentions
+ * neither the collection nor variables.
+ */
+function firstModeId(collection: VariableCollection): string {
+  const mode = collection.modes[0];
+  if (!mode) throw new Error(`Variable collection "${collection.name}" was created with no modes.`);
+  return mode.modeId;
+}
+
 export function createVariables(tokens: DesignTokens, config: GenerationConfig): VariableMap {
   const map = emptyVariableMap();
   if (!config.options.createVariables) return map;
@@ -130,7 +144,7 @@ export function createVariables(tokens: DesignTokens, config: GenerationConfig):
 
   // ---------- Tier 1: Primitives ----------
   const primCollection = figma.variables.createVariableCollection(`${brand} / Primitives`);
-  const primMode = primCollection.modes[0].modeId;
+  const primMode = firstModeId(primCollection);
   primCollection.renameMode(primMode, 'Light');
 
   const primitiveByName: Record<string, Variable> = {};
@@ -155,7 +169,10 @@ export function createVariables(tokens: DesignTokens, config: GenerationConfig):
   map.primitive['Color/White'] = primitiveByName['Color/White'];
   map.primitive['Color/Black'] = primitiveByName['Color/Black'];
 
-  const lookupPrimitive = (ref: ColorRef): Variable => {
+  // Returns undefined for a shade the palette does not contain, rather than
+  // claiming a Variable. An undefined passed to createVariableAlias throws from
+  // inside the Figma API, which used to abort the whole variable pass.
+  const lookupPrimitive = (ref: ColorRef): Variable | undefined => {
     const [name, shade] = ref;
     if (name === 'white') return primitiveByName['Color/White'];
     if (name === 'black') return primitiveByName['Color/Black'];
@@ -164,16 +181,22 @@ export function createVariables(tokens: DesignTokens, config: GenerationConfig):
 
   // ---------- Tier 2: Semantic ----------
   const semCollection = figma.variables.createVariableCollection(`${brand} / Semantic`);
-  const semLight = semCollection.modes[0].modeId;
+  const semLight = firstModeId(semCollection);
   semCollection.renameMode(semLight, 'Light');
   const semDark = config.options.includeDarkMode ? semCollection.addMode('Dark') : undefined;
 
   for (const d of SEMANTIC_DEFS) {
     const name = semanticColorKey(d.name);
+    const lightRef = lookupPrimitive(d.light);
+    if (!lightRef) {
+      console.warn(`[design-system-kit] skipping semantic variable ${name}: no primitive for ${d.light.join('/')}`);
+      continue;
+    }
     const v = figma.variables.createVariable(name, semCollection, 'COLOR');
-    v.setValueForMode(semLight, figma.variables.createVariableAlias(lookupPrimitive(d.light)));
+    v.setValueForMode(semLight, figma.variables.createVariableAlias(lightRef));
     if (semDark) {
-      v.setValueForMode(semDark, figma.variables.createVariableAlias(lookupPrimitive(d.dark ?? d.light)));
+      const darkRef = lookupPrimitive(d.dark ?? d.light) ?? lightRef;
+      v.setValueForMode(semDark, figma.variables.createVariableAlias(darkRef));
     }
     map.semantic[name] = v;
   }
@@ -201,7 +224,7 @@ export function createVariables(tokens: DesignTokens, config: GenerationConfig):
 
   // ---------- Tier 3: Component ----------
   const compCollection = figma.variables.createVariableCollection(`${brand} / Components`);
-  const compLight = compCollection.modes[0].modeId;
+  const compLight = firstModeId(compCollection);
   compCollection.renameMode(compLight, 'Light');
   const compDark = config.options.includeDarkMode ? compCollection.addMode('Dark') : undefined;
 
