@@ -15,11 +15,19 @@
   --ok: #09090b;
   --radius: 14px;
   --radius-lg: 22px;
+
+  /* This iframe cannot load webfonts. vite.config.ts builds its own HTML shell
+     with no <link> tags, and manifest.json declares
+     networkAccess.allowedDomains: ["none"], so a font request is blocked twice
+     over. Name only faces the host OS already has — the panel used to ask for
+     'Google Sans' and fall back silently on every platform. */
+  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 }
 
 * {
   box-sizing: border-box;
-  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-family: var(--font-ui) !important;
 }
 
 html, body {
@@ -27,7 +35,7 @@ html, body {
   padding: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-family: var(--font-ui) !important;
   font-size: 13px;
   letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
@@ -40,7 +48,7 @@ h1, h2, h3, h4, h5, h6,
 .figr-top-tab.active,
 .figr-primary-btn,
 .figr-sidebar-item.active {
-  font-family: 'Google Sans', sans-serif !important;
+  font-family: var(--font-ui) !important;
   letter-spacing: -0.03em;
 }
 
@@ -741,7 +749,7 @@ h1, h2, h3, h4, h5, h6,
   margin: 0;
   max-height: 240px;
   overflow-y: auto;
-  font-family: monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
   color: #4ade80;
 }
@@ -855,7 +863,7 @@ h4 { font-size: 12px; margin: 0 0 8px; color: var(--text-dim); text-transform: u
 }
 .color-row input[type='color']::-webkit-color-swatch-wrapper { padding: 0; }
 .color-row input[type='color']::-webkit-color-swatch { border: none; border-radius: 6px; }
-.color-row .hex { flex: 1; font-family: 'SF Mono', 'Roboto Mono', monospace; }
+.color-row .hex { flex: 1; font-family: var(--font-mono); }
 
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
@@ -971,7 +979,7 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
 .modal-backdrop { position: fixed; inset: 0; background: rgba(8, 10, 14, 0.7); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 60; animation: fade 0.18s ease; }
 .modal { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 22px; width: 460px; max-width: 92vw; box-shadow: var(--shadow); }
 .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.modal textarea.code-input { width: 100%; min-height: 150px; background: #0b0d12; border: 1px solid var(--border); border-radius: 10px; color: #cdd6e4; padding: 12px; font-family: 'SF Mono', 'Roboto Mono', monospace; font-size: 12px; line-height: 1.55; resize: vertical; }
+.modal textarea.code-input { width: 100%; min-height: 150px; background: #0b0d12; border: 1px solid var(--border); border-radius: 10px; color: #cdd6e4; padding: 12px; font-family: var(--font-mono); font-size: 12px; line-height: 1.55; resize: vertical; }
 .modal textarea.code-input:focus { outline: none; border-color: var(--accent); }
 .modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 14px; }
 .modal-error { background: var(--danger-soft); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 9px 12px; border-radius: 9px; font-size: 12.5px; margin-top: 10px; }
@@ -989,7 +997,7 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
 .format-tab:hover { color: var(--text); }
 .format-tab.active { background: var(--grad); border-color: transparent; color: #fff; }
 .export-actions { display: flex; gap: 9px; }
-.code-box { min-height: 300px; background: #0b0d12; border: 1px solid var(--border); border-radius: 12px; color: #cdd6e4; padding: 14px; font-family: 'SF Mono', 'Roboto Mono', monospace; font-size: 12px; line-height: 1.55; resize: vertical; }
+.code-box { min-height: 300px; background: #0b0d12; border: 1px solid var(--border); border-radius: 12px; color: #cdd6e4; padding: 14px; font-family: var(--font-mono); font-size: 12px; line-height: 1.55; resize: vertical; }
 .error-box { background: var(--danger-soft); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 10px 12px; border-radius: 9px; font-size: 12.5px; }
 
 /* ---------- Scan ---------- */
@@ -1060,7 +1068,7 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
 .figr-inspector-subtitle {
   font-size: 11px;
   color: #666666;
-  font-family: monospace;
+  font-family: var(--font-mono);
 }
 
 .figr-generate-ext-btn {
@@ -1150,7 +1158,7 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
 .figr-shade-thumb-hex {
   font-size: 9px;
   color: var(--text-dim, #a1a1aa);
-  font-family: monospace;
+  font-family: var(--font-mono);
 }
 
 .figr-gradients-grid {
@@ -1232,7 +1240,7 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
 
 .figr-stop-hex {
   font-size: 8.5px;
-  font-family: monospace;
+  font-family: var(--font-mono);
   color: var(--text-dim, #a1a1aa);
 }
 
@@ -1295,7 +1303,7 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   flex-direction: column;
   gap: 12px;
   color: #000000;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-ui);
   animation: pop 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
 
@@ -1519,7 +1527,7 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   font-weight: 700;
   padding: 4px 8px;
   border-radius: 6px;
-  font-family: monospace;
+  font-family: var(--font-mono);
 }
 
 .figr-alpha-val {
