@@ -1092,10 +1092,15 @@ function createPatternsPage(page: PageNode, tokens: DesignTokens, config: Genera
   // Stats row pattern
   const stats = figma.createFrame();
   stats.name = 'Stats'; stats.layoutMode = 'HORIZONTAL'; stats.itemSpacing = 16; stats.fills = []; stats.clipsContent = false;
-  ['Users', 'Revenue', 'Growth'].forEach((label, i) => {
+  const wireStats: { label: string; value: string }[] = [
+    { label: 'Users', value: '12.4k' },
+    { label: 'Revenue', value: '$84k' },
+    { label: 'Growth', value: '+18%' },
+  ];
+  wireStats.forEach(({ label, value }) => {
     const s = figma.createFrame(); s.name = label; s.layoutMode = 'VERTICAL'; s.itemSpacing = 4; s.paddingTop = s.paddingBottom = 16; s.paddingLeft = s.paddingRight = 20;
     s.cornerRadius = 12; s.fills = [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }]; s.strokes = [{ type: 'SOLID', color: hexToRgb(tokens.colors.neutral.shades['200']) }]; s.strokeWeight = 1; s.resize(140, 90);
-    const v = figma.createText(); v.fontName = resolveFont(config.fontFamily.heading, 700); v.fontSize = 24; v.characters = ['12.4k', '$84k', '+18%'][i]; v.fills = [{ type: 'SOLID', color: hexToRgb(tokens.colors.primary.shades['600']) }]; s.appendChild(v);
+    const v = figma.createText(); v.fontName = resolveFont(config.fontFamily.heading, 700); v.fontSize = 24; v.characters = value; v.fills = [{ type: 'SOLID', color: hexToRgb(tokens.colors.primary.shades['600']) }]; s.appendChild(v);
     const l = figma.createText(); l.fontName = resolveFont(config.fontFamily.body, 400); l.fontSize = 12; l.characters = label; l.fills = [{ type: 'SOLID', color: hexToRgb(tokens.colors.neutral.shades['500']) }]; s.appendChild(l);
     stats.appendChild(s);
   });
@@ -1251,7 +1256,12 @@ async function createPlaygroundPage(
   stats.layoutMode = 'HORIZONTAL';
   stats.itemSpacing = 12;
   stats.fills = [];
-  ['$48.2k', '1,204', '+12%'].forEach((v, i) => {
+  const dashStats: { label: string; value: string }[] = [
+    { label: 'Revenue', value: '$48.2k' },
+    { label: 'Orders', value: '1,204' },
+    { label: 'Growth', value: '+12%' },
+  ];
+  dashStats.forEach(({ label, value: v }, i) => {
     const c = vbox(`stat-${i}`);
     c.itemSpacing = 4;
     pad(c, 14, 16);
@@ -1259,7 +1269,7 @@ async function createPlaygroundPage(
     setFill(c, '#FFFFFF', semanticColorKey('Surface/Raised'), styleMap, varMap);
     setStroke(c, tokens.colors.neutral.shades['200'], 1, semanticColorKey('Border/Default'), styleMap, varMap);
     c.appendChild(text({ characters: v, fontFamily: config.fontFamily.heading, weight: 700, fontSize: 20, fill: tokens.colors.primary.shades['600'] }));
-    c.appendChild(text({ characters: ['Revenue', 'Orders', 'Growth'][i], fontFamily: config.fontFamily.body, weight: 400, fontSize: 12, fill: tokens.colors.neutral.shades['500'] }));
+    c.appendChild(text({ characters: label, fontFamily: config.fontFamily.body, weight: 400, fontSize: 12, fill: tokens.colors.neutral.shades['500'] }));
     stats.appendChild(c);
   });
   main.appendChild(stats);
@@ -1589,47 +1599,41 @@ async function runColorExtensions(
 
   // Generate All 11 Shades
   const shades = generateColorShades(baseHex);
-  const shadeKeys: Array<keyof typeof shades> = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+  const shadeKeys: ShadeStop[] = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
 
-  for (let i = 0; i < shadeKeys.length; i += 2) {
+  // Two cards per row. Chunked up front so the body iterates a row's keys
+  // instead of re-deriving shadeKeys[i] and shadeKeys[i + 1] and re-checking
+  // both against the length on every card.
+  const shadeRows: ShadeStop[][] = [];
+  for (let i = 0; i < shadeKeys.length; i += 2) shadeRows.push(shadeKeys.slice(i, i + 2));
+
+  for (const [rowIdx, keys] of shadeRows.entries()) {
     const row = figma.createFrame();
-    row.name = `Shades Row ${Math.floor(i / 2) + 1}`;
+    row.name = `Shades Row ${rowIdx + 1}`;
     row.layoutMode = 'HORIZONTAL';
     row.primaryAxisSizingMode = 'AUTO';
     row.counterAxisSizingMode = 'AUTO';
     row.itemSpacing = 24;
     row.fills = [];
 
-    const k1 = shadeKeys[i];
-    const hex1 = shades[k1];
-    const cardTitle1 = k1 === 500 && apiName ? `Shade ${k1} (${apiName})` : `Shade ${k1}`;
-    const card1 = await buildCustomCard(
-      cardTitle1,
-      `Hex: #${hex1.replace('#', '').toUpperCase()}`,
-      `RGB: (${Math.round(hexToRgb(hex1).r * 255)}. ${Math.round(hexToRgb(hex1).g * 255)}. ${Math.round(hexToRgb(hex1).b * 255)})`,
-      [{ type: 'SOLID', color: hexToRgb(hex1) }],
-      i + 1 < shadeKeys.length ? 464 : 952,
-      220,
-      isLightColorHex(hex1),
-      headingFont
-    );
-    row.appendChild(card1);
+    // A lone card on the final row spans the full width rather than leaving a gap.
+    const cardWidth = keys.length > 1 ? 464 : 952;
 
-    if (i + 1 < shadeKeys.length) {
-      const k2 = shadeKeys[i + 1];
-      const hex2 = shades[k2];
-      const cardTitle2 = k2 === 500 && apiName ? `Shade ${k2} (${apiName})` : `Shade ${k2}`;
-      const card2 = await buildCustomCard(
-        cardTitle2,
-        `Hex: #${hex2.replace('#', '').toUpperCase()}`,
-        `RGB: (${Math.round(hexToRgb(hex2).r * 255)}. ${Math.round(hexToRgb(hex2).g * 255)}. ${Math.round(hexToRgb(hex2).b * 255)})`,
-        [{ type: 'SOLID', color: hexToRgb(hex2) }],
-        464,
-        220,
-        isLightColorHex(hex2),
-        headingFont
+    for (const k of keys) {
+      const hex = shades[k];
+      const rgb = hexToRgb(hex);
+      row.appendChild(
+        await buildCustomCard(
+          k === 500 && apiName ? `Shade ${k} (${apiName})` : `Shade ${k}`,
+          `Hex: #${hex.replace('#', '').toUpperCase()}`,
+          `RGB: (${Math.round(rgb.r * 255)}. ${Math.round(rgb.g * 255)}. ${Math.round(rgb.b * 255)})`,
+          [{ type: 'SOLID', color: rgb }],
+          cardWidth,
+          220,
+          isLightColorHex(hex),
+          headingFont
+        )
       );
-      row.appendChild(card2);
     }
 
     shadesBoard.appendChild(row);
@@ -1701,30 +1705,37 @@ async function buildGradientsBoard(
   );
   gradientsBoard.appendChild(gradientsHeroHeader);
 
-  for (let i = 0; i < gradients.length; i += 2) {
+  // Two cards per row, chunked up front for the same reason as the shade rows.
+  const gradientRows: GradientPreset[][] = [];
+  for (let i = 0; i < gradients.length; i += 2) gradientRows.push(gradients.slice(i, i + 2));
+
+  for (const [rowIdx, presets] of gradientRows.entries()) {
     const row = figma.createFrame();
-    row.name = `Gradients Row ${Math.floor(i / 2) + 1}`;
+    row.name = `Gradients Row ${rowIdx + 1}`;
     row.layoutMode = 'HORIZONTAL';
     row.primaryAxisSizingMode = 'AUTO';
     row.counterAxisSizingMode = 'AUTO';
     row.itemSpacing = 24;
     row.fills = [];
 
-    for (let j = i; j < Math.min(i + 2, gradients.length); j++) {
-      const preset = applyCustomStops(gradients[j], customGradientStops);
+    const cardWidth = presets.length > 1 ? 464 : 952;
+
+    for (const base of presets) {
+      const preset = applyCustomStops(base, customGradientStops);
       // A gradient card is dark-on-light only when its own stops are light.
       const light = preset.stops.every((s) => isLightColorHex(s.color));
-      const card = await buildCustomCard(
-        preset.name,
-        preset.description,
-        preset.stops.map((s) => s.color.toUpperCase()).join(' → '),
-        [convertGradientToFigmaPaint(preset)],
-        gradients.length - i > 1 ? 464 : 952,
-        220,
-        light,
-        fontFamily
+      row.appendChild(
+        await buildCustomCard(
+          preset.name,
+          preset.description,
+          preset.stops.map((s) => s.color.toUpperCase()).join(' → '),
+          [convertGradientToFigmaPaint(preset)],
+          cardWidth,
+          220,
+          light,
+          fontFamily
+        )
       );
-      row.appendChild(card);
     }
 
     gradientsBoard.appendChild(row);
@@ -1747,6 +1758,11 @@ function applyCustomStops(
 
   return {
     ...preset,
-    stops: preset.stops.map((stop, i) => (i < custom.length ? { ...stop, color: custom[i] } : stop)),
+    // An override entry that is missing or empty leaves the derived stop alone,
+    // so a partial override cannot put an undefined colour into a paint.
+    stops: preset.stops.map((stop, i) => {
+      const color = custom[i];
+      return color ? { ...stop, color } : stop;
+    }),
   };
 }
