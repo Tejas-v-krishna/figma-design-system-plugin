@@ -1,6 +1,6 @@
 {
-  "name": "FIGR Design System",
-  "id": "figr-design-system-plugin",
+  "name": "Design System Kit",
+  "id": "design-system-kit",
   "api": "1.0.0",
   "main": "dist/code.js",
   "documentAccess": "dynamic-page",
