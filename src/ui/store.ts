@@ -225,7 +225,9 @@ export const useStore = create<UIState>((set, get) => ({
   setOverlay: (o) => set({ overlay: o }),
   setOptionsOpen: (b) => set({ optionsOpen: b }),
   setImportOpen: (b) => set({ importOpen: b }),
-  clearError: () => set({ lastError: null }),
+  // Dismissing the banner has to clear the feature-level errors too, otherwise
+  // the next exportComplete/scanComplete would leave stale state behind.
+  clearError: () => set({ lastError: null, exportError: null, scanError: null }),
 
   updateRadiusItem: (id, value) =>
     set((s) => ({
@@ -348,11 +350,24 @@ export const useStore = create<UIState>((set, get) => ({
       progress: success ? 100 : 0,
     }),
 
+  // Export and scan failures also raise lastError so App's banner shows them.
+  // Without this the only feedback for a failed export was the button leaving
+  // its busy state — exportError was set and never rendered anywhere.
   exportComplete: (success, result, message) =>
-    set({ exportBusy: false, exportResult: success ? result : null, exportError: success ? null : message ?? 'Export failed' }),
+    set({
+      exportBusy: false,
+      exportResult: success ? result : null,
+      exportError: success ? null : message ?? 'Export failed',
+      lastError: success ? null : message ?? 'Export failed',
+    }),
 
   scanComplete: (success, report, message) =>
-    set({ scanBusy: false, scanResult: success ? report : null, scanError: success ? null : message ?? 'Scan failed' }),
+    set({
+      scanBusy: false,
+      scanResult: success ? report : null,
+      scanError: success ? null : message ?? 'Scan failed',
+      lastError: success ? null : message ?? 'Scan failed',
+    }),
 
   setAvailableFonts: (fonts) => set({ availableFonts: fonts }),
 
