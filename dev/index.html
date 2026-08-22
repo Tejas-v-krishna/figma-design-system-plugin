@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Design System Kit — dev harness</title>
+    <style>
+      /* figma.showUI() in src/plugin/main.ts asks for 720x800. Pin the harness to
+         the same box so layout seen here is layout seen in Figma. */
+      html, body { margin: 0; background: #d4d4d8; }
+      #root { width: 720px; height: 800px; overflow: hidden; background: #eaeaea; }
+      .dsk-dev-banner {
+        width: 720px; box-sizing: border-box; padding: 5px 10px;
+        font: 600 11px/1.4 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #1c1c1e; color: #fbbf24; letter-spacing: 0.02em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dsk-dev-banner">
+      DEV HARNESS — mock plugin backend, no Figma canvas. Generate is simulated;
+      export output is real.
+    </div>
+    <div id="root"></div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
