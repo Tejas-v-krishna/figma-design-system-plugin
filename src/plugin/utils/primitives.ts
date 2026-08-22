@@ -302,7 +302,7 @@ export interface MinimalEffects {
  * opaque error thrown from inside the API rather than from the caller. A
  * malformed component degrades to a visible near-black shadow instead.
  */
-function parseRgba(input: string): RGBA {
+export function parseRgba(input: string): RGBA {
   const fallback: RGBA = { r: 0, g: 0, b: 0, a: 0.1 };
   const m = /rgba?\(([^)]+)\)/.exec(input);
   const body = m?.[1];

@@ -34,6 +34,7 @@ import {
   rect,
   pad,
   flushStyleBindings,
+  parseRgba,
 } from '../utils/primitives';
 import { colorShade, radiusPx, shadow } from '../utils/tokenAccess';
 import { setLastTokens } from '../utils/tokensStore';
@@ -1322,13 +1323,6 @@ async function createPlaygroundPage(
 }
 
 // ---------------- helpers ----------------
-
-function parseRgba(input: string): RGBA {
-  const m = input.match(/rgba?\(([^)]+)\)/);
-  if (!m) return { r: 0, g: 0, b: 0, a: 0.1 };
-  const p = m[1].split(',').map((x) => parseFloat(x.trim()));
-  return { r: (p[0] || 0) / 255, g: (p[1] || 0) / 255, b: (p[2] || 0) / 255, a: p[3] ?? 0.1 };
-}
 
 function convertGradientToFigmaPaint(preset: GradientPreset): GradientPaint {
   const gradientStops = preset.stops.map((s) => {
