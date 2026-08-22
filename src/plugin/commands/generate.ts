@@ -8,7 +8,7 @@ import {
 } from '../../shared/types';
 import { COMPONENT_DEFINITIONS } from '../../shared/component-definitions';
 import { generateSemanticColors, hexToRgb, generateColorShades, generateGradientsForColor } from '../../shared/color-utils';
-import { fetchColorName } from '../../shared/color-naming';
+import { getColorName } from '../../shared/color-naming';
 import { GradientPreset } from '../../shared/types';
 import {
   generateTypographyTokens,
@@ -137,7 +137,7 @@ export async function generateDesignSystem(
 
     const colorPage = await openPage('🎨 Color System');
     const cleanHex = config.primaryColor.replace('#', '').toUpperCase();
-    const name = config.colorNames?.[cleanHex] || (await fetchColorName(config.primaryColor)) || `#${cleanHex}`;
+    const name = config.colorNames?.[cleanHex] || getColorName(config.primaryColor) || `#${cleanHex}`;
     const board = await buildGradientsBoard(config.primaryColor, name, `${name} Gradients Board`);
     replaceBoard(colorPage, board);
 
@@ -156,7 +156,8 @@ export async function generateDesignSystem(
   }
 
   // Default / All mode
-  if (!config.componentsToGenerate || config.componentsToGenerate.length === 0) {    config.componentsToGenerate = COMPONENT_DEFINITIONS.map((c) => c.name);
+  if (!config.componentsToGenerate || config.componentsToGenerate.length === 0) {
+    config.componentsToGenerate = COMPONENT_DEFINITIONS.map((c) => c.name);
   }
 
   const pages = createPages();
@@ -1514,7 +1515,7 @@ export async function generateColorExtensions(
   await figma.setCurrentPageAsync(colorPage);
 
   const cleanHex = baseHex.replace('#', '').toUpperCase();
-  const apiName = _config?.colorNames?.[cleanHex] || (await fetchColorName(baseHex));
+  const apiName = _config?.colorNames?.[cleanHex] || getColorName(baseHex);
   const resolvedName = colorName || apiName || `#${cleanHex}`;
   const displayTitle = apiName && apiName.toLowerCase() !== resolvedName.toLowerCase()
     ? `${resolvedName} (${apiName})`

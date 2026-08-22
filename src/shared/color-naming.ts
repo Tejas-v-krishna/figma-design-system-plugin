@@ -1,4 +1,7 @@
-// FIGR Design System - Color Naming Service (PalettesPro API + Offline Matching)
+// Design System Kit — offline colour naming.
+//
+// Nearest-match against a local list. No network: the plugin manifest blocks
+// all outbound requests, so a remote naming API can never succeed here.
 const nameCache: Map<string, string> = new Map();
 
 // Comprehensive color list for guaranteed offline matching
@@ -101,46 +104,23 @@ export function getNearestColorName(hex: string): string {
 }
 
 /**
- * Fetch the color name from PalettesPro API with offline fallback matching.
+ * Resolve a human-readable name for a hex colour.
+ *
+ * This used to try palettespro.com and then thecolorapi.com before falling back
+ * to local matching. manifest.json declares `networkAccess.allowedDomains:
+ * ["none"]`, so both requests were blocked by the sandbox every single time —
+ * every colour name paid for two doomed round-trips and then used the local
+ * result anyway. Naming is now purely local, which also keeps the plugin
+ * offline and removes a network-permission question from Figma's review.
  */
-export async function fetchColorName(hex: string): Promise<string> {
+export function getColorName(hex: string): string {
   if (!hex) return '';
   const cleanHex = hex.replace('#', '').toUpperCase();
 
-  if (nameCache.has(cleanHex)) {
-    return nameCache.get(cleanHex)!;
-  }
+  const cached = nameCache.get(cleanHex);
+  if (cached !== undefined) return cached;
 
-  try {
-    const url = `https://palettespro.com/api/v1/color-name?color=${encodeURIComponent(cleanHex)}`;
-    const response = await fetch(url);
-    if (response.ok) {
-      const data = await response.json();
-      const apiName = data?.name || data?.closest_color?.label || data?.colorName;
-      if (apiName) {
-        nameCache.set(cleanHex, apiName);
-        return apiName;
-      }
-    }
-  } catch (error) {
-    // Ignore API error and fall back to local matching
-  }
-
-  // Fallback to TheColorAPI if PalettesPro fails
-  try {
-    const response = await fetch(`https://www.thecolorapi.com/id?hex=${cleanHex}`);
-    if (response.ok) {
-      const data = await response.json();
-      if (data?.name?.value) {
-        nameCache.set(cleanHex, data.name.value);
-        return data.name.value;
-      }
-    }
-  } catch (error) {
-    // Ignore API error
-  }
-
-  const fallbackName = getNearestColorName(cleanHex);
-  nameCache.set(cleanHex, fallbackName);
-  return fallbackName;
+  const name = getNearestColorName(cleanHex);
+  nameCache.set(cleanHex, name);
+  return name;
 }

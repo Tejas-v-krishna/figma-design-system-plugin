@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useStore, TokenCategory } from '../store';
 import { generateColorShades, generateGradientsForColor, hexToHsl, hexToRgb, interpolateOklchStops } from '../../shared/color-utils';
-import { fetchColorName, getNearestColorName } from '../../shared/color-naming';
+import { getColorName, getNearestColorName } from '../../shared/color-naming';
 import { Info, ChevronUp, Sun, Sparkles, Layers, Palette } from 'lucide-react';
 import { ColorPickerModal } from './ColorPickerModal';
 
@@ -53,26 +53,18 @@ export const SetTokensView: React.FC = () => {
       config.accentColor || '#8B5CF6',
     ];
 
-    let active = true;
-    const resolveNames = async () => {
-      const map: Record<string, string> = { ...colorNames };
-      for (const hex of hexes) {
-        if (!hex) continue;
-        const clean = hex.replace('#', '').toUpperCase();
-        const name = await fetchColorName(clean);
-        map[clean] = name;
-        map['#' + clean] = name;
-      }
-      if (active) {
-        setColorNames(map);
-        updateConfig({ colorNames: map });
-      }
-    };
-
-    resolveNames();
-    return () => {
-      active = false;
-    };
+    // Naming is synchronous and local, so this no longer needs an async effect
+    // or an `active` cancellation guard — there's no in-flight request to race.
+    const map: Record<string, string> = { ...colorNames };
+    for (const hex of hexes) {
+      if (!hex) continue;
+      const clean = hex.replace('#', '').toUpperCase();
+      const name = getColorName(clean);
+      map[clean] = name;
+      map['#' + clean] = name;
+    }
+    setColorNames(map);
+    updateConfig({ colorNames: map });
   }, [
     config.primaryColor,
     config.secondaryColor,
