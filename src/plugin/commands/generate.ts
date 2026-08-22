@@ -130,6 +130,31 @@ export async function generateDesignSystem(
     return { stats: boardStats(targetMode, tokens, styleMap, varMap) };
   }
 
+  // `gradients` is derived from the brand colour rather than from a token
+  // array, so it routes to the colour-derived board instead of TOKEN_BOARDS.
+  if (targetMode === 'gradients') {
+    update('creating-pages', 50, 'Building Gradients board…');
+
+    const colorPage = await openPage('🎨 Color System');
+    const cleanHex = config.primaryColor.replace('#', '').toUpperCase();
+    const name = config.colorNames?.[cleanHex] || (await fetchColorName(config.primaryColor)) || `#${cleanHex}`;
+    const board = await buildGradientsBoard(config.primaryColor, name, `${name} Gradients Board`);
+    replaceBoard(colorPage, board);
+
+    figma.viewport.scrollAndZoomIntoView([board]);
+    update('complete', 100, 'Gradients generated successfully!');
+    setLastTokens(tokens, config);
+    return {
+      stats: {
+        tokensCreated: generateGradientsForColor(config.primaryColor).length,
+        stylesCreated: 0,
+        variablesCreated: 0,
+        componentsCreated: 0,
+        pagesCreated: 1,
+      },
+    };
+  }
+
   // Default / All mode
   if (!config.componentsToGenerate || config.componentsToGenerate.length === 0) {    config.componentsToGenerate = COMPONENT_DEFINITIONS.map((c) => c.name);
   }
