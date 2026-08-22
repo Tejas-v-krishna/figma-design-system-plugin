@@ -15,7 +15,7 @@ export const Header: React.FC = () => {
 
         <div className="dsk-header-actions">
           <button
-            className="figr-icon-btn"
+            className="dsk-icon-btn"
             title="Import a palette"
             aria-label="Import a palette"
             onClick={() => setImportOpen(true)}
@@ -23,7 +23,7 @@ export const Header: React.FC = () => {
             <Palette size={16} />
           </button>
           <button
-            className="figr-icon-btn"
+            className="dsk-icon-btn"
             title="Generation options"
             aria-label="Generation options"
             onClick={() => setOptionsOpen(true)}

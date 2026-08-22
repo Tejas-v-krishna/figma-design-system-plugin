@@ -60,7 +60,7 @@ export const CodeExportView: React.FC = () => {
           <div className="figr-code-block-wrapper">
             <div className="figr-code-block-header">
               <span>{exportFormat.toUpperCase()} Export Output</span>
-              <button className="figr-copy-btn" onClick={handleCopy}>
+              <button className="dsk-copy-btn" onClick={handleCopy}>
                 {copied ? <Check size={14} /> : <Copy size={14} />}
                 {copied ? 'Copied!' : 'Copy Code'}
               </button>
@@ -69,7 +69,7 @@ export const CodeExportView: React.FC = () => {
           </div>
         ) : (
           <button
-            className="figr-primary-btn hero-btn"
+            className="dsk-primary-btn hero-btn"
             onClick={() => handleExport(exportFormat)}
             disabled={exportBusy}
           >

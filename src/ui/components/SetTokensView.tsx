@@ -97,13 +97,13 @@ export const SetTokensView: React.FC = () => {
           <div className="figr-token-panel">
             <div className="figr-token-header">
               <h2>Radius</h2>
-              <button className="figr-link-btn" onClick={addRadiusItem}>
+              <button className="dsk-link-btn" onClick={addRadiusItem}>
                 + New radius
               </button>
             </div>
             <div className="figr-token-group-bar">
               <span>All Radius</span>
-              <button className="figr-icon-add" onClick={addRadiusItem}>+</button>
+              <button className="dsk-icon-add" onClick={addRadiusItem}>+</button>
             </div>
             <div className="figr-token-rows">
               {radiusList.map((item) => (
@@ -128,13 +128,13 @@ export const SetTokensView: React.FC = () => {
           <div className="figr-token-panel">
             <div className="figr-token-header">
               <h2>Stroke</h2>
-              <button className="figr-link-btn" onClick={addStrokeItem}>
+              <button className="dsk-link-btn" onClick={addStrokeItem}>
                 + New stroke
               </button>
             </div>
             <div className="figr-token-group-bar">
               <span>All Stroke</span>
-              <button className="figr-icon-add" onClick={addStrokeItem}>+</button>
+              <button className="dsk-icon-add" onClick={addStrokeItem}>+</button>
             </div>
             <div className="figr-token-rows">
               {strokeList.map((item) => (
@@ -159,13 +159,13 @@ export const SetTokensView: React.FC = () => {
           <div className="figr-token-panel">
             <div className="figr-token-header">
               <h2>Effects</h2>
-              <button className="figr-link-btn">
+              <button className="dsk-link-btn">
                 + New effects
               </button>
             </div>
             <div className="figr-token-group-bar">
               <span>All Effects</span>
-              <button className="figr-icon-add">+</button>
+              <button className="dsk-icon-add">+</button>
             </div>
             <div className="figr-token-rows">
               {effectsList.map((item) => (
@@ -245,7 +245,7 @@ export const SetTokensView: React.FC = () => {
               </label>
               <div className="figr-color-picker-wrap" onClick={(e) => e.stopPropagation()}>
                 <div
-                  className="figr-custom-swatch-button"
+                  className="dsk-custom-swatch-button"
                   style={{ backgroundColor: hex }}
                   title={`Click to pick color for ${label}`}
                   onClick={() => handleOpenPicker(hex, label, onUpdateHex)}
@@ -270,7 +270,7 @@ export const SetTokensView: React.FC = () => {
           <div className="figr-token-panel">
             <div className="figr-token-header">
               <h2>Colors</h2>
-              <button className="figr-link-btn" onClick={handleAddColor}>
+              <button className="dsk-link-btn" onClick={handleAddColor}>
                 + Add another color
               </button>
             </div>
@@ -334,7 +334,7 @@ export const SetTokensView: React.FC = () => {
                   </div>
                 </div>
                 <button
-                  className="figr-generate-ext-btn"
+                  className="dsk-generate-ext-btn"
                   onClick={() => generateColorExtensions(selectedColor.hex, selectedColor.name, customStops)}
                 >
                   <Sparkles size={14} />
@@ -344,7 +344,7 @@ export const SetTokensView: React.FC = () => {
 
               {/* 11 Shades Ramp */}
               <div className="figr-inspector-section">
-                <div className="figr-section-label">
+                <div className="dsk-section-label">
                   <Layers size={14} />
                   <span>Generated Shades (50 – 950)</span>
                 </div>
@@ -377,7 +377,7 @@ export const SetTokensView: React.FC = () => {
             <div className="figr-token-header">
               <h2>Gradients</h2>
               <button
-                className="figr-link-btn"
+                className="dsk-link-btn"
                 onClick={() => generateColorExtensions(selectedColor.hex, selectedColor.name, customStops)}
               >
                 <Sparkles size={14} /> Generate Gradients on Canvas ❖
@@ -404,7 +404,7 @@ export const SetTokensView: React.FC = () => {
 
               {/* 9 Gradients Suite */}
               <div className="figr-inspector-section">
-                <div className="figr-section-label">
+                <div className="dsk-section-label">
                   <Palette size={14} />
                   <span>Gradients Suite</span>
                 </div>
@@ -555,11 +555,11 @@ export const SetTokensView: React.FC = () => {
       </main>
 
       <footer className="dsk-bottom-bar">
-        <div className="figr-split-action">
-          <button className="figr-primary-btn" onClick={() => startGeneration(tokenCategory)}>
+        <div className="dsk-split-action">
+          <button className="dsk-primary-btn" onClick={() => startGeneration(tokenCategory)}>
             Create {tokenCategory} variables in <span className="figma-icon">❖</span>
           </button>
-          <button className="figr-split-caret" onClick={() => startGeneration(tokenCategory)}>
+          <button className="dsk-split-caret" onClick={() => startGeneration(tokenCategory)}>
             <ChevronUp size={16} />
           </button>
         </div>

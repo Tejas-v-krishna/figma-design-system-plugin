@@ -214,27 +214,27 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
         {/* Sliders Section */}
         <div className="figr-picker-sliders">
           <div className="figr-picker-slider-row">
-            <button className="figr-pipette-btn" title="Pick color">
+            <button className="dsk-pipette-btn" title="Pick color">
               <Pipette size={14} />
             </button>
             <div
-              className="figr-slider-bar figr-hue-slider"
+              className="dsk-slider-bar figr-hue-slider"
               onPointerDown={(e) => {
                 isDraggingHue.current = true;
                 handleHuePointer(e);
               }}
             >
               <div
-                className="figr-slider-handle"
+                className="dsk-slider-handle"
                 style={{ left: `${(hue / 360) * 100}%`, backgroundColor: pureHueHex }}
               />
             </div>
           </div>
 
           <div className="figr-picker-slider-row">
-            <div className="figr-slider-spacer" />
+            <div className="dsk-slider-spacer" />
             <div
-              className="figr-slider-bar figr-alpha-slider"
+              className="dsk-slider-bar figr-alpha-slider"
               style={{
                 backgroundImage: `linear-gradient(to right, transparent, ${currentHex}), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="4" height="4" fill="%23ccc"/><rect x="4" width="4" height="4" fill="%23fff"/><rect y="4" width="4" height="4" fill="%23fff"/><rect x="4" y="4" width="4" height="4" fill="%23ccc"/></svg>')`,
               }}
@@ -244,7 +244,7 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
               }}
             >
               <div
-                className="figr-slider-handle"
+                className="dsk-slider-handle"
                 style={{ left: `${alpha}%`, backgroundColor: currentHex }}
               />
             </div>
@@ -254,8 +254,8 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
         {/* Value Inputs Row */}
         <div className="figr-picker-inputs">
           {format === 'Hex' && (
-            <div className="figr-input-group">
-              <span className="figr-input-label">Hex</span>
+            <div className="dsk-input-group">
+              <span className="dsk-input-label">Hex</span>
               <input
                 type="text"
                 className="figr-picker-field"
@@ -274,7 +274,7 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
           )}
 
           {format === 'RGB' && (
-            <div className="figr-input-group row-group">
+            <div className="dsk-input-group row-group">
               <label>R <input type="number" value={currentRgb.r} min={0} max={255} onChange={(e) => {
                 const r = parseInt(e.target.value) || 0;
                 const hsv = rgbToHsv(r, currentRgb.g, currentRgb.b);
@@ -299,7 +299,7 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
           )}
 
           {format === 'HSL' && (
-            <div className="figr-input-group row-group">
+            <div className="dsk-input-group row-group">
               <label>H <input type="number" value={currentHsl.h} min={0} max={360} readOnly /></label>
               <label>S <input type="number" value={currentHsl.s} min={0} max={100} readOnly /></label>
               <label>L <input type="number" value={currentHsl.l} min={0} max={100} readOnly /></label>
@@ -307,8 +307,8 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
           )}
 
           {format === 'Null' && (
-            <div className="figr-input-group">
-              <span className="figr-input-label">Transparent</span>
+            <div className="dsk-input-group">
+              <span className="dsk-input-label">Transparent</span>
             </div>
           )}
 

@@ -28,18 +28,18 @@ export const BuildComponentsView: React.FC = () => {
   return (
     <div className="figr-build-components-container">
       <div className="figr-components-top-bar">
-        <div className="figr-search-wrapper">
-          <Search size={16} className="figr-search-icon" />
+        <div className="dsk-search-wrapper">
+          <Search size={16} className="dsk-search-icon" />
           <input
             type="text"
-            className="figr-search-input"
+            className="dsk-search-input"
             placeholder="Search for a component"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <button
-          className="figr-secondary-btn"
+          className="dsk-secondary-btn"
           onClick={() => selectAll(!allSelected)}
           title={allSelected ? 'Deselect every component' : 'Select every component'}
         >
@@ -91,11 +91,11 @@ export const BuildComponentsView: React.FC = () => {
           <span>{selectedSet.size} components selected</span>
         </div>
 
-        <div className="figr-split-action">
-          <button className="figr-primary-btn" onClick={() => startGeneration('components')}>
+        <div className="dsk-split-action">
+          <button className="dsk-primary-btn" onClick={() => startGeneration('components')}>
             Generate Components in <span className="figma-icon">❖</span>
           </button>
-          <button className="figr-split-caret" onClick={() => startGeneration('components')}>
+          <button className="dsk-split-caret" onClick={() => startGeneration('components')}>
             <ChevronUp size={16} />
           </button>
         </div>
