@@ -31,7 +31,7 @@ import { colorShade, radiusPx, shadow } from '../utils/tokenAccess';
 import { setLastTokens } from '../utils/tokensStore';
 import { generateComponents } from '../utils/factory';
 import { createVariables, VariableMap, emptyVariableMap } from '../utils/variables';
-import { BoardContext, TOKEN_BOARD_BUILDERS, TokenBoardTarget } from '../utils/boards';
+import { BoardContext, TOKEN_BOARD_BUILDERS, TokenBoardTarget, isTokenBoardTarget } from '../utils/boards';
 
 export type { GenerationProgress };
 
@@ -109,9 +109,29 @@ export async function generateDesignSystem(
     };
   }
 
+  // Every remaining token category maps to exactly one board. Before this,
+  // `typography`, `spacing`, `radius`, `stroke` and `effects` all fell through
+  // to the full five-page rebuild below — so "Create radius variables in Figma"
+  // silently regenerated the entire design system.
+  if (isTokenBoardTarget(targetMode)) {
+    const label = TOKEN_BOARD_LABELS[targetMode];
+    update('creating-pages', 50, `Building ${label} board…`);
+
+    const tokensPage = await openPage('🎨 Tokens');
+    const board = await TOKEN_BOARD_BUILDERS[targetMode]({ tokens, config, styleMap, varMap });
+
+    // Replace this category's previous board rather than stacking duplicates,
+    // then drop the fresh one below whatever else is already on the page.
+    replaceBoard(tokensPage, board);
+
+    figma.viewport.scrollAndZoomIntoView([board]);
+    update('complete', 100, `${label} tokens generated successfully!`);
+    setLastTokens(tokens, config);
+    return { stats: boardStats(targetMode, tokens, styleMap, varMap) };
+  }
+
   // Default / All mode
-  if (!config.componentsToGenerate || config.componentsToGenerate.length === 0) {
-    config.componentsToGenerate = COMPONENT_DEFINITIONS.map((c) => c.name);
+  if (!config.componentsToGenerate || config.componentsToGenerate.length === 0) {    config.componentsToGenerate = COMPONENT_DEFINITIONS.map((c) => c.name);
   }
 
   const pages = createPages();
@@ -947,6 +967,67 @@ function bottomOf(page: PageNode): number {
 }
 
 const TOKEN_BOARD_ORDER: TokenBoardTarget[] = ['typography', 'spacing', 'radius', 'stroke', 'effects'];
+
+const TOKEN_BOARD_LABELS: Record<TokenBoardTarget, string> = {
+  typography: 'Typography',
+  spacing: 'Spacing',
+  radius: 'Border radius',
+  stroke: 'Stroke',
+  effects: 'Elevation',
+};
+
+/** Find an existing page by name or create it, then make it current. */
+async function openPage(name: string): Promise<PageNode> {
+  const page = figma.root.children.find((p) => p.name === name) || figma.createPage();
+  page.name = name;
+  await figma.setCurrentPageAsync(page);
+  return page;
+}
+
+/**
+ * Put `board` on `page`, replacing any earlier board of the same name so
+ * repeated runs update in place instead of piling up copies. Boards are keyed
+ * by name, which is why every builder names its frame deterministically.
+ */
+function replaceBoard(page: PageNode, board: FrameNode): void {
+  for (const child of [...page.children]) {
+    if (child.name === board.name) child.remove();
+  }
+  const bottom = bottomOf(page);
+  board.x = 0;
+  board.y = bottom === 0 ? 0 : bottom + 60;
+  page.appendChild(board);
+}
+
+/** Stats for a single-category run: only that category's styles count. */
+function boardStats(
+  target: TokenBoardTarget,
+  tokens: DesignTokens,
+  styleMap: StyleMap,
+  varMap: VariableMap
+): GenerationStats {
+  const stylesCreated =
+    target === 'typography'
+      ? Object.keys(styleMap.text).length
+      : target === 'effects'
+        ? Object.keys(styleMap.effect).length
+        : 0;
+  const variablesCreated = Object.keys(varMap.primitive).filter((key) => key.startsWith(target)).length;
+  const drawn: Record<TokenBoardTarget, number> = {
+    typography: tokens.typography.length,
+    spacing: tokens.spacing.length,
+    radius: tokens.borderRadius.length,
+    stroke: tokens.strokes.length,
+    effects: tokens.shadows.length,
+  };
+  return {
+    tokensCreated: drawn[target],
+    stylesCreated,
+    variablesCreated,
+    componentsCreated: 0,
+    pagesCreated: 1,
+  };
+}
 
 function createPatternsPage(page: PageNode, tokens: DesignTokens, config: GenerationConfig, styleMap: StyleMap, varMap: VariableMap): void {
   const root = figma.createFrame();
