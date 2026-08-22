@@ -222,7 +222,7 @@ export const SetTokensView: React.FC = () => {
           return (
             <div
               key={label}
-              className={`figr-color-base-row clickable-swatch-row ${isSelected ? 'selected-row' : ''}`}
+              className={`dsk-color-base-row clickable-swatch-row ${isSelected ? 'selected-row' : ''}`}
               onClick={() => handleOpenPicker(hex, label, onUpdateHex)}
               style={{
                 display: 'flex',
@@ -238,12 +238,12 @@ export const SetTokensView: React.FC = () => {
               <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text)' }}>
                 <span>{label}</span>
                 {badge && (
-                  <span className="figr-color-name-badge" style={{ fontSize: '11px', opacity: 0.85 }}>
+                  <span className="dsk-color-name-badge" style={{ fontSize: '11px', opacity: 0.85 }}>
                     {badge}
                   </span>
                 )}
               </label>
-              <div className="figr-color-picker-wrap" onClick={(e) => e.stopPropagation()}>
+              <div className="dsk-color-picker-wrap" onClick={(e) => e.stopPropagation()}>
                 <div
                   className="dsk-custom-swatch-button"
                   style={{ backgroundColor: hex }}
@@ -279,7 +279,7 @@ export const SetTokensView: React.FC = () => {
             <div className="dsk-token-group-bar">
               <span>Base Colors (Primitives)</span>
             </div>
-            <div className="figr-color-base-controls" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
+            <div className="dsk-color-base-controls" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
               {renderColorRow('Primary Color', config.primaryColor || '#2563EB', (h) => updateConfig({ primaryColor: h }))}
               {renderColorRow('Secondary Color', config.secondaryColor || '#F97316', (h) => updateConfig({ secondaryColor: h }))}
               {renderColorRow('Neutral / Grayscale', config.neutralColor || '#64748B', (h) => updateConfig({ neutralColor: h }))}
@@ -290,7 +290,7 @@ export const SetTokensView: React.FC = () => {
             <div className="dsk-token-group-bar">
               <span>Status & Feedback Colors (Semantics)</span>
             </div>
-            <div className="figr-color-base-controls" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
+            <div className="dsk-color-base-controls" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
               {renderColorRow('Success / Green', config.successColor || '#10B981', (h) => updateConfig({ successColor: h }))}
               {renderColorRow('Warning / Amber', config.warningColor || '#F59E0B', (h) => updateConfig({ warningColor: h }))}
               {renderColorRow('Error / Red', config.errorColor || '#EF4444', (h) => updateConfig({ errorColor: h }))}
@@ -301,7 +301,7 @@ export const SetTokensView: React.FC = () => {
             <div className="dsk-token-group-bar">
               <span>Text Colors (Functional Tokens)</span>
             </div>
-            <div className="figr-color-base-controls" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
+            <div className="dsk-color-base-controls" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
               {renderColorRow('Black Text', neutShades[900])}
               {renderColorRow('Description', neutShades[600])}
               {renderColorRow('Additional Text', neutShades[400])}
@@ -313,7 +313,7 @@ export const SetTokensView: React.FC = () => {
             <div className="dsk-token-group-bar">
               <span>Background & Surface Colors (Functional Tokens)</span>
             </div>
-            <div className="figr-color-base-controls" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
+            <div className="dsk-color-base-controls" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
               {renderColorRow('bg-base', '#FFFFFF')}
               {renderColorRow('bg-surface', neutShades[50])}
               {renderColorRow('bg-elevated', '#FFFFFF')}
@@ -322,13 +322,13 @@ export const SetTokensView: React.FC = () => {
             </div>
 
             {/* --- SHADES & GRADIENTS INSPECTOR PANEL --- */}
-            <div className="figr-inspector-card">
-              <div className="figr-inspector-header">
-                <div className="figr-inspector-title">
-                  <div className="figr-inspector-swatch" style={{ backgroundColor: selectedColor.hex }} />
+            <div className="dsk-inspector-card">
+              <div className="dsk-inspector-header">
+                <div className="dsk-inspector-title">
+                  <div className="dsk-inspector-swatch" style={{ backgroundColor: selectedColor.hex }} />
                   <div>
                     <h3>{selectedColor.name}</h3>
-                    <span className="figr-inspector-subtitle">
+                    <span className="dsk-inspector-subtitle">
                       {selectedColor.hex.toUpperCase()} • HSL({activeHsl.h}°, {activeHsl.s}%, {activeHsl.l}%)
                     </span>
                   </div>
@@ -343,23 +343,23 @@ export const SetTokensView: React.FC = () => {
               </div>
 
               {/* 11 Shades Ramp */}
-              <div className="figr-inspector-section">
+              <div className="dsk-inspector-section">
                 <div className="dsk-section-label">
                   <Layers size={14} />
                   <span>Generated Shades (50 – 950)</span>
                 </div>
-                <div className="figr-shades-ramp-grid">
+                <div className="dsk-shades-ramp-grid">
                   {Object.entries(activeShades).map(([shadeKey, hexVal]) => (
                     <div
                       key={shadeKey}
-                      className="figr-shade-thumb-card"
+                      className="dsk-shade-thumb-card"
                       onClick={() => handleOpenPicker(hexVal, `${selectedColor.name} ${shadeKey}`)}
                       title={`Click to pick/inspect ${shadeKey}`}
                     >
-                      <div className="figr-shade-preview-box" style={{ backgroundColor: hexVal }} />
-                      <div className="figr-shade-thumb-info">
-                        <span className="figr-shade-thumb-name">{shadeKey}</span>
-                        <span className="figr-shade-thumb-hex">{hexVal.toUpperCase()}</span>
+                      <div className="dsk-shade-preview-box" style={{ backgroundColor: hexVal }} />
+                      <div className="dsk-shade-thumb-info">
+                        <span className="dsk-shade-thumb-name">{shadeKey}</span>
+                        <span className="dsk-shade-thumb-hex">{hexVal.toUpperCase()}</span>
                       </div>
                     </div>
                   ))}
@@ -386,16 +386,16 @@ export const SetTokensView: React.FC = () => {
 
             <div className="dsk-token-group-bar">
               <span>Gradients Suite ({selectedColor.name} Base)</span>
-              <span className="figr-color-name-badge">Dedicated Tab</span>
+              <span className="dsk-color-name-badge">Dedicated Tab</span>
             </div>
 
-            <div className="figr-inspector-card">
-              <div className="figr-inspector-header">
-                <div className="figr-inspector-title">
-                  <div className="figr-inspector-swatch" style={{ backgroundColor: selectedColor.hex }} />
+            <div className="dsk-inspector-card">
+              <div className="dsk-inspector-header">
+                <div className="dsk-inspector-title">
+                  <div className="dsk-inspector-swatch" style={{ backgroundColor: selectedColor.hex }} />
                   <div>
                     <h3>{selectedColor.name} Gradients</h3>
-                    <span className="figr-inspector-subtitle">
+                    <span className="dsk-inspector-subtitle">
                       {selectedColor.hex.toUpperCase()} • Dedicated Gradients Workspace (Under Rework)
                     </span>
                   </div>
@@ -403,12 +403,12 @@ export const SetTokensView: React.FC = () => {
               </div>
 
               {/* 9 Gradients Suite */}
-              <div className="figr-inspector-section">
+              <div className="dsk-inspector-section">
                 <div className="dsk-section-label">
                   <Palette size={14} />
                   <span>Gradients Suite</span>
                 </div>
-                <div className="figr-gradients-grid">
+                <div className="dsk-gradients-grid">
                   {activeGradients.map((g) => {
                     const currentStops = customStops[g.id] || g.stops.map((s) => s.color);
                     const stopsCss = g.stops
@@ -431,23 +431,23 @@ export const SetTokensView: React.FC = () => {
                     else if (g.type === 'GRADIENT_DIAMOND') gradientCss = `radial-gradient(ellipse at center, ${stopsCss})`;
 
                     return (
-                      <div key={g.id} className="figr-gradient-card">
+                      <div key={g.id} className="dsk-gradient-card">
                         <div
-                          className="figr-gradient-preview"
+                          className="dsk-gradient-preview"
                           style={{ background: gradientCss }}
                           title={`${g.name} Color Preview`}
                         />
-                        <div className="figr-gradient-card-info">
-                          <span className="figr-gradient-card-title">{g.name}</span>
-                          <span className="figr-gradient-card-type">{g.description}</span>
+                        <div className="dsk-gradient-card-info">
+                          <span className="dsk-gradient-card-title">{g.name}</span>
+                          <span className="dsk-gradient-card-type">{g.description}</span>
 
-                          <div className="figr-gradient-stops-customizer">
+                          <div className="dsk-gradient-stops-customizer">
                             {g.stops.map((stop, idx) => {
                               const colorVal = currentStops[idx] || stop.color;
                               return (
                                 <div
                                   key={idx}
-                                  className="figr-stop-picker-item"
+                                  className="dsk-stop-picker-item"
                                   title={`Click to customize Stop ${idx + 1}: ${colorVal}`}
                                   onClick={() => {
                                     setActivePicker({
@@ -469,8 +469,8 @@ export const SetTokensView: React.FC = () => {
                                     });
                                   }}
                                 >
-                                  <div className="figr-stop-color-swatch-box" style={{ backgroundColor: colorVal }} />
-                                  <span className="figr-stop-hex">{colorVal.toUpperCase()}</span>
+                                  <div className="dsk-stop-color-swatch-box" style={{ backgroundColor: colorVal }} />
+                                  <span className="dsk-stop-hex">{colorVal.toUpperCase()}</span>
                                 </div>
                               );
                             })}
@@ -491,8 +491,8 @@ export const SetTokensView: React.FC = () => {
             <div className="dsk-token-header">
               <h2>Typography</h2>
             </div>
-            <div className="figr-color-settings">
-              <div className="figr-color-row">
+            <div className="dsk-color-settings">
+              <div className="dsk-color-row">
                 <label>Heading Font Family</label>
                 <input
                   type="text"
@@ -501,7 +501,7 @@ export const SetTokensView: React.FC = () => {
                   onChange={(e) => updateFont('heading', e.target.value)}
                 />
               </div>
-              <div className="figr-color-row">
+              <div className="dsk-color-row">
                 <label>Body Font Family</label>
                 <input
                   type="text"
@@ -520,8 +520,8 @@ export const SetTokensView: React.FC = () => {
             <div className="dsk-token-header">
               <h2>Spacing</h2>
             </div>
-            <div className="figr-color-settings">
-              <div className="figr-color-row">
+            <div className="dsk-color-settings">
+              <div className="dsk-color-row">
                 <label>Base Grid Spacing (px)</label>
                 <input
                   type="number"
