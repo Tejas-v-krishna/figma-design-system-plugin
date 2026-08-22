@@ -177,9 +177,15 @@ function buildVariantSet(
   const ds = pickDefault(def.states, ['default']);
   const dz = pickDefault(def.sizes, ['md', 'default', 'sm']);
 
-  const variantsList = config.options.includeVariants ? def.variants : [dv];
-  const sizesList = config.options.includeVariants ? def.sizes : [dz];
-  const statesList = config.options.includeStates ? def.states : [ds];
+  // Each axis must contribute at least one value. 28 of the 50 definitions
+  // declare `sizes: []`, and without the length guard the matrix loop below
+  // iterates an empty axis, produces zero combos, and drops the component
+  // entirely — silently, since nothing is appended and `primary` stays
+  // undefined. Falling back to the default keeps the component and simply
+  // doesn't expose that axis as a variant property.
+  const variantsList = config.options.includeVariants && def.variants.length ? def.variants : [dv];
+  const sizesList = config.options.includeVariants && def.sizes.length ? def.sizes : [dz];
+  const statesList = config.options.includeStates && def.states.length ? def.states : [ds];
 
   const useVariantAxis = variantsList.length > 1;
   const useSizeAxis = sizesList.length > 1;
