@@ -9,7 +9,10 @@ import {
 import { COMPONENT_DEFINITIONS } from '../../shared/component-definitions';
 import { hexToRgb, generateColorShades, generateGradientsForColor } from '../../shared/color-utils';
 import { getColorName } from '../../shared/color-naming';
-import { GradientPreset } from '../../shared/types';
+import { ColorShades, GradientPreset } from '../../shared/types';
+
+/** A shade step that exists on ColorShades, so a lookup cannot come back empty. */
+type ShadeStop = keyof ColorShades;
 import { buildTokens } from '../../shared/build-tokens';
 import { resolveFont, preloadFonts, ensureFont } from '../utils/fonts';
 import {
@@ -577,12 +580,12 @@ async function buildColorSystemBoard(
   // ── 5-stop horizontal scale row ───────────────────────────────
   const mkScale = async (
     name: string,
-    shades: Record<number, string>,
-    stops: number[]
+    shades: ColorShades,
+    stops: ShadeStop[]
   ): Promise<FrameNode> => {
     const r = mkFrame(name, 'HORIZONTAL', SG);
     for (const s of stops) {
-      r.appendChild(await mkSwatch(shades[s] ?? '#EEEEEE', s, s === 500));
+      r.appendChild(await mkSwatch(shades[s], s, s === 500));
     }
     return r;
   };
@@ -591,8 +594,8 @@ async function buildColorSystemBoard(
   const mkColorBlock = async (
     catLabel: string,
     colorName: string,
-    shades: Record<number, string>,
-    stops: number[],
+    shades: ColorShades,
+    stops: ShadeStop[],
     desc: string,
     rules: { lbl: string; rule: string }[]
   ): Promise<FrameNode> => {
@@ -734,7 +737,7 @@ async function buildColorSystemBoard(
     sec.appendChild(await mkColorBlock(
       'Base color / Brand color',
       `Primary · ${primName}`,
-      primShades as unknown as Record<number, string>,
+      primShades,
       [100, 300, 500, 700, 900],
       'This is the leading brand color used everywhere — shapes, socials, physical products, and prints. It is a base color for most interactive components and the primary product color.',
       [
@@ -749,7 +752,7 @@ async function buildColorSystemBoard(
     sec.appendChild(await mkColorBlock(
       'Base color / Secondary color',
       `Secondary · ${secName}`,
-      secShades as unknown as Record<number, string>,
+      secShades,
       [100, 300, 500, 700, 900],
       'Secondary brand accent color used to highlight key interactive elements, badges, and secondary calls-to-action.',
       [
@@ -764,7 +767,7 @@ async function buildColorSystemBoard(
     sec.appendChild(await mkColorBlock(
       'Base color / Accent color',
       `Accent · ${accName}`,
-      accShades as unknown as Record<number, string>,
+      accShades,
       [100, 300, 500, 700, 900],
       'Supporting accent color used for special badges, subtle highlights, and creative visual accents across the UI.',
       [
@@ -779,7 +782,7 @@ async function buildColorSystemBoard(
     sec.appendChild(await mkColorBlock(
       'Base color',
       'Grayscale',
-      neutShades as unknown as Record<number, string>,
+      neutShades,
       [100, 300, 500, 700, 900],
       'Grayscale palette. Lightly tinted with the brand hue to feel cohesive. Used for text, borders, surfaces and backgrounds across the entire system.',
       [
@@ -801,13 +804,13 @@ async function buildColorSystemBoard(
 
     const semList: {
       name: string;
-      shades: Record<number, string>;
+      shades: ColorShades;
       desc: string;
       rules: { lbl: string; rule: string }[];
     }[] = [
       {
         name: 'Success',
-        shades: sucShades as unknown as Record<number, string>,
+        shades: sucShades,
         desc: 'Communicates positive outcomes, confirmations, and completed actions.',
         rules: [
           { lbl: '900–700', rule: 'Success text on light backgrounds.' },
@@ -817,7 +820,7 @@ async function buildColorSystemBoard(
       },
       {
         name: 'Warning',
-        shades: wrnShades as unknown as Record<number, string>,
+        shades: wrnShades,
         desc: 'Communicates caution, attention-required states, and advisories.',
         rules: [
           { lbl: '900–700', rule: 'Warning text on light backgrounds.' },
@@ -827,7 +830,7 @@ async function buildColorSystemBoard(
       },
       {
         name: 'Error',
-        shades: errShades as unknown as Record<number, string>,
+        shades: errShades,
         desc: 'Communicates errors, destructive actions, and critical failures.',
         rules: [
           { lbl: '900–700', rule: 'Error text and destructive action labels.' },
@@ -837,7 +840,7 @@ async function buildColorSystemBoard(
       },
       {
         name: 'Information',
-        shades: infShades as unknown as Record<number, string>,
+        shades: infShades,
         desc: 'Communicates informational notices, hints, and neutral announcements.',
         rules: [
           { lbl: '900–700', rule: 'Info text and emphasized notices.' },
@@ -869,10 +872,10 @@ async function buildColorSystemBoard(
     sec.appendChild(mkDivider());
 
     const textSwatches = [
-      { label: 'Black Text',      hex: (neutShades as unknown as Record<number,string>)[900] },
-      { label: 'Description',     hex: (neutShades as unknown as Record<number,string>)[600] },
-      { label: 'Additional Text', hex: (neutShades as unknown as Record<number,string>)[400] },
-      { label: 'Disabled',        hex: (neutShades as unknown as Record<number,string>)[200] },
+      { label: 'Black Text',      hex: neutShades[900] },
+      { label: 'Description',     hex: neutShades[600] },
+      { label: 'Additional Text', hex: neutShades[400] },
+      { label: 'Disabled',        hex: neutShades[200] },
       { label: 'White Text',      hex: '#FFFFFF' },
     ];
 
@@ -915,10 +918,10 @@ async function buildColorSystemBoard(
 
     const bgSwatches = [
       { label: 'bg-base',     hex: '#FFFFFF',                                                    token: 'neutral-0' },
-      { label: 'bg-surface',  hex: (neutShades as unknown as Record<number,string>)[50],         token: 'neutral-50' },
+      { label: 'bg-surface',  hex: neutShades[50],         token: 'neutral-50' },
       { label: 'bg-elevated', hex: '#FFFFFF',                                                    token: 'neutral-0 + shadow' },
-      { label: 'bg-inset',    hex: (neutShades as unknown as Record<number,string>)[100],        token: 'neutral-100' },
-      { label: 'bg-overlay',  hex: (neutShades as unknown as Record<number,string>)[900],        token: 'neutral-900' },
+      { label: 'bg-inset',    hex: neutShades[100],        token: 'neutral-100' },
+      { label: 'bg-overlay',  hex: neutShades[900],        token: 'neutral-900' },
     ];
 
     const row = mkFrame('BgRow', 'HORIZONTAL', 8);
