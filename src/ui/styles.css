@@ -1126,7 +1126,7 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
 }
 
 /* ---------- Figma-Style Floating Color Selector Tool ---------- */
-.figr-picker-backdrop {
+.dsk-picker-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.25);
@@ -1138,7 +1138,7 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   animation: fade 0.15s ease;
 }
 
-.figr-picker-card {
+.dsk-picker-card {
   width: 280px;
   background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.05);
@@ -1153,7 +1153,7 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   animation: pop 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
 
-.figr-picker-tabs {
+.dsk-picker-tabs {
   display: flex;
   align-items: center;
   background: #f4f4f6;
@@ -1163,7 +1163,7 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   position: relative;
 }
 
-.figr-picker-tab {
+.dsk-picker-tab {
   flex: 1;
   border: none;
   background: transparent;
@@ -1177,18 +1177,18 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   text-align: center;
 }
 
-.figr-picker-tab:hover {
+.dsk-picker-tab:hover {
   color: #000000;
 }
 
-.figr-picker-tab.active {
+.dsk-picker-tab.active {
   background: #000000;
   color: #ffffff;
   font-weight: 700;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-.figr-picker-close {
+.dsk-picker-close {
   border: none;
   background: transparent;
   color: #666666;
@@ -1201,12 +1201,12 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   transition: all 0.15s ease;
 }
 
-.figr-picker-close:hover {
+.dsk-picker-close:hover {
   color: #000000;
   background: rgba(0, 0, 0, 0.05);
 }
 
-.figr-picker-area {
+.dsk-picker-area {
   width: 100%;
   height: 160px;
   border-radius: 14px;
@@ -1217,19 +1217,19 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
 }
 
-.figr-picker-white-grad {
+.dsk-picker-white-grad {
   position: absolute;
   inset: 0;
   background: linear-gradient(to right, #fff, transparent);
 }
 
-.figr-picker-black-grad {
+.dsk-picker-black-grad {
   position: absolute;
   inset: 0;
   background: linear-gradient(to top, #000, transparent);
 }
 
-.figr-picker-handle {
+.dsk-picker-handle {
   position: absolute;
   width: 16px;
   height: 16px;
@@ -1240,13 +1240,13 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   pointer-events: none;
 }
 
-.figr-picker-sliders {
+.dsk-picker-sliders {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.figr-picker-slider-row {
+.dsk-picker-slider-row {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1286,7 +1286,7 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   touch-action: none;
 }
 
-.figr-hue-slider {
+.dsk-hue-slider {
   background: linear-gradient(
     to right,
     #ff0000 0%,
@@ -1299,7 +1299,7 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   );
 }
 
-.figr-alpha-slider {
+.dsk-alpha-slider {
   background-size: cover;
 }
 
@@ -1315,7 +1315,7 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   pointer-events: none;
 }
 
-.figr-picker-inputs {
+.dsk-picker-inputs {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1364,7 +1364,7 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   color: #000000;
 }
 
-.figr-picker-field {
+.dsk-picker-field {
   width: 80px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   background: #ffffff;
@@ -1376,7 +1376,7 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   font-family: var(--font-mono);
 }
 
-.figr-alpha-val {
+.dsk-alpha-val {
   font-size: 11px;
   font-weight: 700;
   color: #666666;
