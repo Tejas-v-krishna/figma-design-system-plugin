@@ -1,4 +1,4 @@
-// FIGR Design System - Component Definitions (80+ components)
+// Design System Kit - Component Definitions (50 components across 9 categories)
 import { ComponentDefinition } from './types';
 
 export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [

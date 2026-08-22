@@ -144,7 +144,7 @@ export function generateComponents(
         primary = result.primary;
       }
     } catch (err) {
-      console.error(`[figr] component "${def.name}" failed to generate:`, err);
+      console.error(`[design-system-kit] component "${def.name}" failed to generate:`, err);
     }
     // Record the default node per component so downstream consumers (e.g. the
     // Playground) can instantiate real components by name.

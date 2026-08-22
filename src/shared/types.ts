@@ -1,4 +1,4 @@
-// FIGR Design System - Shared Type Definitions
+// Design System Kit - Shared Type Definitions
 
 export type ComponentCategory =
   | 'buttons'

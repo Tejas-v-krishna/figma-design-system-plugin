@@ -1,4 +1,4 @@
-// FIGR Design System - Usage scan command
+// Design System Kit - Usage scan command
 // Counts component instances, local styles, and detects unbound fills.
 import { UsageReport } from '../../shared/types';
 

@@ -1,4 +1,4 @@
-// FIGR Design System - Typography & Scale Utilities
+// Design System Kit - Typography & Scale Utilities
 import {
   TypographyToken,
   SpacingToken,

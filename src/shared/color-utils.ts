@@ -1,4 +1,4 @@
-// FIGR Design System - Color Utilities
+// Design System Kit - Color Utilities
 import { ColorToken, ColorShades, HSLColor } from './types';
 
 export function hexToHsl(hex: string): HSLColor {

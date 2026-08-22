@@ -43,7 +43,7 @@ export default defineConfig({
             '  <head>',
             '    <meta charset="utf-8" />',
             '    <meta name="viewport" content="width=device-width, initial-scale=1" />',
-            '    <title>FIGR Design System</title>',
+            '    <title>Design System Kit</title>',
             '  </head>',
             '  <body>',
             '    <div id="root"></div>',

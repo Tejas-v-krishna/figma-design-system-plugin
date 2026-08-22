@@ -1,4 +1,4 @@
-// FIGR Design System - Naming Utilities
+// Design System Kit - Naming Utilities
 export function toPascalCase(str: string): string {
   return str
     .split(/[-_\s]+/)

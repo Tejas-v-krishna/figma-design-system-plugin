@@ -1,4 +1,4 @@
-// FIGR Design System - Generation command
+// Design System Kit - Generation command
 // Builds tokens -> styles -> pages -> components from a GenerationConfig.
 import {
   DesignTokens,

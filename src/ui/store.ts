@@ -84,7 +84,7 @@ interface UIState {
   importOpen: boolean;
   lastError: string | null;
 
-  // Custom token overrides matching Figr lists
+  // Custom token overrides, editable per row in the token panels
   radiusList: RadiusItem[];
   strokeList: StrokeItem[];
   effectsList: ShadowItem[];

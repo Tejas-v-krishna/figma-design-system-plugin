@@ -1,4 +1,4 @@
-// FIGR Design System - Plugin Entry Point (Figma API)
+// Design System Kit - Plugin Entry Point (Figma API)
 import { generateDesignSystem, generateColorExtensions } from './commands/generate';
 import { exportTokens, ExportFormat } from './commands/export';
 import { scanUsage } from './commands/scan';
