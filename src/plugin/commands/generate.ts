@@ -180,8 +180,10 @@ async function runGeneration(
     };
   }
 
-  // Default / All mode
-  if (!config.componentsToGenerate || config.componentsToGenerate.length === 0) {
+  // Default / All mode. An empty list is the "build everything" sentinel, which
+  // is what a fresh config carries; sanitizeConfig guarantees the field is an
+  // array by the time it reaches here, so only the length needs checking.
+  if (config.componentsToGenerate.length === 0) {
     config.componentsToGenerate = COMPONENT_DEFINITIONS.map((c) => c.name);
   }
 
@@ -505,8 +507,8 @@ async function buildColorSystemBoard(
   const C_BORDER = hexToRgb('#E2E8F0');
 
   const primShades = generateColorShades(tokens.colors.primary.hex);
-  const secShades  = generateColorShades(tokens.colors.secondary?.hex || config.secondaryColor || '#F97316');
-  const accShades  = generateColorShades(tokens.colors.accent?.hex || config.accentColor || '#8B5CF6');
+  const secShades  = generateColorShades(tokens.colors.secondary.hex);
+  const accShades  = generateColorShades(tokens.colors.accent.hex);
   const neutShades = generateColorShades(tokens.colors.neutral.hex);
   const sucShades  = generateColorShades(tokens.colors.success.hex);
   const wrnShades  = generateColorShades(tokens.colors.warning.hex);
@@ -728,10 +730,10 @@ async function buildColorSystemBoard(
 
     const primName =
       config.colorNames?.[tokens.colors.primary.hex.replace('#', '').toUpperCase()] || 'Brand';
-    const secHex = tokens.colors.secondary?.hex || config.secondaryColor || '#F97316';
+    const secHex = tokens.colors.secondary.hex;
     const secName =
       config.colorNames?.[secHex.replace('#', '').toUpperCase()] || 'Secondary';
-    const accHex = tokens.colors.accent?.hex || config.accentColor || '#8B5CF6';
+    const accHex = tokens.colors.accent.hex;
     const accName =
       config.colorNames?.[accHex.replace('#', '').toUpperCase()] || 'Accent';
 
@@ -1521,7 +1523,7 @@ async function runColorExtensions(
 
   const cleanHex = baseHex.replace('#', '').toUpperCase();
   const apiName = config?.colorNames?.[cleanHex] || getColorName(baseHex);
-  const headingFont = config?.fontFamily?.heading ?? 'Inter';
+  const headingFont = config?.fontFamily.heading ?? 'Inter';
   const resolvedName = colorName || apiName || `#${cleanHex}`;
   const displayTitle = apiName && apiName.toLowerCase() !== resolvedName.toLowerCase()
     ? `${resolvedName} (${apiName})`
