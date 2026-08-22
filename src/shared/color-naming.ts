@@ -173,10 +173,37 @@ const COLOR_NAMES_LIST: { name: string; hex: string }[] = [
   { name: 'Lavender', hex: 'E6E6FA' },
 ];
 
+// Parsed once at module load. The previous implementation re-parsed all of the
+// hex strings on every single lookup.
+const COLOR_SWATCHES: { name: string; r: number; g: number; b: number }[] = COLOR_NAMES_LIST.map((item) => ({
+  name: item.name,
+  r: parseInt(item.hex.slice(0, 2), 16),
+  g: parseInt(item.hex.slice(2, 4), 16),
+  b: parseInt(item.hex.slice(4, 6), 16),
+}));
+
+/**
+ * Riemersma's low-cost weighted RGB metric. Straight Euclidean RGB distance
+ * treats all three channels as equally significant, so it sometimes picks a
+ * perceptually worse neighbour — Tailwind's pink-500 (#EC4899) came out as
+ * "Pale Violet Red" under Euclidean and "Hot Pink" under this, which is plainly
+ * the better read. Weighting by the mean red level tracks human sensitivity
+ * better at essentially the same cost; most colours resolve identically.
+ *
+ * Returned squared: only the ordering matters, so the sqrt is redundant.
+ */
+function colorDistanceSq(r1: number, g1: number, b1: number, r2: number, g2: number, b2: number): number {
+  const rMean = (r1 + r2) / 2;
+  const dr = r1 - r2;
+  const dg = g1 - g2;
+  const db = b1 - b2;
+  return (((512 + rMean) * dr * dr) >> 8) + 4 * dg * dg + (((767 - rMean) * db * db) >> 8);
+}
+
 export function getNearestColorName(hex: string): string {
   if (!hex) return 'Custom Color';
   const cleanHex = hex.replace('#', '').toUpperCase();
-  if (cleanHex.length !== 6) return 'Custom Color';
+  if (!/^[0-9A-F]{6}$/.test(cleanHex)) return 'Custom Color';
 
   const r = parseInt(cleanHex.slice(0, 2), 16);
   const g = parseInt(cleanHex.slice(2, 4), 16);
@@ -185,20 +212,11 @@ export function getNearestColorName(hex: string): string {
   let closestName = 'Custom Color';
   let minDistance = Infinity;
 
-  for (const item of COLOR_NAMES_LIST) {
-    const targetR = parseInt(item.hex.slice(0, 2), 16);
-    const targetG = parseInt(item.hex.slice(2, 4), 16);
-    const targetB = parseInt(item.hex.slice(4, 6), 16);
-
-    const dist = Math.sqrt(
-      Math.pow(r - targetR, 2) +
-      Math.pow(g - targetG, 2) +
-      Math.pow(b - targetB, 2)
-    );
-
+  for (const swatch of COLOR_SWATCHES) {
+    const dist = colorDistanceSq(r, g, b, swatch.r, swatch.g, swatch.b);
     if (dist < minDistance) {
       minDistance = dist;
-      closestName = item.name;
+      closestName = swatch.name;
     }
   }
 
