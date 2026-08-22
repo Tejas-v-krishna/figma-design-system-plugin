@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Pipette, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { hexToRgb } from '../../shared/color-utils';
 
 interface ColorPickerModalProps {
@@ -98,9 +98,10 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
   const [alpha, setAlpha] = useState<number>(100);
 
   const areaRef = useRef<HTMLDivElement>(null);
-  const isDraggingArea = useRef<boolean>(false);
-  const isDraggingHue = useRef<boolean>(false);
-  const isDraggingAlpha = useRef<boolean>(false);
+  const hueRef = useRef<HTMLDivElement>(null);
+  const alphaRef = useRef<HTMLDivElement>(null);
+  /** Which track the pointer captured on press, or null when not dragging. */
+  const drag = useRef<'area' | 'hue' | 'alpha' | null>(null);
 
   // Computed current RGB and Hex
   const currentRgb = hsvToRgb(hue, sat, val);
@@ -108,63 +109,93 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
   const currentHsl = rgbToHsl(currentRgb.r, currentRgb.g, currentRgb.b);
 
   // Notify parent on change
-  const updateColor = (h: number, s: number, v: number) => {
+  const emit = (h: number, s: number, v: number) => {
     const rgb = hsvToRgb(h, s, v);
-    const hex = rgbToHexStr(rgb.r, rgb.g, rgb.b);
-    onChange(hex);
+    onChange(rgbToHexStr(rgb.r, rgb.g, rgb.b));
   };
 
-  const handleAreaPointer = (e: React.PointerEvent | PointerEvent) => {
-    if (!areaRef.current) return;
-    const rect = areaRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
-    const y = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+  const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
 
-    const newSat = Math.round((x / rect.width) * 100);
-    const newVal = Math.round((1 - y / rect.height) * 100);
-
-    setSat(newSat);
-    setVal(newVal);
-    updateColor(hue, newSat, newVal);
+  /**
+   * Where a pointer sits along a track, as a 0–1 fraction of its box.
+   *
+   * The zero-size guard is not theoretical: a track that has not been laid out
+   * yet has width 0, and dividing by it produced NaN, which travelled all the
+   * way through hsvToRgb into `NaN.toString(16)` and emitted the literal hex
+   * string "#NANNANNAN".
+   */
+  const ratio = (el: HTMLElement, clientX: number, clientY: number) => {
+    const rect = el.getBoundingClientRect();
+    return {
+      x: rect.width > 0 ? clamp01((clientX - rect.left) / rect.width) : 0,
+      y: rect.height > 0 ? clamp01((clientY - rect.top) / rect.height) : 0,
+    };
   };
 
-  const handleHuePointer = (e: React.PointerEvent | PointerEvent) => {
-    const target = e.currentTarget as HTMLElement;
-    if (!target) return;
-    const rect = target.getBoundingClientRect();
-    const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
-    const newHue = Math.round((x / rect.width) * 360);
-
-    setHue(newHue);
-    updateColor(newHue, sat, val);
+  const applyArea = (clientX: number, clientY: number) => {
+    const el = areaRef.current;
+    if (!el) return;
+    const { x, y } = ratio(el, clientX, clientY);
+    const s = Math.round(x * 100);
+    const v = Math.round((1 - y) * 100);
+    setSat(s);
+    setVal(v);
+    emit(hue, s, v);
   };
 
-  const handleAlphaPointer = (e: React.PointerEvent | PointerEvent) => {
-    const target = e.currentTarget as HTMLElement;
-    if (!target) return;
-    const rect = target.getBoundingClientRect();
-    const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
-    const newAlpha = Math.round((x / rect.width) * 100);
-
-    setAlpha(newAlpha);
+  const applyHue = (clientX: number) => {
+    const el = hueRef.current;
+    if (!el) return;
+    const h = Math.round(ratio(el, clientX, 0).x * 360);
+    setHue(h);
+    emit(h, sat, val);
   };
+
+  const applyAlpha = (clientX: number) => {
+    const el = alphaRef.current;
+    if (!el) return;
+    setAlpha(Math.round(ratio(el, clientX, 0).x * 100));
+  };
+
+  // The window listeners below are installed once and read the current handlers
+  // through this ref. Putting [hue, sat, val] in the dependency array instead
+  // meant every frame of a drag tore down and reinstalled two window listeners.
+  const live = useRef({ applyArea, applyHue, applyAlpha, onClose });
+  live.current = { applyArea, applyHue, applyAlpha, onClose };
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
-      if (isDraggingArea.current) handleAreaPointer(e);
+      const mode = drag.current;
+      if (!mode) return;
+      // Listening on window, not on the track, is what lets a drag continue
+      // once the pointer leaves the 200px-wide slider — which is most of the
+      // time. Previously only the 2D area was wired up here at all, so the hue
+      // and alpha sliders responded to a click but not to a drag.
+      if (mode === 'area') live.current.applyArea(e.clientX, e.clientY);
+      else if (mode === 'hue') live.current.applyHue(e.clientX);
+      else live.current.applyAlpha(e.clientX);
     };
     const onUp = () => {
-      isDraggingArea.current = false;
-      isDraggingHue.current = false;
-      isDraggingAlpha.current = false;
+      drag.current = null;
     };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') live.current.onClose();
+    };
+
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
+    // Without pointercancel the drag flag can stick after the OS steals the
+    // pointer (a window switch mid-drag), leaving the picker following the
+    // cursor with no button held.
+    window.addEventListener('pointercancel', onUp);
+    window.addEventListener('keydown', onKey);
     return () => {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+      window.removeEventListener('keydown', onKey);
     };
-  }, [hue, sat, val]);
+  }, []);
 
   // Pure Hue color for 2D background
   const pureHueRgb = hsvToRgb(hue, 100, 100);
@@ -195,8 +226,8 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
           className="dsk-picker-area"
           style={{ backgroundColor: pureHueHex }}
           onPointerDown={(e) => {
-            isDraggingArea.current = true;
-            handleAreaPointer(e);
+            drag.current = 'area';
+            applyArea(e.clientX, e.clientY);
           }}
         >
           <div className="dsk-picker-white-grad" />
@@ -214,14 +245,13 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
         {/* Sliders Section */}
         <div className="dsk-picker-sliders">
           <div className="dsk-picker-slider-row">
-            <button className="dsk-pipette-btn" title="Pick color">
-              <Pipette size={14} />
-            </button>
+            <div className="dsk-slider-spacer" />
             <div
+              ref={hueRef}
               className="dsk-slider-bar dsk-hue-slider"
               onPointerDown={(e) => {
-                isDraggingHue.current = true;
-                handleHuePointer(e);
+                drag.current = 'hue';
+                applyHue(e.clientX);
               }}
             >
               <div
@@ -234,13 +264,14 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
           <div className="dsk-picker-slider-row">
             <div className="dsk-slider-spacer" />
             <div
+              ref={alphaRef}
               className="dsk-slider-bar dsk-alpha-slider"
               style={{
                 backgroundImage: `linear-gradient(to right, transparent, ${currentHex}), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="4" height="4" fill="%23ccc"/><rect x="4" width="4" height="4" fill="%23fff"/><rect y="4" width="4" height="4" fill="%23fff"/><rect x="4" y="4" width="4" height="4" fill="%23ccc"/></svg>')`,
               }}
               onPointerDown={(e) => {
-                isDraggingAlpha.current = true;
-                handleAlphaPointer(e);
+                drag.current = 'alpha';
+                applyAlpha(e.clientX);
               }}
             >
               <div

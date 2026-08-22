@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useStore, TokenCategory } from '../store';
 import { generateColorShades, generateGradientsForColor, hexToHsl, hexToRgb, interpolateOklchStops } from '../../shared/color-utils';
 import { getColorName, getNearestColorName } from '../../shared/color-naming';
@@ -31,7 +31,12 @@ export const SetTokensView: React.FC = () => {
   const updateFont = useStore((s) => s.updateFont);
   const startGeneration = useStore((s) => s.startGeneration);
 
-  const [colorNames, setColorNames] = useState<Record<string, string>>({});
+  const [colorNames, setColorNames] = useState<Record<string, string>>(
+    () => config.colorNames ?? {}
+  );
+  // Accumulated hex -> name map. See the naming effect below for why this is a
+  // ref and not read off the state it feeds.
+  const namesRef = useRef<Record<string, string>>(config.colorNames ?? {});
   const [customStops, setCustomStops] = useState<Record<string, string[]>>({});
   const [activePicker, setActivePicker] = useState<{
     color: string;
@@ -55,16 +60,22 @@ export const SetTokensView: React.FC = () => {
 
     // Naming is synchronous and local, so this no longer needs an async effect
     // or an `active` cancellation guard — there's no in-flight request to race.
-    const map: Record<string, string> = { ...colorNames };
+    const named: Record<string, string> = {};
     for (const hex of hexes) {
       if (!hex) continue;
       const clean = hex.replace('#', '').toUpperCase();
       const name = getColorName(clean);
-      map[clean] = name;
-      map['#' + clean] = name;
+      named[clean] = name;
+      named['#' + clean] = name;
     }
-    setColorNames(map);
-    updateConfig({ colorNames: map });
+
+    // Merged through a ref rather than through the `colorNames` state this
+    // effect also writes. Reading that state here would make it a dependency,
+    // and an effect that depends on what it sets never settles.
+    const merged = { ...namesRef.current, ...named };
+    namesRef.current = merged;
+    setColorNames(merged);
+    updateConfig({ colorNames: merged });
   }, [
     config.primaryColor,
     config.secondaryColor,
@@ -74,6 +85,7 @@ export const SetTokensView: React.FC = () => {
     config.informationColor,
     config.errorColor,
     config.accentColor,
+    updateConfig,
   ]);
 
   const categories: { key: TokenCategory; label: string }[] = [

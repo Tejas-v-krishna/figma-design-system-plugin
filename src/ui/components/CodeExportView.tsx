@@ -1,6 +1,7 @@
 import React from 'react';
 import { useStore, ExportFormat } from '../store';
 import { Code, Copy, Check } from 'lucide-react';
+import { copyText } from '../clipboard';
 
 export const CodeExportView: React.FC = () => {
   const exportFormat = useStore((s) => s.exportFormat);
@@ -10,6 +11,7 @@ export const CodeExportView: React.FC = () => {
   const exportBusy = useStore((s) => s.exportBusy);
 
   const [copied, setCopied] = React.useState(false);
+  const [copyError, setCopyError] = React.useState<string | null>(null);
 
   const formats: { key: ExportFormat; label: string }[] = [
     { key: 'json', label: 'Design Tokens JSON' },
@@ -24,11 +26,15 @@ export const CodeExportView: React.FC = () => {
   };
 
   const handleCopy = () => {
-    if (exportResult) {
-      navigator.clipboard.writeText(exportResult);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+    if (!exportResult) return;
+    // The confirmation waits on the actual result. It used to be set
+    // unconditionally alongside a floating writeText, so a copy the browser
+    // refused still showed a checkmark and the user pasted stale content.
+    void copyText(exportResult).then((ok) => {
+      setCopied(ok);
+      setCopyError(ok ? null : 'Copy was blocked. Select the code and press Ctrl+C.');
+      if (ok) setTimeout(() => setCopied(false), 2000);
+    });
   };
 
   return (
@@ -65,6 +71,11 @@ export const CodeExportView: React.FC = () => {
                 {copied ? 'Copied!' : 'Copy Code'}
               </button>
             </div>
+            {copyError && (
+              <p className="dsk-copy-error" role="status">
+                {copyError}
+              </p>
+            )}
             <pre className="dsk-code-block">{exportResult}</pre>
           </div>
         ) : (

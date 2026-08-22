@@ -10,7 +10,7 @@ import { BRAND_PRESETS, BrandPreset } from '../shared/presets';
 import { postToPlugin } from './plugin';
 
 export type View = 'set-tokens' | 'build-components' | 'code' | 'brand' | 'typography' | 'components' | 'review' | 'export' | 'scan';
-export type TokenCategory = 'colors' | 'gradients' | 'typography' | 'spacing' | 'radius' | 'stroke' | 'effects';
+export type TokenCategory = 'colors' | 'gradients' | 'typography' | 'spacing' | 'radius' | 'stroke' | 'effects' | 'motion';
 export type Overlay = 'none' | 'generating' | 'success';
 export type ExportFormat = 'json' | 'css' | 'tailwind' | 'dtcg';
 

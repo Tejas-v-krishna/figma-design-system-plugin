@@ -83,9 +83,7 @@ async function runGeneration(
   // Isolated target mode handling (e.g. clicking 'Create colors variables in ❖' ONLY generates colors)
   if (targetMode === 'colors') {
     update('creating-pages', 50, 'Building Color System page…');
-    let colorPage = figma.root.children.find((p) => p.name === '🎨 Color System') || figma.createPage();
-    colorPage.name = '🎨 Color System';
-    await figma.setCurrentPageAsync(colorPage);
+    const colorPage = await openPage('🎨 Color System');
 
     // Clear previous elements on Color System page
     for (const child of [...colorPage.children]) {
@@ -108,9 +106,7 @@ async function runGeneration(
 
   if (targetMode === 'components') {
     update('creating-pages', 50, 'Generating Components page…');
-    let compPage = figma.root.children.find((p) => p.name === '🧩 Components') || figma.createPage();
-    compPage.name = '🧩 Components';
-    await figma.setCurrentPageAsync(compPage);
+    const compPage = await openPage('🧩 Components');
 
     const { count: componentsCreated } = generateComponents(
       tokens,
@@ -1137,14 +1133,17 @@ function createDocumentationPage(page: PageNode, config: GenerationConfig): void
   }
 }
 
-function createPlaygroundPage(
+// Async because sectionTitle loads a font before creating its text node. It was
+// declared sync and called sectionTitle without awaiting, so the heading could
+// render in a fallback face while the rest of the page used the configured one.
+async function createPlaygroundPage(
   page: PageNode,
   tokens: DesignTokens,
   config: GenerationConfig,
   styleMap: StyleMap,
   varMap: VariableMap,
   byName: Map<string, ComponentNode | ComponentSetNode>
-): void {
+): Promise<void> {
   const root = makeFrame('Playground');
   root.name = 'Playground';
   root.layoutMode = 'VERTICAL';
@@ -1155,7 +1154,7 @@ function createPlaygroundPage(
   root.clipsContent = false;
   page.appendChild(root);
 
-  sectionTitle(root, 'Playground', config.fontFamily.heading);
+  await sectionTitle(root, 'Playground', config.fontFamily.heading);
   const sub = figma.createText();
   sub.fontName = resolveFont(config.fontFamily.body, 400);
   sub.fontSize = 14;
@@ -1511,9 +1510,7 @@ async function runColorExtensions(
   config?: GenerationConfig,
   customGradientStops?: Record<string, string[]>
 ): Promise<void> {
-  let colorPage = figma.root.children.find((p) => p.name === '🎨 Color System') || figma.createPage();
-  colorPage.name = '🎨 Color System';
-  await figma.setCurrentPageAsync(colorPage);
+  const colorPage = await openPage('🎨 Color System');
 
   const cleanHex = baseHex.replace('#', '').toUpperCase();
   const apiName = config?.colorNames?.[cleanHex] || getColorName(baseHex);

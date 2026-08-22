@@ -370,9 +370,7 @@ export async function buildEffectsBoard(ctx: BoardContext): Promise<FrameNode> {
     card.resize(120, 88);
     card.cornerRadius = 14;
     card.fills = [{ type: 'SOLID', color: hexToRgb(CARD) }];
-    // Awaited, unlike the original call site — an unawaited setEffect can lose
-    // its style binding if the node is reparented before the promise settles.
-    await setEffect(card, sh, effectStyleKey(sh.name), styleMap, varMap);
+    setEffect(card, sh, effectStyleKey(sh.name), styleMap, varMap);
     cell.appendChild(card);
 
     await label(cell, sh.name, { family: config.fontFamily.body, weight: 600, size: 12 });

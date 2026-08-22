@@ -63,7 +63,10 @@ async function fakeGenerate(config: GenerationConfig & { target?: string }): Pro
 }
 
 export function installMockPlugin(): void {
-  window.addEventListener('message', async (event: MessageEvent) => {
+  // The router is separate from the listener so the promise it returns has
+  // somewhere to be caught. addEventListener ignores a returned promise, so an
+  // async listener that rejects fails silently.
+  const route = async (event: MessageEvent) => {
     const msg = event.data?.pluginMessage;
     if (!msg || typeof msg !== 'object' || !('type' in msg)) return;
 
@@ -140,5 +143,11 @@ export function installMockPlugin(): void {
         });
         break;
     }
+  };
+
+  window.addEventListener('message', (event: MessageEvent) => {
+    route(event).catch((err: unknown) => {
+      console.error('[mock plugin] handler failed:', err);
+    });
   });
 }
