@@ -23,18 +23,25 @@ const CATEGORY_LABELS: Record<string, string> = {
   typography: 'Typography',
 };
 
+// ComponentVariant, ComponentState and ComponentSize are structurally the same
+// shape, so one non-generic parameter type covers all three call sites. The
+// previous `<T extends PropSet>` needed an `as T` cast to build its empty
+// fallback, because T could in principle carry required fields the fallback
+// lacked. Nothing was ever instantiated that way.
 interface PropSet {
   name: string;
-  properties: Record<string, any>;
+  properties: Record<string, string | number | boolean>;
 }
 
-function pickDefault<T extends PropSet>(arr: T[], prefs: string[]): T {
-  if (!arr.length) return { name: 'Default', properties: {} } as T;
+const EMPTY_PROP_SET: PropSet = { name: 'Default', properties: {} };
+
+/** First entry matching a preferred name, else the first entry, else a stub. */
+function pickDefault(arr: PropSet[], prefs: string[]): PropSet {
   for (const p of prefs) {
     const f = arr.find((a) => a.name.toLowerCase() === p);
     if (f) return f;
   }
-  return arr[0];
+  return arr[0] ?? EMPTY_PROP_SET;
 }
 
 function buildOne(
@@ -115,8 +122,12 @@ export function generateComponents(
   let count = 0;
 
   for (const def of selected) {
-    if (!frames[def.category]) {
-      const frame = figma.createFrame();
+    // Looked up and created in one step. Reading it back out of the record
+    // afterwards left `frame` typed as possibly missing for the rest of the
+    // loop, which is the one thing it definitely is not.
+    let frame = frames[def.category];
+    if (!frame) {
+      frame = figma.createFrame();
       frame.name = CATEGORY_LABELS[def.category] ?? def.category;
       frame.layoutMode = 'HORIZONTAL';
       frame.primaryAxisAlignItems = 'MIN';
@@ -127,7 +138,6 @@ export function generateComponents(
       componentsPage.appendChild(frame);
       frames[def.category] = frame;
     }
-    const frame = frames[def.category];
     let primary: ComponentNode | ComponentSetNode | undefined;
     // Isolate each component: a single failing template must never abort the
     // whole run (which would leave later components and pages blank). Skip the
@@ -224,11 +234,12 @@ function buildVariantSet(
   }
 
   let primary: ComponentNode | ComponentSetNode | undefined;
+  const only = combos[0];
   if (combos.length > 1) {
     primary = figma.combineAsVariants(combos, parent);
-  } else if (combos.length === 1) {
-    parent.appendChild(combos[0]);
-    primary = combos[0];
+  } else if (only) {
+    parent.appendChild(only);
+    primary = only;
   }
   return { count: combos.length, primary };
 }

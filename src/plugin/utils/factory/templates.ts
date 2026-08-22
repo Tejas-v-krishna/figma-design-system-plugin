@@ -34,6 +34,24 @@ export interface TemplateCtx {
 
 export type Template = (root: ComponentNode, ctx: TemplateCtx) => ComponentNode;
 
+// ---------------- sample content ----------------
+// Hoisted out of the templates that render them so each item is reached by
+// iteration rather than by indexing a literal with a loop counter.
+
+const SEGMENT_LABELS = ['Day', 'Week', 'Month'];
+
+const AVATAR_MEMBERS: { initial: string; tone: ColorName }[] = [
+  { initial: 'A', tone: 'primary' },
+  { initial: 'B', tone: 'information' },
+  { initial: 'C', tone: 'success' },
+  { initial: 'D', tone: 'warning' },
+];
+
+/** "success" -> "Success". Safe on an empty string, where charAt returns "". */
+function titleCase(word: string): string {
+  return `${word.charAt(0).toUpperCase()}${word.slice(1)}`;
+}
+
 // ---------------- shared resolvers ----------------
 
 function variantKey(ctx: TemplateCtx): string {
@@ -163,14 +181,15 @@ const ButtonGroup: Template = (root, ctx) => {
   root.cornerRadius = radiusPx(ctx.tokens, 'md');
   setFill(root, '#FFFFFF');
   setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
-  for (let i = 0; i < 3; i++) {
+  for (const [i, label] of SEGMENT_LABELS.entries()) {
     const b = makeFrame(`item-${i}`);
     b.layoutMode = 'HORIZONTAL';
     b.primaryAxisAlignItems = 'CENTER';
     b.counterAxisAlignItems = 'CENTER';
     pad(b, 8, 14);
-    setFill(b, i === 1 ? colorShade(ctx.tokens, 'primary', 500) : '#FFFFFF', colorStyleKey('primary', 500), ctx.styleMap, ctx.varMap);
-    b.appendChild(text({ characters: ['Day', 'Week', 'Month'][i], fontFamily: ctx.config.fontFamily.body, weight: i === 1 ? 600 : 400, fontSize: 14, fill: i === 1 ? '#FFFFFF' : colorShade(ctx.tokens, 'neutral', 700) }));
+    const selected = i === 1;
+    setFill(b, selected ? colorShade(ctx.tokens, 'primary', 500) : '#FFFFFF', colorStyleKey('primary', 500), ctx.styleMap, ctx.varMap);
+    b.appendChild(text({ characters: label, fontFamily: ctx.config.fontFamily.body, weight: selected ? 600 : 400, fontSize: 14, fill: selected ? '#FFFFFF' : colorShade(ctx.tokens, 'neutral', 700) }));
     root.appendChild(b);
   }
   return root;
@@ -359,7 +378,7 @@ function populateAlert(root: ComponentNode, ctx: TemplateCtx, toneName: ColorNam
   root.appendChild(buildIcon(20, colorShade(ctx.tokens, toneName, 500)));
   const tf = vbox('text');
   tf.itemSpacing = 2;
-  tf.appendChild(text({ characters: `${toneName[0].toUpperCase()}${toneName.slice(1)}`, fontFamily: ctx.config.fontFamily.heading, weight: 600, fontSize: 14, fill: colorShade(ctx.tokens, toneName, 700) }));
+  tf.appendChild(text({ characters: titleCase(toneName), fontFamily: ctx.config.fontFamily.heading, weight: 600, fontSize: 14, fill: colorShade(ctx.tokens, toneName, 700) }));
   tf.appendChild(text({ characters: `This is a ${toneName} message.`, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 13, fill: colorShade(ctx.tokens, toneName, 600) }));
   root.appendChild(tf);
 }
@@ -431,17 +450,17 @@ const AvatarStack: Template = (root, ctx) => {
   root.layoutMode = 'HORIZONTAL';
   root.counterAxisAlignItems = 'CENTER';
   root.itemSpacing = -8;
-  for (let i = 0; i < 4; i++) {
+  for (const [i, member] of AVATAR_MEMBERS.entries()) {
     const a = makeFrame(`a-${i}`);
     a.layoutMode = 'HORIZONTAL';
     a.primaryAxisAlignItems = 'CENTER';
     a.counterAxisAlignItems = 'CENTER';
     a.resize(36, 36);
-    const shape = ellipse('shape', 36, [colorShade(ctx.tokens, 'primary', 400), colorShade(ctx.tokens, 'information', 400), colorShade(ctx.tokens, 'success', 400), colorShade(ctx.tokens, 'warning', 400)][i]);
+    const shape = ellipse('shape', 36, colorShade(ctx.tokens, member.tone, 400));
     setStroke(shape, '#FFFFFF', 2);
     a.appendChild(shape);
     shape.layoutPositioning = 'ABSOLUTE';
-    a.appendChild(text({ characters: ['A', 'B', 'C', 'D'][i], fontFamily: ctx.config.fontFamily.heading, weight: 600, fontSize: 14, fill: '#FFFFFF', align: 'CENTER' }));
+    a.appendChild(text({ characters: member.initial, fontFamily: ctx.config.fontFamily.heading, weight: 600, fontSize: 14, fill: '#FFFFFF', align: 'CENTER' }));
     root.appendChild(a);
   }
   return root;
