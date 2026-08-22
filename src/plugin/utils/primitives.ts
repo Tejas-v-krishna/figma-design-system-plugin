@@ -37,87 +37,150 @@ export function resolveColorVariable(
   return varMap.component[styleKey] ?? varMap.semantic[styleKey] ?? varMap.primitive[styleKey];
 }
 
+// ---- deferred style bindings ---------------------------------------------
+//
+// Binding a paint or effect style is asynchronous in a dynamic-page document
+// (setFillStyleIdAsync and friends), but the several hundred call sites that
+// paint a node are synchronous builders that construct and return it. Making
+// them async would ripple through the entire component factory, and until now
+// none of them awaited these functions at all — all 75 calls dropped the
+// promise, so a rejection inside one became an unhandled rejection that Figma
+// reports nowhere.
+//
+// So the paint is applied synchronously and the style binding is queued here.
+// Commands call flushStyleBindings() before they report success, which means
+// the work is finished before the sandbox tears down rather than racing it.
+
+const pendingBindings: Promise<void>[] = [];
+
+function queueBinding(p: Promise<unknown>): void {
+  // Failures are absorbed on purpose. A style id that no longer resolves —
+  // the user deleted the style between runs — should leave the raw paint that
+  // was already applied in place, not abort a build of hundreds of nodes.
+  pendingBindings.push(
+    p.then(
+      () => undefined,
+      () => undefined
+    )
+  );
+}
+
+/**
+ * Await every style binding queued so far.
+ *
+ * Loops because a flush can, in principle, run while more nodes are still being
+ * built; splicing the queue each pass means late arrivals are picked up instead
+ * of being silently left behind. Safe to call repeatedly.
+ */
+export async function flushStyleBindings(): Promise<void> {
+  while (pendingBindings.length > 0) {
+    await Promise.all(pendingBindings.splice(0, pendingBindings.length));
+  }
+}
+
+/** How many bindings are still in flight. Used by tests and diagnostics. */
+export function pendingStyleBindingCount(): number {
+  return pendingBindings.length;
+}
+
+interface FillStyleBindable {
+  setFillStyleIdAsync(id: string): Promise<void>;
+}
+interface StrokeStyleBindable {
+  setStrokeStyleIdAsync(id: string): Promise<void>;
+}
+interface EffectStyleBindable {
+  setEffectStyleIdAsync(id: string): Promise<void>;
+}
+
+function canBindFillStyle(node: MinimalFills): node is MinimalFills & FillStyleBindable {
+  return typeof (node as Partial<FillStyleBindable>).setFillStyleIdAsync === 'function';
+}
+function canBindStrokeStyle(node: MinimalStrokes): node is MinimalStrokes & StrokeStyleBindable {
+  return typeof (node as Partial<StrokeStyleBindable>).setStrokeStyleIdAsync === 'function';
+}
+function canBindEffectStyle(node: MinimalEffects): node is MinimalEffects & EffectStyleBindable {
+  return typeof (node as Partial<EffectStyleBindable>).setEffectStyleIdAsync === 'function';
+}
+
 /** Apply a solid fill, optionally binding a Paint Style or Variable by key. */
-export async function setFill(
+export function setFill(
   node: MinimalFills,
   hex: string,
   styleKey?: string,
   styleMap?: StyleMap,
   varMap?: VariableMap
-): Promise<void> {
-  let fill: Paint = { type: 'SOLID', color: hexToRgb(hex) };
+): void {
   const variable = resolveColorVariable(varMap, styleKey);
+  let fill: Paint = { type: 'SOLID', color: hexToRgb(hex) };
+
+  // A bound variable lives inside the paint, so this path is complete once the
+  // fill is assigned — and it takes precedence, since a variable carries mode
+  // information a style cannot.
   if (styleKey && variable) {
     fill = figma.variables.setBoundVariableForPaint(fill as SolidPaint, 'color', variable);
-  } else if (styleKey && styleMap?.color[styleKey]) {
-    const id = styleMap.color[styleKey];
-    if ('setFillStyleIdAsync' in node) {
-      try {
-        await (node as any).setFillStyleIdAsync(id);
-      } catch {
-        /* fallback */
-      }
-    }
+    node.fills = [fill];
+    return;
   }
+
+  // Paint first, style second. Assigning `fills` detaches whatever style is
+  // applied to the node, so the previous order — bind the style, then assign
+  // the paint — threw away the binding it had just made. With variables turned
+  // off, that meant every generated component carried a raw hex fill instead of
+  // a link to the colour style, which is the whole point of generating styles.
+  // The paint is still assigned unconditionally so a binding that fails leaves
+  // the correct colour behind rather than Figma's default grey.
   node.fills = [fill];
+  const id = styleKey ? styleMap?.color[styleKey] : undefined;
+  if (id && canBindFillStyle(node)) queueBinding(node.setFillStyleIdAsync(id));
 }
 
-export async function setStroke(
+export function setStroke(
   node: MinimalStrokes,
   hex: string,
   weight = 1,
   styleKey?: string,
   styleMap?: StyleMap,
   varMap?: VariableMap
-): Promise<void> {
-  let stroke: Paint = { type: 'SOLID', color: hexToRgb(hex) };
+): void {
   const variable = resolveColorVariable(varMap, styleKey);
+  let stroke: Paint = { type: 'SOLID', color: hexToRgb(hex) };
+
+  node.strokeWeight = weight;
+
   if (styleKey && variable) {
     stroke = figma.variables.setBoundVariableForPaint(stroke as SolidPaint, 'color', variable);
-  } else if (styleKey && styleMap?.color[styleKey]) {
-    const id = styleMap.color[styleKey];
-    if ('setStrokeStyleIdAsync' in node) {
-      try {
-        await (node as any).setStrokeStyleIdAsync(id);
-      } catch {
-        /* fallback */
-      }
-    }
+    node.strokes = [stroke];
+    return;
   }
+
+  // Same ordering fix as setFill: assigning `strokes` detaches the stroke style.
   node.strokes = [stroke];
-  node.strokeWeight = weight;
+  const id = styleKey ? styleMap?.color[styleKey] : undefined;
+  if (id && canBindStrokeStyle(node)) queueBinding(node.setStrokeStyleIdAsync(id));
 }
 
-export async function setEffect(
+export function setEffect(
   node: MinimalEffects,
   shadow: { x: number; y: number; blur: number; spread: number; color: string } | undefined,
   styleKey?: string,
   styleMap?: StyleMap,
   _varMap?: VariableMap
-): Promise<void> {
+): void {
   if (!shadow) return;
-  const rgba = parseRgba(shadow.color);
   node.effects = [
     {
       type: 'DROP_SHADOW',
       offset: { x: shadow.x, y: shadow.y },
       radius: shadow.blur,
       spread: shadow.spread,
-      color: rgba,
+      color: parseRgba(shadow.color),
       visible: true,
       blendMode: 'NORMAL',
     },
   ];
-  if (styleKey && styleMap?.effect[styleKey]) {
-    const id = styleMap.effect[styleKey];
-    if ('setEffectStyleIdAsync' in node) {
-      try {
-        await (node as any).setEffectStyleIdAsync(id);
-      } catch {
-        /* fallback */
-      }
-    }
-  }
+  const id = styleKey ? styleMap?.effect[styleKey] : undefined;
+  if (id && canBindEffectStyle(node)) queueBinding(node.setEffectStyleIdAsync(id));
 }
 
 export interface TextOptions {

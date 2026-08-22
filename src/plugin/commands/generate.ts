@@ -20,7 +20,18 @@ import {
   emptyStyleMap,
   StyleMap,
 } from '../utils/styleKeys';
-import { makeFrame, setFill, setStroke, setEffect, hbox, vbox, text, rect, pad } from '../utils/primitives';
+import {
+  makeFrame,
+  setFill,
+  setStroke,
+  setEffect,
+  hbox,
+  vbox,
+  text,
+  rect,
+  pad,
+  flushStyleBindings,
+} from '../utils/primitives';
 import { colorShade, radiusPx, shadow } from '../utils/tokenAccess';
 import { setLastTokens } from '../utils/tokensStore';
 import { generateComponents } from '../utils/factory';
@@ -29,7 +40,27 @@ import { BoardContext, TOKEN_BOARD_BUILDERS, TokenBoardTarget, isTokenBoardTarge
 
 export type { GenerationProgress };
 
+/**
+ * Build a design system on the canvas.
+ *
+ * The flush in `finally` is load-bearing. Paint and effect style bindings are
+ * queued rather than awaited at each of the ~75 call sites that paint a node
+ * (see primitives.ts for why); this is where that queue is drained. It runs on
+ * the error path too, so a build that throws halfway still keeps the styles on
+ * the nodes it managed to create.
+ */
 export async function generateDesignSystem(
+  config: GenerationConfig & { target?: string },
+  onProgress?: (progress: GenerationProgress) => void
+): Promise<{ stats: GenerationStats }> {
+  try {
+    return await runGeneration(config, onProgress);
+  } finally {
+    await flushStyleBindings();
+  }
+}
+
+async function runGeneration(
   config: GenerationConfig & { target?: string },
   onProgress?: (progress: GenerationProgress) => void
 ): Promise<{ stats: GenerationStats }> {
@@ -1462,6 +1493,19 @@ async function buildCustomCard(
 }
 
 export async function generateColorExtensions(
+  baseHex: string,
+  colorName?: string,
+  config?: GenerationConfig,
+  customGradientStops?: Record<string, string[]>
+): Promise<void> {
+  try {
+    await runColorExtensions(baseHex, colorName, config, customGradientStops);
+  } finally {
+    await flushStyleBindings();
+  }
+}
+
+async function runColorExtensions(
   baseHex: string,
   colorName?: string,
   config?: GenerationConfig,
