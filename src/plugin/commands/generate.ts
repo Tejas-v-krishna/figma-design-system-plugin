@@ -132,7 +132,7 @@ export async function generateDesignSystem(
     const colorPage = await openPage('🎨 Color System');
     const cleanHex = config.primaryColor.replace('#', '').toUpperCase();
     const name = config.colorNames?.[cleanHex] || getColorName(config.primaryColor) || `#${cleanHex}`;
-    const board = await buildGradientsBoard(config.primaryColor, name, `${name} Gradients Board`);
+    const board = await buildGradientsBoard(config.primaryColor, name, `${name} Gradients Board`, undefined, config.fontFamily.heading);
     replaceBoard(colorPage, board);
 
     figma.viewport.scrollAndZoomIntoView([board]);
@@ -334,7 +334,8 @@ async function createBlackHeroBox(
   titleText: string,
   mainDesc?: string,
   descItems?: { label: string; desc: string }[],
-  width: number = 904
+  width: number = 904,
+  fontFamily: string = 'Inter'
 ): Promise<FrameNode> {
   const box = figma.createFrame();
   box.name = 'Header Black Box';
@@ -371,7 +372,7 @@ async function createBlackHeroBox(
     badge.strokeWeight = 1;
 
     const badgeTxt = figma.createText();
-    badgeTxt.fontName = await ensureFont('Google Sans', 500);
+    badgeTxt.fontName = await ensureFont(fontFamily, 500);
     badgeTxt.fontSize = 11;
     badgeTxt.characters = badgeText;
     badgeTxt.fills = [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }];
@@ -382,7 +383,7 @@ async function createBlackHeroBox(
   // 2. Title (e.g. "Color System")
   const title = figma.createText();
   title.name = 'Title';
-  title.fontName = await ensureFont('Google Sans', 700);
+  title.fontName = await ensureFont(fontFamily, 700);
   title.fontSize = 36;
   title.letterSpacing = { value: -2, unit: 'PERCENT' };
   title.characters = titleText;
@@ -393,7 +394,7 @@ async function createBlackHeroBox(
   if (mainDesc) {
     const mainDescTxt = figma.createText();
     mainDescTxt.name = 'Main Description';
-    mainDescTxt.fontName = await ensureFont('Google Sans', 400);
+    mainDescTxt.fontName = await ensureFont(fontFamily, 400);
     mainDescTxt.fontSize = 13;
     mainDescTxt.characters = mainDesc;
     mainDescTxt.fills = [{ type: 'SOLID', color: hexToRgb('#CBD5E1') }];
@@ -425,13 +426,13 @@ async function createBlackHeroBox(
       row.fills = [];
 
       const lbl = figma.createText();
-      lbl.fontName = await ensureFont('Google Sans', 700);
+      lbl.fontName = await ensureFont(fontFamily, 700);
       lbl.fontSize = 12;
       lbl.characters = `${item.label} : `;
       lbl.fills = [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }];
 
       const body = figma.createText();
-      body.fontName = await ensureFont('Google Sans', 400);
+      body.fontName = await ensureFont(fontFamily, 400);
       body.fontSize = 12;
       body.characters = item.desc;
       body.fills = [{ type: 'SOLID', color: hexToRgb('#94A3B8') }];
@@ -486,7 +487,7 @@ async function buildColorSystemBoard(
     chars: string, wt: number, sz: number, col: RGB, ls = 0
   ): Promise<TextNode> => {
     const t = figma.createText();
-    t.fontName = await ensureFont('Google Sans', wt);
+    t.fontName = await ensureFont(config.fontFamily.heading, wt);
     t.fontSize = sz;
     t.characters = chars;
     t.fills = [{ type: 'SOLID', color: col }];
@@ -682,7 +683,8 @@ async function buildColorSystemBoard(
         desc: 'Highlight semantic states to provide visual feedback and warnings during interface use.',
       },
     ],
-    CW
+    CW,
+    config.fontFamily.heading
   );
   board.appendChild(heroHeader);
   board.appendChild(mkDivider());
@@ -1354,7 +1356,8 @@ async function buildCustomCard(
   paints: Paint[],
   width: number,
   height: number,
-  isLight: boolean
+  isLight: boolean,
+  fontFamily: string = 'Inter'
 ): Promise<FrameNode> {
   const card = figma.createFrame();
   card.name = `${title} Card`;
@@ -1389,7 +1392,7 @@ async function buildCustomCard(
   const textSubColor = isLight ? hexToRgb('#334155') : hexToRgb('#F1F5F9');
 
   const nameText = figma.createText();
-  nameText.fontName = await ensureFont('Google Sans', 600);
+  nameText.fontName = await ensureFont(fontFamily, 600);
   nameText.fontSize = width > 300 ? 24 : 18;
   nameText.letterSpacing = { value: -3, unit: 'PERCENT' };
   nameText.characters = title;
@@ -1411,7 +1414,7 @@ async function buildCustomCard(
 
   if (sub1) {
     const sub1Text = figma.createText();
-    sub1Text.fontName = await ensureFont('Google Sans', 500);
+    sub1Text.fontName = await ensureFont(fontFamily, 500);
     sub1Text.fontSize = 13;
     sub1Text.letterSpacing = { value: -3, unit: 'PERCENT' };
     sub1Text.characters = sub1;
@@ -1434,7 +1437,7 @@ async function buildCustomCard(
 
   if (sub2) {
     const sub2Text = figma.createText();
-    sub2Text.fontName = await ensureFont('Google Sans', 400);
+    sub2Text.fontName = await ensureFont(fontFamily, 400);
     sub2Text.fontSize = 13;
     sub2Text.letterSpacing = { value: -3, unit: 'PERCENT' };
     sub2Text.characters = sub2;
@@ -1461,7 +1464,7 @@ async function buildCustomCard(
 export async function generateColorExtensions(
   baseHex: string,
   colorName?: string,
-  _config?: GenerationConfig,
+  config?: GenerationConfig,
   customGradientStops?: Record<string, string[]>
 ): Promise<void> {
   let colorPage = figma.root.children.find((p) => p.name === '🎨 Color System') || figma.createPage();
@@ -1469,7 +1472,8 @@ export async function generateColorExtensions(
   await figma.setCurrentPageAsync(colorPage);
 
   const cleanHex = baseHex.replace('#', '').toUpperCase();
-  const apiName = _config?.colorNames?.[cleanHex] || getColorName(baseHex);
+  const apiName = config?.colorNames?.[cleanHex] || getColorName(baseHex);
+  const headingFont = config?.fontFamily?.heading ?? 'Inter';
   const resolvedName = colorName || apiName || `#${cleanHex}`;
   const displayTitle = apiName && apiName.toLowerCase() !== resolvedName.toLowerCase()
     ? `${resolvedName} (${apiName})`
@@ -1540,7 +1544,8 @@ export async function generateColorExtensions(
         desc: 'Highlight semantic states to provide visual feedback and warnings during interface use.',
       },
     ],
-    952
+    952,
+    headingFont
   );
   shadesBoard.appendChild(shadesHeroHeader);
 
@@ -1567,7 +1572,8 @@ export async function generateColorExtensions(
       [{ type: 'SOLID', color: hexToRgb(hex1) }],
       i + 1 < shadeKeys.length ? 464 : 952,
       220,
-      isLightColorHex(hex1)
+      isLightColorHex(hex1),
+      headingFont
     );
     row.appendChild(card1);
 
@@ -1582,7 +1588,8 @@ export async function generateColorExtensions(
         [{ type: 'SOLID', color: hexToRgb(hex2) }],
         464,
         220,
-        isLightColorHex(hex2)
+        isLightColorHex(hex2),
+        headingFont
       );
       row.appendChild(card2);
     }
@@ -1591,7 +1598,7 @@ export async function generateColorExtensions(
   }
 
   // --- SEPARATE BOARD 2: GRADIENTS BOARD ---
-  const gradientsBoard = await buildGradientsBoard(baseHex, displayTitle, gradientsBoardName, customGradientStops);
+  const gradientsBoard = await buildGradientsBoard(baseHex, displayTitle, gradientsBoardName, customGradientStops, headingFont);
   gradientsBoard.x = 0;
   gradientsBoard.y = startY + shadesBoard.height + 60;
   colorPage.appendChild(gradientsBoard);
@@ -1609,7 +1616,8 @@ async function buildGradientsBoard(
   baseHex: string,
   displayTitle: string,
   boardName: string,
-  customGradientStops?: Record<string, string[]>
+  customGradientStops?: Record<string, string[]>,
+  fontFamily: string = 'Inter'
 ): Promise<FrameNode> {
   const gradients = generateGradientsForColor(baseHex);
 
@@ -1650,7 +1658,8 @@ async function buildGradientsBoard(
         desc: 'Stops that fade in opacity, intended for glassmorphic overlays stacked over content.',
       },
     ],
-    952
+    952,
+    fontFamily
   );
   gradientsBoard.appendChild(gradientsHeroHeader);
 
@@ -1674,7 +1683,8 @@ async function buildGradientsBoard(
         [convertGradientToFigmaPaint(preset)],
         gradients.length - i > 1 ? 464 : 952,
         220,
-        light
+        light,
+        fontFamily
       );
       row.appendChild(card);
     }
