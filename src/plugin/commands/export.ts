@@ -41,6 +41,7 @@ function toJson(tokens: DesignTokens) {
     spacing: tokens.spacing,
     shadows: tokens.shadows,
     borderRadius: tokens.borderRadius,
+    strokes: tokens.strokes,
   };
 }
 
@@ -49,6 +50,18 @@ function colorVars(tokens: DesignTokens): string[] {
   for (const [name, ct] of Object.entries(tokens.colors)) {
     for (const [shade, hex] of Object.entries(ct.shades)) {
       lines.push(`  --color-${name}-${shade}: ${hex};`);
+    }
+  }
+  return lines;
+}
+
+/** Dark-mode overrides, or [] when dark mode wasn't generated. */
+function darkColorVars(tokens: DesignTokens): string[] {
+  const lines: string[] = [];
+  for (const [name, ct] of Object.entries(tokens.colors)) {
+    if (!ct.darkShades) continue;
+    for (const [shade, hex] of Object.entries(ct.darkShades)) {
+      lines.push(`    --color-${name}-${shade}: ${hex};`);
     }
   }
   return lines;
@@ -76,17 +89,37 @@ function toCss(tokens: DesignTokens, config: GenerationConfig): string {
   for (const s of tokens.spacing) lines.push(`  --space-${s.name}: ${s.value}px;`);
   lines.push('  /* Radius */');
   for (const r of tokens.borderRadius) lines.push(`  --radius-${r.name}: ${r.value};`);
+  lines.push('  /* Stroke */');
+  for (const s of tokens.strokes) lines.push(`  --stroke-${s.name}: ${s.value}px;`);
   lines.push('  /* Elevation */');
   for (const s of tokens.shadows) lines.push(`  --shadow-${s.name}: ${s.value};`);
   lines.push('}');
+
+  const dark = darkColorVars(tokens);
+  if (dark.length) {
+    lines.push('');
+    lines.push('@media (prefers-color-scheme: dark) {');
+    lines.push('  :root {');
+    lines.push(...dark);
+    lines.push('  }');
+    lines.push('}');
+  }
+
   return lines.join('\n');
 }
 
 function toTailwind(tokens: DesignTokens): string {
-  const colors: Record<string, Record<string, string>> = {};
+  const colors: Record<string, Record<string, string | Record<string, string>>> = {};
   for (const [name, ct] of Object.entries(tokens.colors)) {
     colors[name] = {};
     for (const [shade, hex] of Object.entries(ct.shades)) colors[name][shade] = hex;
+    // Nested keys flatten with dashes in Tailwind, so this yields utilities
+    // like `bg-primary-dark-500` alongside `bg-primary-500`.
+    if (ct.darkShades) {
+      const dark: Record<string, string> = {};
+      for (const [shade, hex] of Object.entries(ct.darkShades)) dark[shade] = hex;
+      colors[name].dark = dark;
+    }
   }
   const spacing: Record<string, string> = {};
   for (const s of tokens.spacing) spacing[s.name] = `${s.value}px`;
@@ -94,6 +127,8 @@ function toTailwind(tokens: DesignTokens): string {
   for (const r of tokens.borderRadius) radius[r.name] = r.value;
   const shadow: Record<string, string> = {};
   for (const s of tokens.shadows) shadow[s.name] = s.value;
+  const borderWidth: Record<string, string> = {};
+  for (const s of tokens.strokes) borderWidth[s.name] = `${s.value}px`;
 
   const obj = {
     theme: {
@@ -101,6 +136,7 @@ function toTailwind(tokens: DesignTokens): string {
         colors,
         spacing,
         borderRadius: radius,
+        borderWidth,
         boxShadow: shadow,
       },
     },
@@ -109,11 +145,17 @@ function toTailwind(tokens: DesignTokens): string {
 }
 
 function toDtcg(tokens: DesignTokens): string {
-  const dtcg: any = { color: {}, dimension: {}, borderRadius: {}, shadow: {} };
+  const dtcg: any = { color: {}, dimension: {}, borderRadius: {}, strokeWidth: {}, shadow: {} };
   for (const [name, ct] of Object.entries(tokens.colors)) {
     dtcg.color[name] = {};
     for (const [shade, hex] of Object.entries(ct.shades)) {
       dtcg.color[name][shade] = { $type: 'color', $value: hex };
+    }
+    if (ct.darkShades) {
+      dtcg.color[name].dark = {};
+      for (const [shade, hex] of Object.entries(ct.darkShades)) {
+        dtcg.color[name].dark[shade] = { $type: 'color', $value: hex };
+      }
     }
   }
   for (const s of tokens.spacing) {
@@ -121,6 +163,9 @@ function toDtcg(tokens: DesignTokens): string {
   }
   for (const r of tokens.borderRadius) {
     dtcg.borderRadius[r.name] = { $type: 'borderRadius', $value: r.value };
+  }
+  for (const s of tokens.strokes) {
+    dtcg.strokeWidth[s.name] = { $type: 'dimension', $value: `${s.value}px` };
   }
   for (const s of tokens.shadows) {
     dtcg.shadow[s.name] = { $type: 'shadow', $value: s.value };
