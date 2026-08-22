@@ -39,7 +39,6 @@ export const CodeExportView: React.FC = () => {
         </div>
         <div className="figr-code-header-badge">
           <h2>Export Code</h2>
-          <span className="figr-badge-pill">Production Ready</span>
         </div>
         <p className="figr-code-desc">
           Export your tokens and components for development use across web, mobile, and design tools.

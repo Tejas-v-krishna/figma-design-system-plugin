@@ -624,15 +624,6 @@ h1, h2, h3, h4, h5, h6,
 }
 .figr-code-header-badge h2 { font-size: 22px; font-weight: 700; color: #fff; }
 
-.figr-badge-pill {
-  background: #282828;
-  color: #aaa;
-  border: 1px solid #383838;
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 12px;
-}
-
 .figr-code-desc {
   color: #888;
   font-size: 13px;
