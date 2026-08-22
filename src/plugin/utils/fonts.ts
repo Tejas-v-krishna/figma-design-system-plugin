@@ -52,16 +52,39 @@ function nearestStyle(styles: string[], weight: number): string {
   return styles[0] ?? 'Regular';
 }
 
+// Families Figma resolves in every document without the user installing
+// anything. Used as the fallback chain when the requested family is missing,
+// in preference to "whatever happens to be installed".
+const GUARANTEED_FAMILIES = ['Inter', 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial'];
+
+function firstInstalled(names: string[]): string | undefined {
+  for (const n of names) {
+    const found = findFamily(n);
+    if (found) return found;
+  }
+  return undefined;
+}
+
 /** Resolve a desired font family + numeric weight to an installed { family, style }. */
 export function resolveFont(family: string, weight: number): FontName {
   const targetWeight = Math.min(weight, 600);
 
   if (!byFamily || byFamily.size === 0) {
     const styleName = targetWeight >= 600 ? 'Semi Bold' : targetWeight >= 500 ? 'Medium' : 'Regular';
-    return { family: 'Google Sans', style: styleName };
+    return { family: family || 'Inter', style: styleName };
   }
 
-  const fam = findFamily('Google Sans') ?? findFamily(family) ?? AVAILABLE[0]?.family ?? 'Google Sans';
+  // The requested family wins. This used to resolve a hardcoded 'Google Sans'
+  // *before* the caller's family, so a user who happened to have that family
+  // installed got it on every text node regardless of what they configured —
+  // and a user who didn't fell through to AVAILABLE[0], i.e. whichever family
+  // sorted first alphabetically across their whole font list.
+  const fam =
+    findFamily(family) ??
+    firstInstalled(GUARANTEED_FAMILIES) ??
+    AVAILABLE[0]?.family ??
+    'Inter';
+
   return { family: fam, style: nearestStyle(byFamily.get(fam) ?? [], targetWeight) };
 }
 
@@ -76,7 +99,12 @@ export async function preloadFonts(config: GenerationConfig): Promise<void> {
       /* listing can fail (e.g. offline); resolveFont then falls back safely */
     }
   }
-  const families = [config.fontFamily.heading, config.fontFamily.body, config.fontFamily.mono, 'Google Sans', 'Inter'];
+  const families = [
+    config.fontFamily.heading,
+    config.fontFamily.body,
+    config.fontFamily.mono,
+    ...GUARANTEED_FAMILIES,
+  ];
   const weights = [400, 500, 600, 700];
   const promises: Promise<void>[] = [];
 

@@ -142,7 +142,12 @@ export interface GenerationOptions {
 export const DEFAULT_CONFIG: GenerationConfig = {
   brandName: 'My Design System',
   primaryColor: '#2563EB',
-  fontFamily: { heading: 'Google Sans', body: 'Google Sans', mono: 'Google Sans Code' },
+  // Inter and Roboto Mono are bundled with Figma and resolve in every document
+  // without the user installing anything. The previous default was 'Google Sans'
+  // and 'Google Sans Code', which are not distributed through Figma's font
+  // picker at all — so loadFontAsync rejected for effectively every user and
+  // every text node fell back to whatever Figma chose.
+  fontFamily: { heading: 'Inter', body: 'Inter', mono: 'Roboto Mono' },
   typographyScale: 'material',
   baseFontSize: 16,
   baseSpacing: 4,
