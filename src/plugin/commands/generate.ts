@@ -357,8 +357,11 @@ async function createBlackHeroBox(
     badge.paddingLeft = 12;
     badge.paddingRight = 12;
     badge.cornerRadius = 100;
-    badge.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1, a: 0.05 } }];
-    badge.strokes = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1, a: 0.25 } }];
+    // Figma's RGB has no alpha channel — translucency goes on the paint's
+    // `opacity`, not inside `color`. Passing `a` there is silently ignored,
+    // which rendered this badge fully opaque instead of a subtle 5% wash.
+    badge.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 }, opacity: 0.05 }];
+    badge.strokes = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 }, opacity: 0.25 }];
     badge.strokeWeight = 1;
 
     const badgeTxt = figma.createText();
@@ -624,7 +627,7 @@ async function buildColorSystemBoard(
         ],
       },
     ];
-    h.strokes = [{ type: 'SOLID', color: { r: 0.89, g: 0.91, b: 0.94, a: 1 } }];
+    h.strokes = [{ type: 'SOLID', color: { r: 0.89, g: 0.91, b: 0.94 } }];
     h.strokeWeight = 1;
 
     h.appendChild(await mkTxt(label.toUpperCase(), 600, 11, C_MUTED, 6));
