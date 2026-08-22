@@ -1,7 +1,18 @@
 {
-  "name": "figr-design-system",
+  "name": "design-system-kit",
   "version": "1.0.0",
-  "description": "FIGR-inspired Design System Generator for Figma",
+  "description": "Figma plugin that generates a complete design system: color, type, spacing, radius and elevation tokens, Figma styles and variables, 50 components, and token export to CSS, Tailwind and DTCG.",
+  "license": "MIT",
+  "author": "Tejas V Krishna",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tejas-v-krishna/figma-design-system-plugin.git"
+  },
+  "homepage": "https://github.com/Tejas-v-krishna/figma-design-system-plugin#readme",
+  "bugs": {
+    "url": "https://github.com/Tejas-v-krishna/figma-design-system-plugin/issues"
+  },
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite build --watch --mode development --config vite.ui.config.ts & vite build --watch --mode development --config vite.config.ts",
