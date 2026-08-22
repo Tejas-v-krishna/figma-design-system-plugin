@@ -16,13 +16,14 @@ export type ExportFormat = 'json' | 'css' | 'tailwind' | 'dtcg';
  */
 export function exportTokens(format: ExportFormat, config?: GenerationConfig): string {
   const last = getLastTokens();
-  const tokens = last ? last.tokens : config ? buildTokens(config) : null;
-  if (!tokens) {
+  const resolved = last ?? (config ? { tokens: buildTokens(config), config } : null);
+  if (!resolved) {
     throw new Error('No tokens to export. Configure a design system in the panel first.');
   }
+  const { tokens, config: cfg } = resolved;
   switch (format) {
     case 'css':
-      return toCss(tokens);
+      return toCss(tokens, cfg);
     case 'tailwind':
       return toTailwind(tokens);
     case 'dtcg':
@@ -53,15 +54,24 @@ function colorVars(tokens: DesignTokens): string[] {
   return lines;
 }
 
-function toCss(tokens: DesignTokens): string {
+/**
+ * A CSS font stack for one configured family. Families whose names contain
+ * anything other than letters, digits and single spaces get quoted, which is
+ * what the CSS grammar requires for names like "IBM Plex Mono".
+ */
+function cssFontStack(family: string, fallback: string): string {
+  const quoted = /^[A-Za-z][A-Za-z0-9]*( [A-Za-z0-9]+)*$/.test(family) ? family : JSON.stringify(family);
+  return `${quoted}, ${fallback}`;
+}
+
+function toCss(tokens: DesignTokens, config: GenerationConfig): string {
   const lines: string[] = [':root {'];
   lines.push('  /* Color */');
   lines.push(...colorVars(tokens));
   lines.push('  /* Typography */');
-  // font families aren't in tokens; use generic fallbacks
-  lines.push('  --font-heading: Inter, sans-serif;');
-  lines.push('  --font-body: Inter, sans-serif;');
-  lines.push('  --font-mono: "IBM Plex Mono", monospace;');
+  lines.push(`  --font-heading: ${cssFontStack(config.fontFamily.heading, 'sans-serif')};`);
+  lines.push(`  --font-body: ${cssFontStack(config.fontFamily.body, 'sans-serif')};`);
+  lines.push(`  --font-mono: ${cssFontStack(config.fontFamily.mono, 'monospace')};`);
   lines.push('  /* Spacing */');
   for (const s of tokens.spacing) lines.push(`  --space-${s.name}: ${s.value}px;`);
   lines.push('  /* Radius */');
