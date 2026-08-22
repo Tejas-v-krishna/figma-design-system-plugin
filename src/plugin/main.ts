@@ -20,29 +20,41 @@ figma.showUI(__html__, {
 // Selection change listener for canvas color detection
 figma.on('selectionchange', () => {
   const selection = figma.currentPage.selection;
-  if (selection.length === 1) {
-    const node = selection[0];
-    let fillHex: string | null = null;
-    const colorName: string | null = node.name || null;
+  // Only a single node gives an unambiguous colour to offer the UI.
+  if (selection.length !== 1) return;
+  const node = selection[0];
+  if (!node) return;
 
-    if ('fills' in node && Array.isArray(node.fills) && node.fills.length > 0) {
-      const fill = node.fills[0];
-      if (fill.type === 'SOLID') {
-        const r = Math.round(fill.color.r * 255).toString(16).padStart(2, '0');
-        const g = Math.round(fill.color.g * 255).toString(16).padStart(2, '0');
-        const b = Math.round(fill.color.b * 255).toString(16).padStart(2, '0');
-        fillHex = `#${r}${g}${b}`.toUpperCase();
-      }
-    }
-
-    if (fillHex) {
-      figma.ui.postMessage({
-        type: 'COLOR_SELECTED',
-        payload: { hex: fillHex, name: colorName },
-      });
-    }
-  }
+  const hex = solidFillHex(node);
+  if (!hex) return;
+  figma.ui.postMessage({
+    type: 'COLOR_SELECTED',
+    payload: { hex, name: node.name || null },
+  });
 });
+
+/**
+ * Hex of a node's first fill, if that fill is a plain solid colour.
+ *
+ * `'fills' in node` is the only way to ask, because a fill-less node type has no
+ * such property at all. The paint is then narrowed by tag rather than accessed
+ * through an `any`: a gradient paint has no `.color`, so reading `.color.r` off
+ * one throws, and Array.isArray on `node.fills` widens the element type to `any`
+ * and hides exactly that.
+ */
+function solidFillHex(node: SceneNode): string | null {
+  if (!('fills' in node)) return null;
+  const fills = node.fills;
+  if (fills === figma.mixed || !Array.isArray(fills)) return null;
+  const paint: Paint | undefined = fills[0];
+  if (!paint || paint.type !== 'SOLID') return null;
+
+  const channel = (n: number) =>
+    Math.round(Math.min(1, Math.max(0, n)) * 255)
+      .toString(16)
+      .padStart(2, '0');
+  return `#${channel(paint.color.r)}${channel(paint.color.g)}${channel(paint.color.b)}`.toUpperCase();
+}
 
 // Tell the UI which font families are actually installed, so its font
 // dropdowns only offer fonts Figma can render (the rest silently fail).
