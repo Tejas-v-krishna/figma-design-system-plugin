@@ -94,25 +94,25 @@ export const SetTokensView: React.FC = () => {
     switch (tokenCategory) {
       case 'radius':
         return (
-          <div className="figr-token-panel">
-            <div className="figr-token-header">
+          <div className="dsk-token-panel">
+            <div className="dsk-token-header">
               <h2>Radius</h2>
               <button className="dsk-link-btn" onClick={addRadiusItem}>
                 + New radius
               </button>
             </div>
-            <div className="figr-token-group-bar">
+            <div className="dsk-token-group-bar">
               <span>All Radius</span>
               <button className="dsk-icon-add" onClick={addRadiusItem}>+</button>
             </div>
-            <div className="figr-token-rows">
+            <div className="dsk-token-rows">
               {radiusList.map((item) => (
-                <div className="figr-token-row" key={item.id}>
-                  <span className="figr-token-name">{item.label}</span>
-                  <div className="figr-token-input-wrapper">
+                <div className="dsk-token-row" key={item.id}>
+                  <span className="dsk-token-name">{item.label}</span>
+                  <div className="dsk-token-input-wrapper">
                     <input
                       type="number"
-                      className="figr-token-input"
+                      className="dsk-token-input"
                       value={item.value}
                       onChange={(e) => updateRadiusItem(item.id, Number(e.target.value))}
                     />
@@ -125,25 +125,25 @@ export const SetTokensView: React.FC = () => {
 
       case 'stroke':
         return (
-          <div className="figr-token-panel">
-            <div className="figr-token-header">
+          <div className="dsk-token-panel">
+            <div className="dsk-token-header">
               <h2>Stroke</h2>
               <button className="dsk-link-btn" onClick={addStrokeItem}>
                 + New stroke
               </button>
             </div>
-            <div className="figr-token-group-bar">
+            <div className="dsk-token-group-bar">
               <span>All Stroke</span>
               <button className="dsk-icon-add" onClick={addStrokeItem}>+</button>
             </div>
-            <div className="figr-token-rows">
+            <div className="dsk-token-rows">
               {strokeList.map((item) => (
-                <div className="figr-token-row" key={item.id}>
-                  <span className="figr-token-name">{item.label}</span>
-                  <div className="figr-token-input-wrapper">
+                <div className="dsk-token-row" key={item.id}>
+                  <span className="dsk-token-name">{item.label}</span>
+                  <div className="dsk-token-input-wrapper">
                     <input
                       type="number"
-                      className="figr-token-input"
+                      className="dsk-token-input"
                       value={item.value}
                       onChange={(e) => updateStrokeItem(item.id, Number(e.target.value))}
                     />
@@ -156,26 +156,26 @@ export const SetTokensView: React.FC = () => {
 
       case 'effects':
         return (
-          <div className="figr-token-panel">
-            <div className="figr-token-header">
+          <div className="dsk-token-panel">
+            <div className="dsk-token-header">
               <h2>Effects</h2>
               <button className="dsk-link-btn">
                 + New effects
               </button>
             </div>
-            <div className="figr-token-group-bar">
+            <div className="dsk-token-group-bar">
               <span>All Effects</span>
               <button className="dsk-icon-add">+</button>
             </div>
-            <div className="figr-token-rows">
+            <div className="dsk-token-rows">
               {effectsList.map((item) => (
-                <div className="figr-token-row" key={item.id}>
-                  <span className="figr-token-name">{item.label}</span>
-                  <div className="figr-effect-pill">
-                    <Sun size={13} className="figr-effect-icon" />
+                <div className="dsk-token-row" key={item.id}>
+                  <span className="dsk-token-name">{item.label}</span>
+                  <div className="dsk-effect-pill">
+                    <Sun size={13} className="dsk-effect-icon" />
                     <input
                       type="text"
-                      className="figr-effect-input"
+                      className="dsk-effect-input"
                       value={item.value}
                       onChange={(e) => updateEffectItem(item.id, e.target.value)}
                     />
@@ -252,7 +252,7 @@ export const SetTokensView: React.FC = () => {
                 />
                 <input
                   type="text"
-                  className="figr-token-input text-input"
+                  className="dsk-token-input text-input"
                   value={hex}
                   onChange={(e) => {
                     if (onUpdateHex) {
@@ -267,8 +267,8 @@ export const SetTokensView: React.FC = () => {
         };
 
         return (
-          <div className="figr-token-panel">
-            <div className="figr-token-header">
+          <div className="dsk-token-panel">
+            <div className="dsk-token-header">
               <h2>Colors</h2>
               <button className="dsk-link-btn" onClick={handleAddColor}>
                 + Add another color
@@ -276,7 +276,7 @@ export const SetTokensView: React.FC = () => {
             </div>
 
             {/* --- 1. BASE COLORS (PRIMITIVES) --- */}
-            <div className="figr-token-group-bar">
+            <div className="dsk-token-group-bar">
               <span>Base Colors (Primitives)</span>
             </div>
             <div className="figr-color-base-controls" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
@@ -287,7 +287,7 @@ export const SetTokensView: React.FC = () => {
             </div>
 
             {/* --- 2. STATUS & FEEDBACK COLORS (SEMANTICS) --- */}
-            <div className="figr-token-group-bar">
+            <div className="dsk-token-group-bar">
               <span>Status & Feedback Colors (Semantics)</span>
             </div>
             <div className="figr-color-base-controls" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
@@ -298,7 +298,7 @@ export const SetTokensView: React.FC = () => {
             </div>
 
             {/* --- 3. TEXT COLORS (FUNCTIONAL TOKENS) --- */}
-            <div className="figr-token-group-bar">
+            <div className="dsk-token-group-bar">
               <span>Text Colors (Functional Tokens)</span>
             </div>
             <div className="figr-color-base-controls" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
@@ -310,7 +310,7 @@ export const SetTokensView: React.FC = () => {
             </div>
 
             {/* --- 4. BACKGROUND & SURFACE COLORS (FUNCTIONAL TOKENS) --- */}
-            <div className="figr-token-group-bar">
+            <div className="dsk-token-group-bar">
               <span>Background & Surface Colors (Functional Tokens)</span>
             </div>
             <div className="figr-color-base-controls" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
@@ -373,8 +373,8 @@ export const SetTokensView: React.FC = () => {
 
       case 'gradients':
         return (
-          <div className="figr-token-panel">
-            <div className="figr-token-header">
+          <div className="dsk-token-panel">
+            <div className="dsk-token-header">
               <h2>Gradients</h2>
               <button
                 className="dsk-link-btn"
@@ -384,7 +384,7 @@ export const SetTokensView: React.FC = () => {
               </button>
             </div>
 
-            <div className="figr-token-group-bar">
+            <div className="dsk-token-group-bar">
               <span>Gradients Suite ({selectedColor.name} Base)</span>
               <span className="figr-color-name-badge">Dedicated Tab</span>
             </div>
@@ -487,8 +487,8 @@ export const SetTokensView: React.FC = () => {
 
       case 'typography':
         return (
-          <div className="figr-token-panel">
-            <div className="figr-token-header">
+          <div className="dsk-token-panel">
+            <div className="dsk-token-header">
               <h2>Typography</h2>
             </div>
             <div className="figr-color-settings">
@@ -496,7 +496,7 @@ export const SetTokensView: React.FC = () => {
                 <label>Heading Font Family</label>
                 <input
                   type="text"
-                  className="figr-token-input text-input"
+                  className="dsk-token-input text-input"
                   value={config.fontFamily.heading}
                   onChange={(e) => updateFont('heading', e.target.value)}
                 />
@@ -505,7 +505,7 @@ export const SetTokensView: React.FC = () => {
                 <label>Body Font Family</label>
                 <input
                   type="text"
-                  className="figr-token-input text-input"
+                  className="dsk-token-input text-input"
                   value={config.fontFamily.body}
                   onChange={(e) => updateFont('body', e.target.value)}
                 />
@@ -516,8 +516,8 @@ export const SetTokensView: React.FC = () => {
 
       case 'spacing':
         return (
-          <div className="figr-token-panel">
-            <div className="figr-token-header">
+          <div className="dsk-token-panel">
+            <div className="dsk-token-header">
               <h2>Spacing</h2>
             </div>
             <div className="figr-color-settings">
@@ -525,7 +525,7 @@ export const SetTokensView: React.FC = () => {
                 <label>Base Grid Spacing (px)</label>
                 <input
                   type="number"
-                  className="figr-token-input"
+                  className="dsk-token-input"
                   value={config.baseSpacing}
                   onChange={(e) => updateConfig({ baseSpacing: Number(e.target.value) })}
                 />
@@ -537,12 +537,12 @@ export const SetTokensView: React.FC = () => {
   };
 
   return (
-    <div className="figr-set-tokens-container">
-      <aside className="figr-sidebar-subnav">
+    <div className="dsk-set-tokens-container">
+      <aside className="dsk-sidebar-subnav">
         {categories.map((cat) => (
           <button
             key={cat.key}
-            className={`figr-sidebar-item ${tokenCategory === cat.key ? 'active' : ''}`}
+            className={`dsk-sidebar-item ${tokenCategory === cat.key ? 'active' : ''}`}
             onClick={() => setTokenCategory(cat.key)}
           >
             {cat.label}
@@ -550,7 +550,7 @@ export const SetTokensView: React.FC = () => {
         ))}
       </aside>
 
-      <main className="figr-token-main">
+      <main className="dsk-token-main">
         {renderContent()}
       </main>
 
