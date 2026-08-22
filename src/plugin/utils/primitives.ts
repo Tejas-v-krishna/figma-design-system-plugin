@@ -212,9 +212,13 @@ export function text(opts: TextOptions): TextNode {
     t.lineHeight = { value: (opts.fontSize ?? 14) * opts.lineHeightRatio, unit: 'PIXELS' };
   }
   t.letterSpacing = { value: opts.letterSpacing ?? -5, unit: 'PERCENT' };
-  if (opts.styleKey && opts.styleMap?.text[opts.styleKey]) {
-    t.textStyleId = opts.styleMap.text[opts.styleKey];
-  }
+  // The sync `textStyleId` setter is read-only when the manifest declares
+  // documentAccess: "dynamic-page" — assigning it throws "Cannot write to
+  // internal and read-only node property". It was assigned here, so every text
+  // node that had a style key threw, which is every heading and label once
+  // "create styles" is on. Same deferred queue as the paint bindings.
+  const textStyleId = opts.styleKey ? opts.styleMap?.text[opts.styleKey] : undefined;
+  if (textStyleId) queueBinding(t.setTextStyleIdAsync(textStyleId));
   return t;
 }
 
@@ -290,15 +294,29 @@ export interface MinimalEffects {
   effectStyleId?: string | symbol;
 }
 
+/**
+ * Parse an `rgb()` / `rgba()` string into a Figma RGBA.
+ *
+ * Everything is bounds-checked because the input is a token value that may have
+ * come from an imported file, and Figma rejects a paint containing NaN with an
+ * opaque error thrown from inside the API rather than from the caller. A
+ * malformed component degrades to a visible near-black shadow instead.
+ */
 function parseRgba(input: string): RGBA {
-  const m = input.match(/rgba?\(([^)]+)\)/);
-  if (!m) return { r: 0, g: 0, b: 0, a: 0.1 };
-  const parts = m[1].split(',').map((p) => parseFloat(p.trim()));
-  const [r, g, b, a = 0.1] = parts;
+  const fallback: RGBA = { r: 0, g: 0, b: 0, a: 0.1 };
+  const m = /rgba?\(([^)]+)\)/.exec(input);
+  const body = m?.[1];
+  if (!body) return fallback;
+
+  const parts = body.split(',').map((p) => parseFloat(p.trim()));
+  const channel = (n: number | undefined) =>
+    typeof n === 'number' && Number.isFinite(n) ? Math.min(1, Math.max(0, n / 255)) : 0;
+  const alpha = parts[3];
+
   return {
-    r: r / 255,
-    g: g / 255,
-    b: b / 255,
-    a,
+    r: channel(parts[0]),
+    g: channel(parts[1]),
+    b: channel(parts[2]),
+    a: typeof alpha === 'number' && Number.isFinite(alpha) ? Math.min(1, Math.max(0, alpha)) : 0.1,
   };
 }
