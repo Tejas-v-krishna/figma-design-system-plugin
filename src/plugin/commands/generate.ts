@@ -1606,14 +1606,30 @@ export async function generateColorExtensions(
   }
 
   // --- SEPARATE BOARD 2: GRADIENTS BOARD ---
-  // The UI previews these gradients and the message that triggers this command
-  // is named "shades & gradients", but the board itself was never built. Nine
-  // OKLCH presets come from generateGradientsForColor(); convert each to a
-  // Figma GradientPaint and lay them out to match the shades board.
+  const gradientsBoard = await buildGradientsBoard(baseHex, displayTitle, gradientsBoardName, customGradientStops);
+  gradientsBoard.x = 0;
+  gradientsBoard.y = startY + shadesBoard.height + 60;
+  colorPage.appendChild(gradientsBoard);
+}
+
+/**
+ * Nine OKLCH gradient presets derived from a base colour, as one board.
+ *
+ * The UI previews these and the message that triggers the colour command is
+ * named "shades & gradients", but the board itself was never built. Presets
+ * come from generateGradientsForColor(); each is converted to a Figma
+ * GradientPaint and laid out two-up to match the shades board.
+ */
+async function buildGradientsBoard(
+  baseHex: string,
+  displayTitle: string,
+  boardName: string,
+  customGradientStops?: Record<string, string[]>
+): Promise<FrameNode> {
   const gradients = generateGradientsForColor(baseHex);
 
   const gradientsBoard = figma.createFrame();
-  gradientsBoard.name = gradientsBoardName;
+  gradientsBoard.name = boardName;
   gradientsBoard.layoutMode = 'VERTICAL';
   gradientsBoard.primaryAxisSizingMode = 'AUTO';
   gradientsBoard.counterAxisSizingMode = 'AUTO';
@@ -1626,9 +1642,6 @@ export async function generateColorExtensions(
   gradientsBoard.fills = [{ type: 'SOLID', color: hexToRgb('#FAFAFA') }];
   gradientsBoard.cornerRadius = 25;
   gradientsBoard.clipsContent = false;
-  gradientsBoard.x = 0;
-  gradientsBoard.y = startY + shadesBoard.height + 60;
-  colorPage.appendChild(gradientsBoard);
 
   const gradientsHeroHeader = await createBlackHeroBox(
     'Gradients',
@@ -1683,6 +1696,8 @@ export async function generateColorExtensions(
 
     gradientsBoard.appendChild(row);
   }
+
+  return gradientsBoard;
 }
 
 /**
