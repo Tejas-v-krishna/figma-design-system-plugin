@@ -48,9 +48,6 @@ html, body {
 
 h1, h2, h3, h4, h5, h6,
 .figr-token-header h2,
-.figr-brand-title,
-.figr-project-name,
-.figr-top-tab.active,
 .figr-primary-btn,
 .figr-sidebar-item.active {
   font-family: var(--font-ui);
@@ -276,84 +273,6 @@ h1, h2, h3, h4, h5, h6,
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.figr-color-groups-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.figr-color-group-section {
-  display: flex;
-  flex-direction: column;
-}
-
-.figr-color-group-header {
-  background: #282828;
-  padding: 8px 12px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-weight: 600;
-  color: #eee;
-  font-size: 13px;
-  margin-bottom: 8px;
-}
-
-.figr-color-shade-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.figr-color-shade-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 6px;
-}
-
-.figr-shade-label {
-  color: #ccc;
-  font-size: 13px;
-}
-
-.figr-swatch-wrapper {
-  position: relative;
-  width: 50px;
-  height: 24px;
-}
-
-.figr-swatch-picker-input {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-  z-index: 2;
-}
-
-.figr-color-swatch-pill {
-  width: 100%;
-  height: 100%;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
-}
-
-.figr-color-swatch-pill.alpha-checkerboard {
-  background-image: linear-gradient(45deg, #444 25%, transparent 25%),
-    linear-gradient(-45deg, #444 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #444 75%),
-    linear-gradient(-45deg, transparent 75%, #444 75%);
-  background-size: 8px 8px;
-  background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
 }
 
 .figr-color-row {
@@ -1163,16 +1082,6 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   border: 1px solid var(--border, #27272a);
   border-radius: 4px;
   padding: 2px 4px;
-}
-
-.figr-stop-color-input {
-  width: 16px;
-  height: 16px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  padding: 0;
-  border-radius: 3px;
 }
 
 .figr-stop-hex {
