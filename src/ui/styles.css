@@ -505,7 +505,7 @@ h1, h2, h3, h4, h5, h6,
 }
 
 /* ---------- Code Export Screen ---------- */
-.figr-code-view-container {
+.dsk-code-view-container {
   flex: 1;
   padding: 40px 24px;
   display: flex;
@@ -514,7 +514,7 @@ h1, h2, h3, h4, h5, h6,
   overflow-y: auto;
 }
 
-.figr-code-hero {
+.dsk-code-hero {
   max-width: 500px;
   text-align: center;
   display: flex;
@@ -522,7 +522,7 @@ h1, h2, h3, h4, h5, h6,
   align-items: center;
 }
 
-.figr-code-illustration {
+.dsk-code-illustration {
   width: 90px;
   height: 90px;
   background: #252525;
@@ -535,22 +535,22 @@ h1, h2, h3, h4, h5, h6,
   margin-bottom: 20px;
 }
 
-.figr-code-header-badge {
+.dsk-code-header-badge {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 8px;
 }
-.figr-code-header-badge h2 { font-size: 22px; font-weight: 700; color: #fff; }
+.dsk-code-header-badge h2 { font-size: 22px; font-weight: 700; color: #fff; }
 
-.figr-code-desc {
+.dsk-code-desc {
   color: #888;
   font-size: 13px;
   line-height: 1.5;
   margin-bottom: 24px;
 }
 
-.figr-code-format-pills {
+.dsk-code-format-pills {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -558,7 +558,7 @@ h1, h2, h3, h4, h5, h6,
   margin-bottom: 24px;
 }
 
-.figr-format-pill {
+.dsk-format-pill {
   background: #242424;
   border: 1px solid #333;
   color: #ccc;
@@ -567,10 +567,10 @@ h1, h2, h3, h4, h5, h6,
   font-size: 12px;
   cursor: pointer;
 }
-.figr-format-pill:hover { background: #2c2c2c; }
-.figr-format-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.dsk-format-pill:hover { background: #2c2c2c; }
+.dsk-format-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-.figr-code-block-wrapper {
+.dsk-code-block-wrapper {
   width: 100%;
   background: #141414;
   border: 1px solid #333;
@@ -579,7 +579,7 @@ h1, h2, h3, h4, h5, h6,
   text-align: left;
 }
 
-.figr-code-block-header {
+.dsk-code-block-header {
   background: #202020;
   padding: 8px 12px;
   display: flex;
@@ -600,7 +600,7 @@ h1, h2, h3, h4, h5, h6,
   gap: 4px;
 }
 
-.figr-code-block {
+.dsk-code-block {
   padding: 12px;
   margin: 0;
   max-height: 240px;

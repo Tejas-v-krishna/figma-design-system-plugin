@@ -32,23 +32,23 @@ export const CodeExportView: React.FC = () => {
   };
 
   return (
-    <div className="figr-code-view-container">
-      <div className="figr-code-hero">
-        <div className="figr-code-illustration">
-          <Code size={48} className="figr-code-icon" />
+    <div className="dsk-code-view-container">
+      <div className="dsk-code-hero">
+        <div className="dsk-code-illustration">
+          <Code size={48} className="dsk-code-icon" />
         </div>
-        <div className="figr-code-header-badge">
+        <div className="dsk-code-header-badge">
           <h2>Export Code</h2>
         </div>
-        <p className="figr-code-desc">
+        <p className="dsk-code-desc">
           Export your tokens and components for development use across web, mobile, and design tools.
         </p>
 
-        <div className="figr-code-format-pills">
+        <div className="dsk-code-format-pills">
           {formats.map((fmt) => (
             <button
               key={fmt.key}
-              className={`figr-format-pill ${exportFormat === fmt.key ? 'active' : ''}`}
+              className={`dsk-format-pill ${exportFormat === fmt.key ? 'active' : ''}`}
               onClick={() => handleExport(fmt.key)}
             >
               {fmt.label}
@@ -57,15 +57,15 @@ export const CodeExportView: React.FC = () => {
         </div>
 
         {exportResult ? (
-          <div className="figr-code-block-wrapper">
-            <div className="figr-code-block-header">
+          <div className="dsk-code-block-wrapper">
+            <div className="dsk-code-block-header">
               <span>{exportFormat.toUpperCase()} Export Output</span>
               <button className="dsk-copy-btn" onClick={handleCopy}>
                 {copied ? <Check size={14} /> : <Copy size={14} />}
                 {copied ? 'Copied!' : 'Copy Code'}
               </button>
             </div>
-            <pre className="figr-code-block">{exportResult}</pre>
+            <pre className="dsk-code-block">{exportResult}</pre>
           </div>
         ) : (
           <button
