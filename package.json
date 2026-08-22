@@ -1,0 +1,30 @@
+{
+  "name": "figr-design-system",
+  "version": "1.0.0",
+  "description": "FIGR-inspired Design System Generator for Figma",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch --mode development --config vite.ui.config.ts & vite build --watch --mode development --config vite.config.ts",
+    "build": "vite build --config vite.ui.config.ts && vite build --config vite.config.ts",
+    "preview": "vite preview",
+    "lint": "eslint src --ext ts,tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "culori": "^4.0.2",
+    "lucide-react": "^0.294.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zustand": "^4.4.7"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.85.0",
+    "@types/culori": "^4.0.1",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.3.2",
+    "vite": "^5.0.8",
+    "vite-plugin-static-copy": "^1.0.0"
+  }
+}
