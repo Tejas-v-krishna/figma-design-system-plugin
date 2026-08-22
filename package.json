@@ -21,7 +21,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "check:config": "vite-node scripts/check-config-schema.ts"
   },
   "dependencies": {
     "culori": "^4.0.2",
