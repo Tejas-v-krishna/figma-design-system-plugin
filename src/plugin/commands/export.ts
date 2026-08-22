@@ -1,6 +1,6 @@
 // Design System Kit - Token export command
 import { getLastTokens } from '../utils/tokensStore';
-import { buildTokens } from './generate';
+import { buildTokens } from '../../shared/build-tokens';
 import { DesignTokens, GenerationConfig } from '../../shared/types';
 
 export type ExportFormat = 'json' | 'css' | 'tailwind' | 'dtcg';

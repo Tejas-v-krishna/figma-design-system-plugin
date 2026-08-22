@@ -7,16 +7,10 @@ import {
   GenerationProgress,
 } from '../../shared/types';
 import { COMPONENT_DEFINITIONS } from '../../shared/component-definitions';
-import { generateSemanticColors, hexToRgb, generateColorShades, generateGradientsForColor } from '../../shared/color-utils';
+import { hexToRgb, generateColorShades, generateGradientsForColor } from '../../shared/color-utils';
 import { getColorName } from '../../shared/color-naming';
 import { GradientPreset } from '../../shared/types';
-import {
-  generateTypographyTokens,
-  generateSpacingTokens,
-  generateShadowTokens,
-  generateBorderRadiusTokens,
-  generateStrokeTokens,
-} from '../../shared/typography-utils';
+import { buildTokens } from '../../shared/build-tokens';
 import { resolveFont, preloadFonts, ensureFont } from '../utils/fonts';
 import {
   colorStyleKey,
@@ -217,46 +211,6 @@ export async function generateDesignSystem(
  * export command can rebuild tokens from the UI's config when nothing has been
  * generated in this plugin session yet.
  */
-export function buildTokens(config: GenerationConfig): DesignTokens {
-  const colors = generateSemanticColors({
-    primary: config.primaryColor,
-    secondary: config.secondaryColor,
-    accent: config.accentColor,
-    success: config.successColor,
-    error: config.errorColor,
-    warning: config.warningColor,
-    information: config.informationColor,
-    neutral: config.neutralColor,
-  });
-
-  let typography = generateTypographyTokens(config.fontFamily.body, config.baseFontSize, config.typographyScale);
-  // Headings use the heading typeface.
-  typography = typography.map((t) =>
-    t.group === 'headings' ? { ...t, fontFamily: config.fontFamily.heading } : t
-  );
-
-  let borderRadius = generateBorderRadiusTokens();
-  if (config.radiusPreset === 'sharp') {
-    borderRadius = borderRadius.map((r) => (r.name === 'none' ? r : { ...r, px: 0, value: '0px' }));
-  } else if (config.radiusPreset === 'pill') {
-    borderRadius = borderRadius.map((r) => (r.name === 'none' ? r : { ...r, px: 9999, value: '9999px' }));
-  }
-
-  const intensityMap: Record<string, string[]> = {
-    none: [],
-    subtle: ['E0', 'E1'],
-    medium: ['E0', 'E1', 'E2', 'E3'],
-    strong: generateShadowTokens().map((s) => s.name),
-  };
-  const allowed = intensityMap[config.effectsIntensity] ?? intensityMap.medium;
-  const shadows = generateShadowTokens().filter((s) => allowed.includes(s.name));
-
-  const spacing = generateSpacingTokens(config.baseSpacing);
-  const strokes = generateStrokeTokens();
-
-  return { colors, typography, spacing, shadows, borderRadius, strokes };
-}
-
 // ---------------- fonts ----------------
 
 // Font preloading is handled by preloadFonts() in ../utils/fonts, which resolves
