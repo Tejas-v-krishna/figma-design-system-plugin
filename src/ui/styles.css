@@ -534,6 +534,9 @@ h1, h2, h3, h4, h5, h6,
 .figr-split-action {
   display: flex;
   align-items: center;
+  /* Keeps the CTA right-aligned in footers whose left slot is empty. With two
+     children and space-between this is a no-op. */
+  margin-left: auto;
 }
 
 .figr-primary-btn {

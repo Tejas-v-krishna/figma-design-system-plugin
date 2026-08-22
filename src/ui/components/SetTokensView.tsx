@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useStore, TokenCategory } from '../store';
 import { generateColorShades, generateGradientsForColor, hexToHsl, hexToRgb, interpolateOklchStops } from '../../shared/color-utils';
 import { getColorName, getNearestColorName } from '../../shared/color-naming';
-import { Info, ChevronUp, Sun, Sparkles, Layers, Palette } from 'lucide-react';
+import { ChevronUp, Sun, Sparkles, Layers, Palette } from 'lucide-react';
 import { ColorPickerModal } from './ColorPickerModal';
 
 export const SetTokensView: React.FC = () => {
@@ -555,11 +555,6 @@ export const SetTokensView: React.FC = () => {
       </main>
 
       <footer className="figr-bottom-bar">
-        <div className="figr-credits-badge">
-          <span>10 export credits left today</span>
-          <Info size={14} />
-        </div>
-
         <div className="figr-split-action">
           <button className="figr-primary-btn" onClick={() => startGeneration(tokenCategory)}>
             Create {tokenCategory} variables in <span className="figma-icon">❖</span>
