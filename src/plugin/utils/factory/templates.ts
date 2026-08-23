@@ -131,6 +131,7 @@ export const ICONS = {
   info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`,
   warning: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
   search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>`,
+  externalLink: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`,
   star: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
   mail: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22 6 12 13 2 6"></polyline></svg>`,
   lock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
@@ -513,6 +514,8 @@ const Button: Template = (root, ctx) => {
     root.appendChild(buildIcon(iconSize, textHex, 'copy'));
   } else if (iconType === 'copied') {
     root.appendChild(buildIcon(iconSize, textHex, 'check'));
+  } else if (iconType === 'badge') {
+    root.appendChild(buildIcon(iconSize, textHex, 'star'));
   } else if (iconType === 'loading') {
     const spinner = ellipse('spinnerRing', iconSize);
     spinner.fills = [];
@@ -540,19 +543,23 @@ const Button: Template = (root, ctx) => {
   if (iconType === 'trailing') {
     root.appendChild(buildIcon(iconSize, textHex, 'arrowRight'));
   } else if (iconType === 'external') {
-    root.appendChild(buildIcon(iconSize, textHex, 'arrowUp'));
+    root.appendChild(buildIcon(iconSize, textHex, 'externalLink'));
   } else if (iconType === 'badge') {
-    const badge = makeFrame('badge');
+    const badge = figma.createFrame();
+    badge.name = 'badge';
     badge.layoutMode = 'HORIZONTAL';
+    badge.primaryAxisSizingMode = 'AUTO';
+    badge.counterAxisSizingMode = 'AUTO';
+    badge.primaryAxisAlignItems = 'CENTER';
     badge.counterAxisAlignItems = 'CENTER';
     badge.cornerRadius = 9999;
-    pad(badge, 2, 6);
+    pad(badge, 2, 7);
     badge.fills = [{ type: 'SOLID', color: hexToRgbSafe(isSecondary ? '#F1F5F9' : '#323236') }];
     badge.appendChild(text({
       characters: '1.2k',
       fontFamily: ctx.config.fontFamily.body,
       weight: 600,
-      fontSize: fontSize - 2,
+      fontSize: Math.max(10, fontSize - 2),
       fill: isSecondary ? '#64748B' : '#FFFFFF',
     }));
     root.appendChild(badge);
