@@ -1,8 +1,8 @@
 import React from 'react';
-import { useStore } from '../store';
+import { useStore, isGenerateBusy } from '../store';
 import { COMPONENT_DEFINITIONS } from '../../shared/component-definitions';
 import { countComponentsFor } from '../../shared/variant-count';
-import { Search, SearchX, CheckSquare, XSquare, CheckCircle, ChevronUp } from 'lucide-react';
+import { Search, SearchX, CheckSquare, XSquare, CheckCircle, ChevronUp, Loader2 } from 'lucide-react';
 
 export const BuildComponentsView: React.FC = () => {
   const search = useStore((s) => s.componentSearch);
@@ -10,6 +10,8 @@ export const BuildComponentsView: React.FC = () => {
   const config = useStore((s) => s.config);
   const toggleComponent = useStore((s) => s.toggleComponent);
   const startGeneration = useStore((s) => s.startGeneration);
+  const checkingExisting = useStore((s) => s.checkingExisting);
+  const generateBusy = useStore(isGenerateBusy);
   const selectAll = useStore((s) => s.selectAll);
 
   const selectedSet = new Set(config.componentsToGenerate);
@@ -122,17 +124,29 @@ export const BuildComponentsView: React.FC = () => {
         </div>
 
         <div className="dsk-split-action">
+          {/* Generate does not start the run: it asks the sandbox what is already
+              in the file first, and on a large file that answer takes seconds.
+              Without a label change the button looked idle for the whole wait. */}
           <button
             className="dsk-primary-btn"
             onClick={() => startGeneration('components')}
-            disabled={selectedSet.size === 0}
+            disabled={selectedSet.size === 0 || generateBusy}
           >
-            Generate Components in <span className="figma-icon">❖</span>
+            {checkingExisting ? (
+              <>
+                <Loader2 size={15} className="dsk-spin" />
+                Checking this file…
+              </>
+            ) : (
+              <>
+                Generate Components in <span className="figma-icon">❖</span>
+              </>
+            )}
           </button>
           <button
             className="dsk-split-caret"
             onClick={() => startGeneration('components')}
-            disabled={selectedSet.size === 0}
+            disabled={selectedSet.size === 0 || generateBusy}
           >
             <ChevronUp size={16} />
           </button>
