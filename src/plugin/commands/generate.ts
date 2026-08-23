@@ -79,7 +79,7 @@ async function runGeneration(
   const tokens = buildTokens(config);
   update('generating-tokens', 25, 'Tokens built');
 
-  const styleMap = config.options.createStyles ? createStyles(tokens, config) : emptyStyleMap();
+  const styleMap = config.options.createStyles ? await createStyles(tokens, config) : emptyStyleMap();
   const varMap: VariableMap = config.options.createVariables ? createVariables(tokens, config) : emptyVariableMap();
 
   const targetMode = config.target || 'all';
@@ -255,22 +255,64 @@ async function runGeneration(
 
 // ---------------- styles ----------------
 
-function createStyles(tokens: DesignTokens, config: GenerationConfig): StyleMap {
+/**
+ * Look up the local styles that already exist, keyed by name.
+ *
+ * Figma allows two styles to share a name, so `figma.createPaintStyle()` on
+ * every run built a second complete set rather than replacing the first: a full
+ * regenerate added ~250 duplicate styles, and the user's style panel filled with
+ * pairs that were impossible to tell apart.
+ *
+ * Reusing by name also preserves every binding the user already has. Deleting
+ * and recreating would give each style a new id and silently detach every layer
+ * painted with it, which is the opposite of what styles are for.
+ *
+ * When duplicates already exist from an earlier build, the first wins and the
+ * rest are left alone — this repairs the count going forward without deleting
+ * anything a user might have bound something to in the meantime.
+ */
+async function existingStyles(): Promise<{
+  paint: Map<string, PaintStyle>;
+  text: Map<string, TextStyle>;
+  effect: Map<string, EffectStyle>;
+}> {
+  const [paints, texts, effects] = await Promise.all([
+    figma.getLocalPaintStylesAsync(),
+    figma.getLocalTextStylesAsync(),
+    figma.getLocalEffectStylesAsync(),
+  ]);
+  const index = <T extends BaseStyle>(styles: T[]): Map<string, T> => {
+    const map = new Map<string, T>();
+    for (const style of styles) if (!map.has(style.name)) map.set(style.name, style);
+    return map;
+  };
+  return { paint: index(paints), text: index(texts), effect: index(effects) };
+}
+
+async function createStyles(tokens: DesignTokens, config: GenerationConfig): Promise<StyleMap> {
   const map = emptyStyleMap();
+  const existing = await existingStyles();
+
+  const paintStyle = (key: string): PaintStyle => {
+    const found = existing.paint.get(key);
+    if (found) return found;
+    const style = figma.createPaintStyle();
+    style.name = key;
+    existing.paint.set(key, style);
+    return style;
+  };
 
   for (const [colorName, ct] of Object.entries(tokens.colors)) {
     for (const [shade, hex] of Object.entries(ct.shades)) {
       const key = colorStyleKey(colorName, shade);
-      const style = figma.createPaintStyle();
-      style.name = key;
+      const style = paintStyle(key);
       style.paints = [{ type: 'SOLID', color: hexToRgb(hex) }];
       map.color[key] = style.id;
     }
     if (config.options.includeDarkMode && ct.darkShades) {
       for (const [shade, hex] of Object.entries(ct.darkShades)) {
         const key = `${colorStyleKey(colorName, shade)}/Dark`;
-        const style = figma.createPaintStyle();
-        style.name = key;
+        const style = paintStyle(key);
         style.paints = [{ type: 'SOLID', color: hexToRgb(hex) }];
         map.color[key] = style.id;
       }
@@ -279,7 +321,7 @@ function createStyles(tokens: DesignTokens, config: GenerationConfig): StyleMap 
 
   for (const t of tokens.typography) {
     const key = textStyleKey(t.name);
-    const style = figma.createTextStyle();
+    const style = existing.text.get(key) ?? figma.createTextStyle();
     style.name = key;
     style.fontName = resolveFont(t.fontFamily, t.fontWeight);
     style.fontSize = t.fontSize;
@@ -291,7 +333,7 @@ function createStyles(tokens: DesignTokens, config: GenerationConfig): StyleMap 
 
   for (const s of tokens.shadows) {
     const key = effectStyleKey(s.name);
-    const style = figma.createEffectStyle();
+    const style = existing.effect.get(key) ?? figma.createEffectStyle();
     style.name = key;
     style.effects = [
       {
