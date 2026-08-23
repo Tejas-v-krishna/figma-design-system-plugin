@@ -465,7 +465,7 @@ export async function generateComponents(
             buttonsContainer.counterAxisAlignItems = 'CENTER';
             buttonsContainer.primaryAxisSizingMode = 'AUTO';
             buttonsContainer.counterAxisSizingMode = 'AUTO';
-            buttonsContainer.itemSpacing = 28;
+            buttonsContainer.itemSpacing = 20;
             buttonsContainer.fills = [];
             buttonsContainer.clipsContent = false;
 
