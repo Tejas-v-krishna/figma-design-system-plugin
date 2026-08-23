@@ -1,6 +1,7 @@
 // Design System Kit - Usage scan command
 // Counts component instances, local styles, and detects unbound fills.
 import { UsageReport } from '../../shared/types';
+import { yieldToUI } from '../utils/yield';
 
 /** A node that can be asked about its fills, without widening anything to `any`. */
 interface FillReadable {
@@ -81,9 +82,11 @@ export async function scanUsage(onProgress?: (p: ScanProgress) => void): Promise
       if (node.type === 'INSTANCE') instances.push(node);
       if (hasFills(node)) unboundFills += unboundSolidFills(node);
     }
-    // Yield between pages so the UI can paint the progress bar. Without this the
-    // whole scan runs in one synchronous block and the panel freezes.
-    await Promise.resolve();
+    // Yield between pages so the UI can paint the progress bar. This has to be a
+    // macrotask: `await Promise.resolve()` drains inside the same task, so the
+    // sandbox never handed control back and the whole scan still ran as one
+    // blocking block with every progress message delivered at the end.
+    await yieldToUI();
   }
 
   const counts: Record<string, number> = {};
