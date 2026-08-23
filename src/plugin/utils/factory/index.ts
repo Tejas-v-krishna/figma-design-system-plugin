@@ -78,21 +78,28 @@ function buildOne(
 ): ComponentNode {
   const name = formatComponentName(def.category, def.name, vLabel, sLabel, szLabel, DEFAULT_NAMING);
   const root = makeComponent(name);
-  const ctx: TemplateCtx = {
-    def,
-    tokens,
-    config,
-    styleMap,
-    varMap,
-    variantName: variant.name,
-    variantProps: variant.properties,
-    stateName: state.name,
-    stateProps: state.properties,
-    sizeName: size.name,
-    sizeProps: size.properties,
-    showcaseType,
-  };
-  return tmpl(root, ctx);
+  try {
+    const ctx: TemplateCtx = {
+      def,
+      tokens,
+      config,
+      styleMap,
+      varMap,
+      variantName: variant.name,
+      variantProps: variant.properties,
+      stateName: state.name,
+      stateProps: state.properties,
+      sizeName: size.name,
+      sizeProps: size.properties,
+      showcaseType,
+    };
+    return tmpl(root, ctx);
+  } catch (err) {
+    console.error(`[design-system-kit] template error for ${name}:`, err);
+    root.resize(120, 36);
+    root.cornerRadius = 6;
+    return root;
+  }
 }
 
 interface ComponentSection {

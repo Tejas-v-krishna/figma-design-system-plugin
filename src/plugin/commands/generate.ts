@@ -226,13 +226,16 @@ async function runGeneration(
 
   if (targetMode === 'components') {
     if (config.componentsToGenerate.length === 0) {
-      throw new Error(
-        'No components are selected. Pick at least one in Build Components, or use Select all.'
-      );
+      config.componentsToGenerate = COMPONENT_DEFINITIONS.map((c) => c.name);
     }
 
     update('creating-pages', 50, 'Generating Components page…');
     const compPage = await openPage(FULL_RUN_PAGES.components);
+    figma.currentPage = compPage;
+
+    for (const child of [...compPage.children]) {
+      child.remove();
+    }
 
     const { count: componentsCreated } = await generateComponents(
       tokens,
