@@ -19,6 +19,20 @@ export function colorStyleKey(colorName: string, shade: string | number): string
   return formatTokenName(STYLE_GROUPS.color, colorName, String(shade), DEFAULT_NAMING);
 }
 
+/**
+ * The dark-theme twin of a colour style.
+ *
+ * `Dark` goes in as the *second* segment rather than the last, so Figma collapses
+ * the whole dark set into one "Color / Dark" group in the styles panel, mirroring
+ * the light set above it. Appending it — `Color/Primary/500/Dark`, which is how
+ * generate.ts built the key — makes Figma read the shade as a group name, so a
+ * run would leave eleven single-item groups per colour.
+ */
+export function darkColorStyleKey(colorName: string, shade: string | number): string {
+  const [group, ...rest] = colorStyleKey(colorName, shade).split(DEFAULT_NAMING.separator);
+  return [group, 'Dark', ...rest].join(DEFAULT_NAMING.separator);
+}
+
 export function textStyleKey(tokenName: string): string {
   return formatStyleName(STYLE_GROUPS.text, tokenName, undefined, DEFAULT_NAMING);
 }

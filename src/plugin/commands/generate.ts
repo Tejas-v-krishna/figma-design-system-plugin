@@ -17,6 +17,7 @@ import { buildTokens } from '../../shared/build-tokens';
 import { resolveFont, preloadFonts, ensureFont } from '../utils/fonts';
 import {
   colorStyleKey,
+  darkColorStyleKey,
   textStyleKey,
   effectStyleKey,
   semanticColorKey,
@@ -321,7 +322,7 @@ async function createStyles(tokens: DesignTokens, config: GenerationConfig): Pro
     }
     if (config.options.includeDarkMode && ct.darkShades) {
       for (const [shade, hex] of Object.entries(ct.darkShades)) {
-        const key = `${colorStyleKey(colorName, shade)}/Dark`;
+        const key = darkColorStyleKey(colorName, shade);
         const style = paintStyle(key);
         style.paints = [{ type: 'SOLID', color: hexToRgb(hex) }];
         map.color[key] = style.id;
