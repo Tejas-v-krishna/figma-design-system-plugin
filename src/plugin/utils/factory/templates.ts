@@ -869,7 +869,7 @@ const Input: Template = (root, ctx) => {
   } else if (vKey.includes('email')) {
     labelStr = isError ? 'invalid-email' : isFocus ? 'alex@|' : 'alex@domain.com';
   } else if (vKey.includes('search') || vKey.includes('withicon')) {
-    labelStr = isSuccess ? 'Design System' : isFocus ? 'Search query|' : 'Search components…';
+    labelStr = isSuccess ? '12 results' : isFocus ? 'Search…|' : 'Search…';
     if (!isSuccess && !isFocus) isPlaceholder = true;
   } else {
     // Text / Default
@@ -3466,7 +3466,7 @@ const SearchInput: Template = (root, ctx) => {
   const fieldHeight = Number(ctx.sizeProps.height ?? (ctx.sizeName === 'sm' ? 36 : ctx.sizeName === 'lg' ? 52 : 44));
   const fieldWidth = isSizeShowcase ? 240 : 176;
   const fontSize = Number(ctx.sizeProps.fontSize ?? (fieldHeight <= 36 ? 12 : fieldHeight >= 50 ? 15 : 13));
-  const padX = fieldHeight <= 36 ? 12 : fieldHeight >= 50 ? 16 : 14;
+  const padX = fieldHeight <= 36 ? 10 : fieldHeight >= 50 ? 14 : 12;
   const iconSz = fieldHeight <= 36 ? 13 : fieldHeight >= 50 ? 17 : 15;
 
   root.layoutMode = 'HORIZONTAL';
@@ -3502,12 +3502,12 @@ const SearchInput: Template = (root, ctx) => {
   root.effects = [];
 
   const left = hbox('left');
-  left.itemSpacing = 8;
+  left.itemSpacing = 6;
   left.appendChild(buildIcon(iconSz, iconColor, 'search'));
 
-  let searchStr = isSizeShowcase ? `Search (${fieldHeight}px)` : 'Search components…';
-  if (isFocus) searchStr = 'Search query|';
-  else if (isResults) searchStr = 'Found 12 items';
+  let searchStr = isSizeShowcase ? `Search (${fieldHeight}px)` : 'Search…';
+  if (isFocus) searchStr = 'Search…|';
+  else if (isResults) searchStr = '12 results';
 
   left.appendChild(text({
     characters: searchStr,
@@ -3522,7 +3522,7 @@ const SearchInput: Template = (root, ctx) => {
   if (vKey.includes('shortcut')) {
     const kbd = makeFrame('kbd');
     kbd.layoutMode = 'HORIZONTAL';
-    pad(kbd, 2, 6);
+    pad(kbd, 2, 5);
     kbd.cornerRadius = 4;
     setFill(kbd, '#E4E4E7');
     kbd.appendChild(text({ characters: '⌘K', fontFamily: ctx.config.fontFamily.mono, weight: 500, fontSize: 10, fill: '#71717A' }));
