@@ -1695,7 +1695,12 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
 }
 
 .dsk-slider-bar {
-  flex: 1;
+  /* Was `flex: 1`, which was correct while the bar sat in a horizontal row and
+     wrong the moment it became a direct child of the card's column: in a column,
+     flex-basis sizes the *height*, so `flex: 1` (basis 0) overrode `height: 12px`
+     and the bar collapsed to an invisible line with a floating handle. */
+  width: 100%;
+  flex-shrink: 0;
   height: 12px;
   border-radius: 999px;
   position: relative;
