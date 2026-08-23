@@ -356,8 +356,8 @@ export async function generateComponents(
           rowFrame.layoutMode = 'HORIZONTAL';
           rowFrame.layoutWrap = 'WRAP';
           rowFrame.resize(CW - 56, 40);
-          rowFrame.itemSpacing = 16;
-          rowFrame.counterAxisSpacing = 16;
+          rowFrame.itemSpacing = 24;
+          rowFrame.counterAxisSpacing = 20;
           rowFrame.counterAxisAlignItems = 'CENTER';
           rowFrame.fills = [];
           rowFrame.clipsContent = false;
@@ -372,14 +372,11 @@ export async function generateComponents(
             cell.primaryAxisAlignItems = 'CENTER';
             cell.counterAxisAlignItems = 'CENTER';
             cell.itemSpacing = 8;
-            cell.paddingTop = 14;
-            cell.paddingBottom = 12;
-            cell.paddingLeft = 18;
-            cell.paddingRight = 18;
-            cell.cornerRadius = 10;
-            cell.fills = [{ type: 'SOLID', color: hexToRgb('#F8FAFC') }];
-            cell.strokes = [{ type: 'SOLID', color: hexToRgb('#E2E8F0') }];
-            cell.strokeWeight = 1;
+            cell.paddingTop = 4;
+            cell.paddingBottom = 4;
+            cell.paddingLeft = 4;
+            cell.paddingRight = 4;
+            cell.fills = [];
             cell.appendChild(n);
 
             const propLabel = figma.createText();

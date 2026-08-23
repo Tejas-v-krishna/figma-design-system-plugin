@@ -110,9 +110,6 @@ function sizeMetrics(ctx: TemplateCtx): { height: number; fontSize: number; padX
   };
 }
 
-function disabledOpacity(ctx: TemplateCtx): number {
-  return ctx.stateName.toLowerCase() === 'disabled' ? 0.45 : 1;
-}
 
 function containerRadius(ctx: TemplateCtx, step: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' = 'md', max = 16): number {
   if (ctx.config.radiusPreset === 'sharp') return 0;
@@ -233,118 +230,239 @@ function hexToRgbSafe(hex: string): RGB {
 // ---------------- templates ----------------
 
 const Button: Template = (root, ctx) => {
-  const t = tone(ctx);
   const m = sizeMetrics(ctx);
   const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
   const isHover = sKey === 'hover';
   const isActive = sKey === 'active';
   const isFocused = sKey === 'focused' || sKey === 'focus';
-  const isGhost = vKey === 'ghost' || vKey === 'tertiary';
-  const isOutline = vKey === 'outline' || vKey === 'secondary';
-  const isBlack = vKey === 'black' || vKey === 'dark' || Boolean(ctx.variantProps.isBlack);
-  const isInformation = vKey === 'information';
-  const iconPos = String(ctx.variantProps.iconPosition || '');
+  const isDisabled = sKey === 'disabled';
+  const isLoading = sKey === 'loading';
+
+  const isSecondary = vKey === 'secondary' || vKey === 'outline';
+  const isTertiary = vKey === 'tertiary' || vKey === 'tonal' || vKey === 'soft';
+  const isGhost = vKey === 'ghost';
+  const isDestructive = vKey === 'destructive' || vKey === 'danger';
+  const isObsidian = vKey === 'obsidian' || vKey === 'dark' || vKey === 'black';
+  const isLink = vKey === 'link';
+  const isPrimary = !isSecondary && !isTertiary && !isGhost && !isDestructive && !isObsidian && !isLink;
 
   root.layoutMode = 'HORIZONTAL';
   root.primaryAxisSizingMode = 'AUTO';
   root.counterAxisSizingMode = 'AUTO';
   root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
-  root.itemSpacing = 6;
-  pad(root, Math.max(6, Math.round((m.height - m.fontSize) / 2)), m.padX);
-  const isPill = Boolean(ctx.variantProps.isPill) || ctx.config.radiusPreset === 'pill' || vKey === 'pill';
-  root.cornerRadius = isPill ? 9999 : ctx.config.radiusPreset === 'sharp' ? 0 : radiusPx(ctx.tokens, 'md');
+  root.itemSpacing = 8;
 
-  if (isBlack) {
-    if (isHover) {
-      setFill(root, '#27272A');
+  if (isLink) {
+    pad(root, 4, 4);
+    root.cornerRadius = 4;
+  } else {
+    pad(root, Math.max(6, Math.round((m.height - m.fontSize) / 2) - 1), m.padX);
+    const isPill = Boolean(ctx.variantProps.isPill) || ctx.config.radiusPreset === 'pill' || vKey === 'pill';
+    root.cornerRadius = isPill ? 9999 : ctx.config.radiusPreset === 'sharp' ? 0 : radiusPx(ctx.tokens, 'md');
+  }
+
+  let textHex = '#FFFFFF';
+  root.strokes = [];
+  root.effects = [];
+
+  if (isPrimary) {
+    if (isDisabled) {
+      setFill(root, colorShade(ctx.tokens, 'primary', 200), colorStyleKey('primary', 200), ctx.styleMap, ctx.varMap);
+      textHex = '#FFFFFF';
     } else if (isActive) {
-      setFill(root, '#09090B');
-    } else if (sKey === 'disabled') {
-      setFill(root, '#D4D4D8');
-    } else {
-      setFill(root, '#18181B');
-    }
-    if (isFocused) {
+      setFill(root, colorShade(ctx.tokens, 'primary', 700), colorStyleKey('primary', 700), ctx.styleMap, ctx.varMap);
+    } else if (isHover) {
+      setFill(root, colorShade(ctx.tokens, 'primary', 600), colorStyleKey('primary', 600), ctx.styleMap, ctx.varMap);
       root.effects = [{
         type: 'DROP_SHADOW',
-        color: { r: 0.1, g: 0.1, b: 0.1, a: 0.25 },
-        offset: { x: 0, y: 0 },
+        color: { r: 0.1, g: 0.2, b: 0.4, a: 0.18 },
+        offset: { x: 0, y: 2 },
         radius: 4,
-        spread: 2,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    } else {
+      setFill(root, colorShade(ctx.tokens, 'primary', 500), colorStyleKey('primary', 500), ctx.styleMap, ctx.varMap);
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0.1, g: 0.2, b: 0.4, a: 0.12 },
+        offset: { x: 0, y: 1 },
+        radius: 2,
+        spread: 0,
         visible: true,
         blendMode: 'NORMAL',
       }];
     }
-  } else if (isGhost) {
-    if (isHover) {
-      setFill(root, colorShade(ctx.tokens, 'primary', 50), colorStyleKey('primary', 50), ctx.styleMap, ctx.varMap);
-    } else if (isActive) {
-      setFill(root, colorShade(ctx.tokens, 'primary', 100), colorStyleKey('primary', 100), ctx.styleMap, ctx.varMap);
-    } else {
-      root.fills = [];
-    }
-    if (isFocused) {
-      setStroke(root, colorShade(ctx.tokens, 'primary', 500), 1.5);
-    }
-  } else if (isOutline) {
-    if (isHover) {
-      setFill(root, colorShade(ctx.tokens, 'neutral', 100), colorStyleKey('neutral', 100), ctx.styleMap, ctx.varMap);
-    } else if (isActive) {
-      setFill(root, colorShade(ctx.tokens, 'neutral', 200), colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
-    } else {
+  } else if (isSecondary) {
+    if (isDisabled) {
       setFill(root, '#FFFFFF');
-    }
-    setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1.5, colorStyleKey('neutral', 300), ctx.styleMap, ctx.varMap);
-    if (isFocused) {
-      setStroke(root, colorShade(ctx.tokens, 'primary', 500), 2);
-    }
-  } else if (isInformation) {
-    const secShade = isHover ? 600 : isActive ? 700 : 500;
-    setFill(root, colorShade(ctx.tokens, 'information', secShade), colorStyleKey('information', secShade), ctx.styleMap, ctx.varMap);
-  } else {
-    const baseShade = isHover ? 600 : isActive ? 700 : 500;
-    if (sKey === 'disabled') {
-      setFill(root, colorShade(ctx.tokens, 'primary', 200), colorStyleKey(t, 200), ctx.styleMap, ctx.varMap);
-    } else {
-      setFill(root, colorShade(ctx.tokens, t, baseShade), colorStyleKey(t, baseShade), ctx.styleMap, ctx.varMap);
-    }
-    if (isFocused) {
+      setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+      textHex = colorShade(ctx.tokens, 'neutral', 400);
+    } else if (isActive) {
+      setFill(root, colorShade(ctx.tokens, 'neutral', 100));
+      setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+      textHex = colorShade(ctx.tokens, 'neutral', 900);
+    } else if (isHover) {
+      setFill(root, colorShade(ctx.tokens, 'neutral', 50));
+      setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+      textHex = colorShade(ctx.tokens, 'neutral', 900);
       root.effects = [{
         type: 'DROP_SHADOW',
-        color: { r: 0.23, g: 0.51, b: 0.96, a: 0.35 },
-        offset: { x: 0, y: 0 },
+        color: { r: 0, g: 0, b: 0, a: 0.06 },
+        offset: { x: 0, y: 1 },
+        radius: 3,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    } else {
+      setFill(root, '#FFFFFF');
+      setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
+      textHex = colorShade(ctx.tokens, 'neutral', 800);
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.04 },
+        offset: { x: 0, y: 1 },
+        radius: 2,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    }
+  } else if (isTertiary) {
+    if (isDisabled) {
+      setFill(root, colorShade(ctx.tokens, 'neutral', 100));
+      textHex = colorShade(ctx.tokens, 'neutral', 400);
+    } else if (isActive) {
+      setFill(root, colorShade(ctx.tokens, 'primary', 200));
+      textHex = colorShade(ctx.tokens, 'primary', 800);
+    } else if (isHover) {
+      setFill(root, colorShade(ctx.tokens, 'primary', 100));
+      textHex = colorShade(ctx.tokens, 'primary', 700);
+    } else {
+      setFill(root, colorShade(ctx.tokens, 'primary', 50), colorStyleKey('primary', 50), ctx.styleMap, ctx.varMap);
+      textHex = colorShade(ctx.tokens, 'primary', 600);
+    }
+  } else if (isGhost) {
+    root.fills = [];
+    if (isDisabled) {
+      textHex = colorShade(ctx.tokens, 'neutral', 300);
+    } else if (isActive) {
+      setFill(root, colorShade(ctx.tokens, 'neutral', 200));
+      textHex = colorShade(ctx.tokens, 'neutral', 900);
+    } else if (isHover) {
+      setFill(root, colorShade(ctx.tokens, 'neutral', 100));
+      textHex = colorShade(ctx.tokens, 'neutral', 900);
+    } else {
+      textHex = colorShade(ctx.tokens, 'neutral', 700);
+    }
+  } else if (isDestructive) {
+    if (isDisabled) {
+      setFill(root, colorShade(ctx.tokens, 'error', 200));
+      textHex = '#FFFFFF';
+    } else if (isActive) {
+      setFill(root, colorShade(ctx.tokens, 'error', 700));
+      textHex = '#FFFFFF';
+    } else if (isHover) {
+      setFill(root, colorShade(ctx.tokens, 'error', 600));
+      textHex = '#FFFFFF';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0.8, g: 0.1, b: 0.1, a: 0.22 },
+        offset: { x: 0, y: 2 },
         radius: 4,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    } else {
+      setFill(root, colorShade(ctx.tokens, 'error', 500), colorStyleKey('error', 500), ctx.styleMap, ctx.varMap);
+      textHex = '#FFFFFF';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0.8, g: 0.1, b: 0.1, a: 0.15 },
+        offset: { x: 0, y: 1 },
+        radius: 2,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    }
+  } else if (isObsidian) {
+    if (isDisabled) {
+      setFill(root, '#94A3B8');
+      textHex = '#FFFFFF';
+    } else if (isActive) {
+      setFill(root, '#020617');
+      textHex = '#FFFFFF';
+    } else if (isHover) {
+      setFill(root, '#1E293B');
+      textHex = '#FFFFFF';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.25 },
+        offset: { x: 0, y: 2 },
+        radius: 4,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    } else {
+      setFill(root, '#0F172A');
+      textHex = '#FFFFFF';
+      setStroke(root, '#1E293B', 1);
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.18 },
+        offset: { x: 0, y: 1 },
+        radius: 2,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    }
+  } else if (isLink) {
+    root.fills = [];
+    if (isDisabled) {
+      textHex = colorShade(ctx.tokens, 'neutral', 300);
+    } else if (isActive) {
+      textHex = colorShade(ctx.tokens, 'primary', 800);
+    } else if (isHover) {
+      textHex = colorShade(ctx.tokens, 'primary', 700);
+    } else {
+      textHex = colorShade(ctx.tokens, 'primary', 600);
+    }
+  }
+
+  if (isFocused) {
+    root.effects = [
+      ...(root.effects || []),
+      {
+        type: 'DROP_SHADOW',
+        color: { r: 0.15, g: 0.45, b: 0.95, a: 0.35 },
+        offset: { x: 0, y: 0 },
+        radius: 0,
         spread: 3,
         visible: true,
         blendMode: 'NORMAL',
-      }];
-    }
+      },
+    ];
   }
 
-  const textHex = isBlack
-    ? '#FFFFFF'
-    : isGhost
-    ? colorShade(ctx.tokens, 'primary', 600)
-    : isOutline
-    ? colorShade(ctx.tokens, 'neutral', 900)
-    : '#FFFFFF';
+  root.opacity = isDisabled ? 0.55 : 1;
 
-  root.opacity = disabledOpacity(ctx);
-
-  const loading = sKey === 'loading';
-  if (loading) {
-    root.appendChild(buildSpinner(14, textHex));
-  } else if (iconPos === 'left') {
-    root.appendChild(buildIcon(14, textHex, 'plus'));
+  if (isLoading) {
+    root.appendChild(buildSpinner(m.fontSize + 2, textHex));
   }
-  
+
   let btnLabel = 'Button';
-  if (loading) {
+  if (isLoading) {
     btnLabel = 'Loading…';
   } else if (ctx.showcaseType === 'size') {
-    btnLabel = `Button (${m.height}px)`;
+    btnLabel = ctx.sizeName === 'sm' ? 'Small' : ctx.sizeName === 'lg' ? 'Large' : 'Medium';
   } else if (ctx.variantProps.customLabel) {
     btnLabel = String(ctx.variantProps.customLabel);
   }
@@ -358,69 +476,92 @@ const Button: Template = (root, ctx) => {
   });
   root.appendChild(label);
 
-  if (!loading && iconPos === 'right') {
-    root.appendChild(buildIcon(14, textHex, 'download'));
-  }
-
   return root;
 };
 
 const IconButton: Template = (root, ctx) => {
-  const t = tone(ctx);
   const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
   const isHover = sKey === 'hover';
   const isActive = sKey === 'active';
   const isFocused = sKey === 'focused' || sKey === 'focus';
-  const isBlack = vKey === 'black' || vKey === 'dark' || Boolean(ctx.variantProps.isBlack);
+  const isDisabled = sKey === 'disabled';
+
+  const isSecondary = vKey === 'secondary' || vKey === 'outline';
   const isGhost = vKey === 'ghost';
-  const isOutline = vKey === 'outline' || vKey === 'tertiary';
-  const baseShade = isHover ? 600 : isActive ? 700 : 500;
+  const isObsidian = vKey === 'obsidian' || vKey === 'dark' || vKey === 'black';
 
   root.layoutMode = 'HORIZONTAL';
   root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
   pad(root, 0);
-  const iconBtnSize = ctx.sizeName === 'sm' ? 32 : 40;
+  const iconBtnSize = ctx.sizeName === 'sm' ? 32 : ctx.sizeName === 'lg' ? 48 : 40;
   root.resize(iconBtnSize, iconBtnSize);
   root.cornerRadius = 9999;
+  root.strokes = [];
+  root.effects = [];
 
   let fgHex = '#FFFFFF';
 
-  if (isBlack) {
-    if (isHover) setFill(root, '#27272A');
-    else if (isActive) setFill(root, '#09090B');
-    else if (sKey === 'disabled') setFill(root, '#D4D4D8');
-    else setFill(root, '#18181B');
+  if (isObsidian) {
+    if (isActive) setFill(root, '#020617');
+    else if (isHover) setFill(root, '#1E293B');
+    else setFill(root, '#0F172A');
+    setStroke(root, '#1E293B', 1);
     fgHex = '#FFFFFF';
   } else if (isGhost) {
-    if (isHover) setFill(root, colorShade(ctx.tokens, 'neutral', 100));
+    if (isActive) setFill(root, colorShade(ctx.tokens, 'neutral', 200));
+    else if (isHover) setFill(root, colorShade(ctx.tokens, 'neutral', 100));
     else root.fills = [];
     fgHex = colorShade(ctx.tokens, 'neutral', 700);
-  } else if (isOutline) {
-    if (isHover) setFill(root, colorShade(ctx.tokens, 'neutral', 100));
+  } else if (isSecondary) {
+    if (isActive) setFill(root, colorShade(ctx.tokens, 'neutral', 100));
+    else if (isHover) setFill(root, colorShade(ctx.tokens, 'neutral', 50));
     else setFill(root, '#FFFFFF');
-    setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1.5);
-    fgHex = colorShade(ctx.tokens, 'neutral', 700);
-  } else {
-    setFill(root, colorShade(ctx.tokens, t, baseShade));
-    fgHex = '#FFFFFF';
-  }
-
-  if (isFocused) {
+    setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+    fgHex = colorShade(ctx.tokens, 'neutral', 800);
     root.effects = [{
       type: 'DROP_SHADOW',
-      color: { r: 0.23, g: 0.51, b: 0.96, a: 0.35 },
-      offset: { x: 0, y: 0 },
-      radius: 4,
-      spread: 3,
+      color: { r: 0, g: 0, b: 0, a: 0.04 },
+      offset: { x: 0, y: 1 },
+      radius: 2,
+      spread: 0,
+      visible: true,
+      blendMode: 'NORMAL',
+    }];
+  } else {
+    if (isActive) setFill(root, colorShade(ctx.tokens, 'primary', 700));
+    else if (isHover) setFill(root, colorShade(ctx.tokens, 'primary', 600));
+    else setFill(root, colorShade(ctx.tokens, 'primary', 500));
+    fgHex = '#FFFFFF';
+    root.effects = [{
+      type: 'DROP_SHADOW',
+      color: { r: 0.1, g: 0.2, b: 0.4, a: 0.12 },
+      offset: { x: 0, y: 1 },
+      radius: 2,
+      spread: 0,
       visible: true,
       blendMode: 'NORMAL',
     }];
   }
 
-  root.opacity = sKey === 'disabled' ? 0.6 : 1;
-  root.appendChild(buildIcon(ctx.sizeName === 'sm' ? 14 : 16, fgHex, 'star'));
+  if (isFocused) {
+    root.effects = [
+      ...(root.effects || []),
+      {
+        type: 'DROP_SHADOW',
+        color: { r: 0.15, g: 0.45, b: 0.95, a: 0.35 },
+        offset: { x: 0, y: 0 },
+        radius: 0,
+        spread: 3,
+        visible: true,
+        blendMode: 'NORMAL',
+      },
+    ];
+  }
+
+  root.opacity = isDisabled ? 0.5 : 1;
+  root.appendChild(buildIcon(ctx.sizeName === 'sm' ? 14 : ctx.sizeName === 'lg' ? 18 : 16, fgHex, 'plus'));
 
   return root;
 };
