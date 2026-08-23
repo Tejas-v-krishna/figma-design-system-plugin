@@ -3789,20 +3789,82 @@ const PhoneInput: Template = (root, ctx) => {
 };
 
 const PinInput: Template = (root, ctx) => {
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const is6Digit = vKey.includes('6');
+  const isMasked = vKey.includes('masked');
+  const count = is6Digit ? 6 : 4;
+  const boxW = is6Digit ? 24 : 34;
+  const boxH = 40;
+  const gap = is6Digit ? 4 : 6;
+
   root.layoutMode = 'HORIZONTAL';
   root.counterAxisAlignItems = 'CENTER';
-  root.itemSpacing = 8;
-  const count = variantKey(ctx).includes('6') ? 6 : 4;
+  root.primaryAxisAlignItems = 'CENTER';
+  root.itemSpacing = gap;
+  root.fills = [];
+  root.strokes = [];
+
+  const isFocus = sKey === 'focus' || sKey === 'focused';
+  const isFilled = sKey === 'filled';
+  const isError = sKey === 'error' || sKey === 'invalid';
+  const isDefault = !isFocus && !isFilled && !isError;
+
+  const pinDigits = ['7', '8', '4', '9', '2', '5'];
+
   for (let i = 0; i < count; i++) {
     const box = makeFrame(`pin-${i}`);
     box.layoutMode = 'HORIZONTAL';
     box.primaryAxisAlignItems = 'CENTER';
     box.counterAxisAlignItems = 'CENTER';
-    box.resize(40, 44);
+    box.resize(boxW, boxH);
     box.cornerRadius = 8;
-    setFill(box, '#FFFFFF');
-    setStroke(box, i === 0 ? colorShade(ctx.tokens, 'primary', 500) : colorShade(ctx.tokens, 'neutral', 300), i === 0 ? 2 : 1);
-    box.appendChild(text({ characters: i < 2 ? String(i + 7) : '', fontFamily: ctx.config.fontFamily.mono, weight: 600, fontSize: 16, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+
+    let bg = '#F1F3F5';
+    let textFill = '#18181B';
+    let char = '';
+
+    if (isDefault) {
+      bg = '#F1F3F5';
+      char = '';
+    } else if (isFocus) {
+      if (i < 2) {
+        bg = '#F1F3F5';
+        char = isMasked ? '●' : (pinDigits[i] ?? '7');
+      } else if (i === 2) {
+        bg = '#EEF2FF';
+        char = '|';
+        textFill = '#3B82F6';
+      } else {
+        bg = '#F1F3F5';
+        char = '';
+      }
+    } else if (isFilled) {
+      bg = '#E8F8EE';
+      char = isMasked ? '●' : (pinDigits[i] ?? '7');
+    } else if (isError) {
+      bg = '#FEEAEA';
+      char = isMasked ? '●' : (pinDigits[i] ?? '7');
+      textFill = '#DC2626';
+    }
+
+    setFill(box, bg);
+    if (isFocus && i === 2) {
+      setStroke(box, '#3B82F6', 1.5);
+    } else if (isError) {
+      setStroke(box, '#EF4444', 1);
+    }
+
+    if (char) {
+      box.appendChild(text({
+        characters: char,
+        fontFamily: isMasked && char === '●' ? ctx.config.fontFamily.body : ctx.config.fontFamily.mono,
+        weight: isMasked && char === '●' ? 700 : 600,
+        fontSize: isMasked && char === '●' ? 10 : is6Digit ? 12 : 14,
+        fill: textFill,
+      }));
+    }
+
     root.appendChild(box);
   }
   return root;
