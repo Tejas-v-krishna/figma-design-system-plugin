@@ -333,32 +333,32 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
     name: 'RichTextEditor',
     category: 'inputs',
     variants: [
-      { name: 'StandardToolbar', properties: { variant: 'standardtoolbar' } },
-      { name: 'CompactFloating', properties: { variant: 'compactfloating' } },
+      { name: 'Toolbar', properties: { variant: 'toolbar' } },
+      { name: 'Floating', properties: { variant: 'floating' } },
     ],
     states: [
       { name: 'Default', properties: { state: 'default' } },
       { name: 'Focus', properties: { state: 'focus' } },
-      { name: 'Disabled', properties: { state: 'disabled' } },
+      { name: 'Formatted', properties: { state: 'formatted' } },
     ],
     sizes: [
-      { name: 'md', properties: { name: 'md', minHeight: 140 } },
+      { name: 'md', properties: { name: 'md', minHeight: 110 } },
     ],
-    defaultProps: { variant: 'standardtoolbar', state: 'default' },
+    defaultProps: { variant: 'toolbar', state: 'default' },
   },
   {
     name: 'TagInput',
     category: 'inputs',
     variants: [
       { name: 'Default', properties: { variant: 'default' } },
-      { name: 'PillTags', properties: { variant: 'pilltags' } },
-      { name: 'ColoredTags', properties: { variant: 'coloredtags' } },
+      { name: 'Pill', properties: { variant: 'pill' } },
+      { name: 'Colored', properties: { variant: 'colored' } },
     ],
     states: [
       { name: 'Default', properties: { state: 'default' } },
       { name: 'Hover', properties: { state: 'hover' } },
       { name: 'Focus', properties: { state: 'focus' } },
-      { name: 'Disabled', properties: { state: 'disabled' } },
+      { name: 'Filled', properties: { state: 'filled' } },
     ],
     sizes: [
       { name: 'md', properties: { name: 'md', height: 44 } },
