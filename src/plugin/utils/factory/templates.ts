@@ -327,7 +327,7 @@ const CardFrame = (root: ComponentNode, ctx: TemplateCtx, elevated: boolean) => 
   root.cornerRadius = radiusPx(ctx.tokens, 'lg');
   setFill(root, '#FFFFFF');
   setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
-  if (elevated) setEffect(root, shadow(ctx.tokens, 'md')!, effectStyleKey('md'), ctx.styleMap, ctx.varMap);
+  if (elevated) setEffect(root, shadow(ctx.tokens, 'md'), effectStyleKey('md'), ctx.styleMap, ctx.varMap);
   root.resize(320, 200);
 };
 
@@ -395,7 +395,7 @@ const Toast: Template = (root, ctx) => {
   pad(root, 12, 16);
   root.cornerRadius = radiusPx(ctx.tokens, 'md');
   setFill(root, '#1E293B');
-  setEffect(root, shadow(ctx.tokens, 'lg')!, effectStyleKey('lg'), ctx.styleMap, ctx.varMap);
+  setEffect(root, shadow(ctx.tokens, 'lg'), effectStyleKey('lg'), ctx.styleMap, ctx.varMap);
   root.resize(320, 56);
   root.appendChild(buildIcon(18, colorShade(ctx.tokens, t, 400)));
   root.appendChild(text({ characters: 'Operation completed', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 14, fill: '#F8FAFC' }));
@@ -543,7 +543,7 @@ const Tabs: Template = (root, ctx) => {
     tab.cornerRadius = radiusPx(ctx.tokens, 'sm');
     const active = i === 0;
     setFill(tab, active ? '#FFFFFF' : colorShade(ctx.tokens, 'neutral', 100), active ? undefined : colorStyleKey('neutral', 100), ctx.styleMap, ctx.varMap);
-    if (active) setEffect(tab, shadow(ctx.tokens, 'xs')!, effectStyleKey('xs'), ctx.styleMap, ctx.varMap);
+    if (active) setEffect(tab, shadow(ctx.tokens, 'xs'), effectStyleKey('xs'), ctx.styleMap, ctx.varMap);
     tab.appendChild(text({ characters: label, fontFamily: ctx.config.fontFamily.body, weight: active ? 600 : 400, fontSize: 14, fill: active ? colorShade(ctx.tokens, 'primary', 700) : colorShade(ctx.tokens, 'neutral', 600) }));
     root.appendChild(tab);
   });
@@ -683,7 +683,7 @@ const Modal: Template = (root, ctx) => {
   pad(root, 24);
   root.cornerRadius = radiusPx(ctx.tokens, 'xl');
   setFill(root, '#FFFFFF');
-  setEffect(root, shadow(ctx.tokens, 'xl')!, effectStyleKey('xl'), ctx.styleMap, ctx.varMap);
+  setEffect(root, shadow(ctx.tokens, 'xl'), effectStyleKey('xl'), ctx.styleMap, ctx.varMap);
   root.resize(400, 220);
   root.appendChild(text({ characters: 'Modal Title', fontFamily: ctx.config.fontFamily.heading, weight: 700, fontSize: 20, fill: colorShade(ctx.tokens, 'neutral', 900) }));
   root.appendChild(text({ characters: 'Modal body text describing the action.', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 14, fill: colorShade(ctx.tokens, 'neutral', 600) }));
@@ -744,7 +744,7 @@ const Popover: Template = (root, ctx) => {
   pad(root, 8);
   root.cornerRadius = radiusPx(ctx.tokens, 'md');
   setFill(root, '#FFFFFF');
-  setEffect(root, shadow(ctx.tokens, 'lg')!, effectStyleKey('lg'), ctx.styleMap, ctx.varMap);
+  setEffect(root, shadow(ctx.tokens, 'lg'), effectStyleKey('lg'), ctx.styleMap, ctx.varMap);
   ['Profile', 'Settings', 'Sign out'].forEach((label, i) => {
     const item = makeFrame(`item-${i}`);
     pad(item, 8, 10);
@@ -761,7 +761,7 @@ const DropdownMenu: Template = (root, ctx) => {
   pad(root, 6);
   root.cornerRadius = radiusPx(ctx.tokens, 'md');
   setFill(root, '#FFFFFF');
-  setEffect(root, shadow(ctx.tokens, 'lg')!, effectStyleKey('lg'), ctx.styleMap, ctx.varMap);
+  setEffect(root, shadow(ctx.tokens, 'lg'), effectStyleKey('lg'), ctx.styleMap, ctx.varMap);
   ['Edit', 'Duplicate', 'Archive', 'Delete'].forEach((label, i) => {
     const item = makeFrame(`item-${i}`);
     pad(item, 8, 10);
