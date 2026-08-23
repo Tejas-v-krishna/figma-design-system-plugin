@@ -16,16 +16,23 @@ import {
 } from './typography-utils';
 
 export function buildTokens(config: GenerationConfig): DesignTokens {
-  const colors = generateSemanticColors({
-    primary: config.primaryColor,
-    secondary: config.secondaryColor,
-    accent: config.accentColor,
-    success: config.successColor,
-    error: config.errorColor,
-    warning: config.warningColor,
-    information: config.informationColor,
-    neutral: config.neutralColor,
-  });
+  const colors = generateSemanticColors(
+    {
+      primary: config.primaryColor,
+      secondary: config.secondaryColor,
+      accent: config.accentColor,
+      success: config.successColor,
+      error: config.errorColor,
+      warning: config.warningColor,
+      information: config.informationColor,
+      neutral: config.neutralColor,
+    },
+    // Without this the dark ramp was never built, so `darkShades` was undefined
+    // on every token and all four exporters — which each guard on it — skipped
+    // their dark block. Turning "Include dark-mode token variants" on and off
+    // produced byte-identical CSS, Tailwind, DTCG and JSON.
+    config.options.includeDarkMode
+  );
 
   let typography = generateTypographyTokens(
     config.fontFamily.body,

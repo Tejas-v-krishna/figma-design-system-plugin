@@ -86,6 +86,34 @@ export function generateColorShades(baseHex: string): ColorShades {
   return shades;
 }
 
+/**
+ * The dark-theme counterpart of a light ramp: every step swapped for its mirror
+ * across 500, so 50↔950, 100↔900, 400↔600 and 500 stays put.
+ *
+ * This is not a new rule. It is the rule `createVariables` already applies to
+ * the Semantic tier's Dark mode (`mirrorShade = 1000 - shade` there), and the
+ * reason for it is that a dark theme is not a darker theme — it is one where the
+ * *roles* invert. A `neutral/200` hairline on white has to become `neutral/800`
+ * on near-black to stay a hairline, and `neutral/900` body text has to become
+ * `neutral/100` to stay readable. Mirroring gets that for the whole ramp with no
+ * per-token table to maintain.
+ *
+ * Derived from the light shades rather than recomputed from the base hex so the
+ * two ramps cannot drift: the dark ramp is exactly a permutation of the light
+ * one, which also means every colour a dark build emits is a colour the light
+ * build already vouched for.
+ */
+export function generateDarkShades(light: ColorShades): ColorShades {
+  const dark = {} as ColorShades;
+  for (const key of Object.keys(light) as unknown as (keyof ColorShades)[]) {
+    // 1000 - shade is an involution over 50…950, so this both fills every slot
+    // and never reads one that isn't there.
+    const mirror = (1000 - Number(key)) as keyof ColorShades;
+    dark[key] = light[mirror];
+  }
+  return dark;
+}
+
 /** Alias used by the generation pipeline. */
 export function generateColorPalette(baseHex: string): ColorShades {
   return generateColorShades(baseHex);
@@ -96,15 +124,18 @@ export function generateNeutralPalette(baseHex: string): ColorShades {
 }
 
 /**
- * Builds a single-color token. Dark-mode values are provided by the
- * Mapped/Alias variable tiers (their Dark mode), not by a per-token ramp.
+ * Builds a single-color token. The dark ramp is attached only when dark mode is
+ * on, because every exporter treats `darkShades` being present as the signal to
+ * write a dark block at all.
  */
-export function createColorToken(name: string, hex: string): ColorToken {
+export function createColorToken(name: string, hex: string, includeDark = false): ColorToken {
+  const shades = generateColorShades(hex);
   return {
     name,
     hex,
     hsl: hexToHsl(hex),
-    shades: generateColorShades(hex),
+    shades,
+    ...(includeDark ? { darkShades: generateDarkShades(shades) } : {}),
   };
 }
 
@@ -119,22 +150,32 @@ export interface SemanticColorInput {
   neutral?: string;
 }
 
-/** Builds the full semantic color system, respecting user-chosen bases. */
-export function generateSemanticColors(input: SemanticColorInput): Record<
+/**
+ * Builds the full semantic color system, respecting user-chosen bases.
+ *
+ * `includeDarkMode` defaults to false so a caller that only wants the light ramp
+ * — the swatch grid in the UI, for instance — doesn't pay for one it won't read.
+ */
+export function generateSemanticColors(
+  input: SemanticColorInput,
+  includeDarkMode = false
+): Record<
   'primary' | 'secondary' | 'accent' | 'success' | 'error' | 'warning' | 'information' | 'neutral',
   ColorToken
 > {
-  const primary = createColorToken('Primary', input.primary);
-  const secondary = createColorToken('Secondary', input.secondary ?? '#F97316');
-  const accent = createColorToken('Accent', input.accent ?? '#8B5CF6');
+  const dark = includeDarkMode;
+  const primary = createColorToken('Primary', input.primary, dark);
+  const secondary = createColorToken('Secondary', input.secondary ?? '#F97316', dark);
+  const accent = createColorToken('Accent', input.accent ?? '#8B5CF6', dark);
   const information = createColorToken(
     'Information',
-    input.information ?? shiftHue(input.primary, 180)
+    input.information ?? shiftHue(input.primary, 180),
+    dark
   );
-  const success = createColorToken('Success', input.success ?? '#10B981');
-  const warning = createColorToken('Warning', input.warning ?? '#F59E0B');
-  const error = createColorToken('Error', input.error ?? '#EF4444');
-  const neutral = createColorToken('Neutral', input.neutral ?? '#64748B');
+  const success = createColorToken('Success', input.success ?? '#10B981', dark);
+  const warning = createColorToken('Warning', input.warning ?? '#F59E0B', dark);
+  const error = createColorToken('Error', input.error ?? '#EF4444', dark);
+  const neutral = createColorToken('Neutral', input.neutral ?? '#64748B', dark);
   return { primary, secondary, accent, success, error, warning, information, neutral };
 }
 
