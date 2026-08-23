@@ -122,8 +122,10 @@ function buildComponentShowcase(
   const sections: ComponentSection[] = [];
   let totalCount = 0;
 
-  if (def.name === 'Button') {
-    const statesToUse = def.states.filter((s) => ['Default', 'Hover', 'Focus', 'Disabled'].includes(s.name));
+  const hasMatrix = def.variants.length > 1 && def.states.length > 1;
+
+  if (hasMatrix) {
+    const statesToUse = def.states.filter((s) => ['Default', 'Hover', 'Focus', 'Active', 'Disabled', 'Checked', 'Unchecked'].includes(s.name));
     const states = statesToUse.length > 0 ? statesToUse : def.states;
 
     for (const v of def.variants) {
@@ -137,34 +139,38 @@ function buildComponentShowcase(
     }
 
     // Sizes Scale
-    const sizeNodes: ComponentNode[] = [];
-    for (const sz of def.sizes) {
-      sizeNodes.push(buildOne(def, tokens, config, styleMap, tmpl, dv, ds, sz, undefined, undefined, sz.name, varMap, 'size'));
+    if (def.sizes.length > 1) {
+      const sizeNodes: ComponentNode[] = [];
+      for (const sz of def.sizes) {
+        sizeNodes.push(buildOne(def, tokens, config, styleMap, tmpl, dv, ds, sz, undefined, undefined, sz.name, varMap, 'size'));
+      }
+      sections.push({ title: 'Sizes Scale', nodes: sizeNodes });
+      totalCount += sizeNodes.length;
     }
-    sections.push({ title: 'Sizes Scale', nodes: sizeNodes });
-    totalCount += sizeNodes.length;
 
-    // Icons & Contextual Actions
-    const iconDefs = [
-      { label: 'Create New', iconType: 'leading', variant: 'primary', caption: 'Leading Icon' },
-      { label: 'Continue', iconType: 'trailing', variant: 'primary', caption: 'Trailing Icon' },
-      { label: 'Star', iconType: 'badge', variant: 'secondary', caption: 'Badge Counter' },
-      { label: 'Docs', iconType: 'external', variant: 'ghost', caption: 'External Link' },
-      { label: 'Copy Link', iconType: 'copy', variant: 'secondary', caption: 'Copy Action' },
-      { label: 'Copied!', iconType: 'copied', variant: 'tonal', caption: 'Copied State' },
-      { label: 'Saving…', iconType: 'loading', variant: 'primary', caption: 'Async Loading' },
-    ];
+    // Icons & Contextual Actions for Button
+    if (def.name === 'Button') {
+      const iconDefs = [
+        { label: 'Create New', iconType: 'leading', variant: 'primary', caption: 'Leading Icon' },
+        { label: 'Continue', iconType: 'trailing', variant: 'primary', caption: 'Trailing Icon' },
+        { label: 'Star', iconType: 'badge', variant: 'secondary', caption: 'Badge Counter' },
+        { label: 'Docs', iconType: 'external', variant: 'ghost', caption: 'External Link' },
+        { label: 'Copy Link', iconType: 'copy', variant: 'secondary', caption: 'Copy Action' },
+        { label: 'Copied!', iconType: 'copied', variant: 'tonal', caption: 'Copied State' },
+        { label: 'Saving…', iconType: 'loading', variant: 'primary', caption: 'Async Loading' },
+      ];
 
-    const iconNodes: ComponentNode[] = [];
-    for (const ic of iconDefs) {
-      const v = def.variants.find((x) => x.name.toLowerCase() === ic.variant) ?? dv;
-      const vProps = { ...v.properties, iconType: ic.iconType, customLabel: ic.label };
-      const customVariant = { name: ic.caption, properties: vProps };
-      const node = buildOne(def, tokens, config, styleMap, tmpl, customVariant, ds, dz, ic.caption, undefined, undefined, varMap, 'icon');
-      iconNodes.push(node);
+      const iconNodes: ComponentNode[] = [];
+      for (const ic of iconDefs) {
+        const v = def.variants.find((x) => x.name.toLowerCase() === ic.variant) ?? dv;
+        const vProps = { ...v.properties, iconType: ic.iconType, customLabel: ic.label };
+        const customVariant = { name: ic.caption, properties: vProps };
+        const node = buildOne(def, tokens, config, styleMap, tmpl, customVariant, ds, dz, ic.caption, undefined, undefined, varMap, 'icon');
+        iconNodes.push(node);
+      }
+      sections.push({ title: 'Icons & Contextual', nodes: iconNodes });
+      totalCount += iconNodes.length;
     }
-    sections.push({ title: 'Icons & Contextual', nodes: iconNodes });
-    totalCount += iconNodes.length;
 
     const primary = sections[0]?.nodes[0] ?? buildOne(def, tokens, config, styleMap, tmpl, dv, ds, dz, undefined, undefined, undefined, varMap);
     return { sections, primary, totalCount };
@@ -191,7 +197,7 @@ function buildComponentShowcase(
     for (const sz of def.sizes) {
       sizeNodes.push(buildOne(def, tokens, config, styleMap, tmpl, dv, ds, sz, undefined, undefined, sz.name, varMap, 'size'));
     }
-    sections.push({ title: 'Sizes', nodes: sizeNodes });
+    sections.push({ title: 'Sizes Scale', nodes: sizeNodes });
     totalCount += sizeNodes.length;
   }
 
@@ -413,12 +419,11 @@ export async function generateComponents(
         cardBody.clipsContent = false;
 
         const showcase = buildComponentShowcase(def, tokens, config, styleMap, varMap);
-        const isButtonComp = def.name === 'Button';
-
         for (const [sIdx, section] of showcase.sections.entries()) {
-          const isButtonMatrixRow = isButtonComp && !['Sizes Scale', 'Icons & Contextual'].includes(section.title);
+          const isSpecialNonMatrix = ['Sizes Scale', 'Sizes', 'Icons & Contextual', 'Contextual', 'Variants', 'Interactive States', 'Default'].includes(section.title);
+          const isMatrixRow = !isSpecialNonMatrix;
 
-          if (sIdx > 0 && !isButtonMatrixRow) {
+          if (sIdx > 0 && !isMatrixRow) {
             const innerDiv = figma.createFrame();
             innerDiv.name = 'SubDivider';
             innerDiv.resize(CW - 80, 1);
@@ -426,8 +431,8 @@ export async function generateComponents(
             cardBody.appendChild(innerDiv);
           }
 
-          if (isButtonMatrixRow) {
-            // Horizontal row with left label and right state buttons matching the reference image!
+          if (isMatrixRow) {
+            // Horizontal row with left label and right state buttons matching the studio style
             const rowLine = figma.createFrame();
             rowLine.name = `Row ${section.title}`;
             rowLine.layoutMode = 'HORIZONTAL';
