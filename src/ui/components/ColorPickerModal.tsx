@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { hexToRgb } from '../../shared/color-utils';
+import { contrastRatio, wcagLevel } from '../../shared/contrast';
 
 interface ColorPickerModalProps {
   color: string;
@@ -260,6 +261,46 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
             className="dsk-slider-handle"
             style={{ left: `${(hue / 360) * 100}%`, backgroundColor: pureHueHex }}
           />
+        </div>
+
+        {/*
+          What replaced the alpha slider. That slider moved a handle, showed a
+          percentage, and was discarded: onChange only ever emitted a 6-digit hex,
+          and it could not do otherwise — this colour seeds an 11-step ramp built
+          by overlaying it on white and black, so a semi-transparent seed has no
+          meaning anywhere downstream.
+
+          Contrast is the thing a designer actually needs to know at the moment
+          they pick a brand colour, because it decides whether the colour can
+          carry text at all. Measured against white and black rather than guessed
+          from lightness.
+        */}
+        <div className="dsk-picker-contrast">
+          {([['#FFFFFF', 'on white'], ['#000000', 'on black']] as const).map(([on, label]) => {
+            const cr = contrastRatio(currentHex, on);
+            // wcagLevel rather than a second copy of the thresholds here — it is
+            // the same grader useBrandTheme and the audit already read from.
+            const grade = wcagLevel(cr);
+            return (
+              <div className="dsk-contrast-chip" key={on}>
+                <span className="dsk-contrast-sample" style={{ background: currentHex, color: on }}>
+                  Aa
+                </span>
+                <span className="dsk-contrast-label">{label}</span>
+                <span className="dsk-contrast-ratio">{cr.toFixed(2)}:1</span>
+                {/* Three states, not two. "AA Large" passing as green would be
+                    a lie about body text: it means this pairing is only legal at
+                    24px, or 18.66px bold. */}
+                <span
+                  className={`dsk-contrast-grade ${
+                    grade === 'Fail' ? 'fail' : grade === 'AA Large' ? 'warn' : 'pass'
+                  }`}
+                >
+                  {grade}
+                </span>
+              </div>
+            );
+          })}
         </div>
 
         {/* Value Inputs Row */}

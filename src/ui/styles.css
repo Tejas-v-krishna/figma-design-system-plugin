@@ -1794,6 +1794,81 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   font-family: var(--font-mono);
 }
 
+/* ---------- Contrast readout ---------- */
+/* One row per pairing rather than two side by side: at 280px the grade pill
+   and the ratio cannot both fit in half the card, and "AA Large" is the
+   longest grade wcagLevel returns. */
+.dsk-picker-contrast {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dsk-contrast-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f4f4f6;
+  border-radius: 10px;
+  padding: 5px 8px;
+}
+
+/* Shows the pairing it is grading, so the number is never the only evidence. */
+.dsk-contrast-sample {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  /* A near-white pick would otherwise have no edge against the card. */
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.dsk-contrast-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #666666;
+}
+
+.dsk-contrast-ratio {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: #000000;
+  /* Tabular, so the two rows' decimal points hold still while dragging. */
+  font-variant-numeric: tabular-nums;
+}
+
+.dsk-contrast-grade {
+  margin-left: auto;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 5px;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+.dsk-contrast-grade.pass {
+  background: rgba(22, 163, 74, 0.14);
+  color: #15803d;
+}
+
+.dsk-contrast-grade.warn {
+  background: rgba(217, 119, 6, 0.16);
+  color: #b45309;
+}
+
+.dsk-contrast-grade.fail {
+  background: rgba(220, 38, 38, 0.14);
+  color: #b91c1c;
+}
+
 /* ---------- Interactive Animations & Hover States ---------- */
 .clickable-swatch-row {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
