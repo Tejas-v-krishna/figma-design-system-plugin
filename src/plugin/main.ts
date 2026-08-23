@@ -120,13 +120,34 @@ async function route(msg: PluginMessage): Promise<void> {
   }
 }
 
+/**
+ * What the user was trying to do, for the message shown when a handler throws
+ * somewhere it did not expect to.
+ *
+ * The catch below used to interpolate the raw message type, so a failure read
+ * "Something went wrong handling GENERATE_DESIGN_SYSTEM" — an internal constant
+ * in front of someone who has no idea what it refers to.
+ */
+const ACTION_NAMES: Record<string, string> = {
+  GENERATE_DESIGN_SYSTEM: 'generating the design system',
+  GENERATE_COLOR_EXTENSIONS: 'generating shades and gradients',
+  EXPORT_TOKENS: 'exporting your tokens',
+  SCAN_USAGE: 'scanning this file',
+  CHECK_EXISTING: 'checking what is already in this file',
+  LOAD_CONFIG: 'loading your saved settings',
+  SAVE_CONFIG: 'saving your settings',
+};
+
 figma.ui.onmessage = (msg: PluginMessage) => {
   route(msg).catch((error: unknown) => {
     const message = error instanceof Error ? error.message : String(error);
     console.error('[design-system-kit] unhandled error handling', msg.type, error);
+    const action = ACTION_NAMES[msg.type] ?? `handling ${msg.type}`;
     figma.ui.postMessage({
       type: 'PLUGIN_ERROR',
-      payload: { message: `Something went wrong handling ${msg.type}: ${message}` },
+      payload: {
+        message: `Something went wrong while ${action}: ${message}. Nothing else was changed — try again, and check Plugins › Development › Open console for details.`,
+      },
     });
   });
 };
