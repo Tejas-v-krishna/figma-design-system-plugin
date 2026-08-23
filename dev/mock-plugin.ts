@@ -169,6 +169,14 @@ export function installMockPlugin(): void {
       case 'CHECK_EXISTING': {
         // The real check reads local styles and page names. Here the answer is
         // "nothing" until a generate has run, then a plausible non-empty summary.
+        //
+        // The wait is not padding. summarizeExisting runs loadAllPagesAsync plus
+        // three style queries, which on the large files this plugin targets is
+        // well past the half second where an action has to say it is working.
+        // Replying instantly made the Generate button's busy state unreachable
+        // outside Figma, so a regression in it could only be caught by reading
+        // code — the same reason the overwrite dialog is reachable here at all.
+        await wait(700);
         const generated = localStorage.getItem(GENERATED_KEY) === '1';
         reply(
           'EXISTING_SUMMARY',
