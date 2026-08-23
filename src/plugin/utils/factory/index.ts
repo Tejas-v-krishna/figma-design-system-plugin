@@ -105,6 +105,7 @@ function buildOne(
 interface ComponentSection {
   title: string;
   nodes: ComponentNode[];
+  kind?: 'matrix-row' | 'sizes' | 'contextual' | 'variants' | 'states' | 'default';
 }
 
 function buildComponentShowcase(
@@ -125,8 +126,7 @@ function buildComponentShowcase(
   const hasMatrix = def.variants.length > 1 && def.states.length > 1;
 
   if (hasMatrix) {
-    const statesToUse = def.states.filter((s) => ['Default', 'Hover', 'Focus', 'Active', 'Disabled', 'Checked', 'Unchecked'].includes(s.name));
-    const states = statesToUse.length > 0 ? statesToUse : def.states;
+    const states = def.states;
 
     for (const v of def.variants) {
       const rowNodes: ComponentNode[] = [];
@@ -134,7 +134,7 @@ function buildComponentShowcase(
         const node = buildOne(def, tokens, config, styleMap, tmpl, v, st, dz, v.name, st.name, undefined, varMap, 'state');
         rowNodes.push(node);
       }
-      sections.push({ title: v.name, nodes: rowNodes });
+      sections.push({ title: v.name, nodes: rowNodes, kind: 'matrix-row' });
       totalCount += rowNodes.length;
     }
 
@@ -144,7 +144,7 @@ function buildComponentShowcase(
       for (const sz of def.sizes) {
         sizeNodes.push(buildOne(def, tokens, config, styleMap, tmpl, dv, ds, sz, undefined, undefined, sz.name, varMap, 'size'));
       }
-      sections.push({ title: 'Sizes Scale', nodes: sizeNodes });
+      sections.push({ title: 'Sizes Scale', nodes: sizeNodes, kind: 'sizes' });
       totalCount += sizeNodes.length;
     }
 
@@ -168,7 +168,7 @@ function buildComponentShowcase(
         const node = buildOne(def, tokens, config, styleMap, tmpl, customVariant, ds, dz, ic.caption, undefined, undefined, varMap, 'icon');
         iconNodes.push(node);
       }
-      sections.push({ title: 'Icons & Contextual', nodes: iconNodes });
+      sections.push({ title: 'Icons & Contextual', nodes: iconNodes, kind: 'contextual' });
       totalCount += iconNodes.length;
     }
 
@@ -184,10 +184,10 @@ function buildComponentShowcase(
   }
   const primary = variantNodes[0] ?? buildOne(def, tokens, config, styleMap, tmpl, dv, ds, dz, undefined, undefined, undefined, varMap);
   if (variantNodes.length > 0) {
-    sections.push({ title: 'Variants', nodes: variantNodes });
+    sections.push({ title: 'Variants', nodes: variantNodes, kind: 'variants' });
     totalCount += variantNodes.length;
   } else {
-    sections.push({ title: 'Default', nodes: [primary] });
+    sections.push({ title: 'Default', nodes: [primary], kind: 'default' });
     totalCount += 1;
   }
 
@@ -197,7 +197,7 @@ function buildComponentShowcase(
     for (const sz of def.sizes) {
       sizeNodes.push(buildOne(def, tokens, config, styleMap, tmpl, dv, ds, sz, undefined, undefined, sz.name, varMap, 'size'));
     }
-    sections.push({ title: 'Sizes Scale', nodes: sizeNodes });
+    sections.push({ title: 'Sizes Scale', nodes: sizeNodes, kind: 'sizes' });
     totalCount += sizeNodes.length;
   }
 
@@ -207,7 +207,7 @@ function buildComponentShowcase(
     for (const st of def.states) {
       stateNodes.push(buildOne(def, tokens, config, styleMap, tmpl, dv, st, dz, undefined, st.name, undefined, varMap, 'state'));
     }
-    sections.push({ title: 'Interactive States', nodes: stateNodes });
+    sections.push({ title: 'Interactive States', nodes: stateNodes, kind: 'states' });
     totalCount += stateNodes.length;
   }
 
@@ -424,8 +424,7 @@ export async function generateComponents(
 
         const showcase = buildComponentShowcase(def, tokens, config, styleMap, varMap);
         for (const [sIdx, section] of showcase.sections.entries()) {
-          const isSpecialNonMatrix = ['Sizes Scale', 'Sizes', 'Icons & Contextual', 'Contextual', 'Variants', 'Interactive States', 'Default'].includes(section.title);
-          const isMatrixRow = !isSpecialNonMatrix;
+          const isMatrixRow = section.kind === 'matrix-row';
 
           if (sIdx > 0 && !isMatrixRow) {
             const innerDiv = figma.createFrame();

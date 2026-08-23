@@ -152,9 +152,9 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
     name: 'CopyButton',
     category: 'buttons',
     variants: [
-      { name: 'Default', properties: { variant: 'default' } },
-      { name: 'Ghost', properties: { variant: 'ghost' } },
+      { name: 'Filled', properties: { variant: 'filled' } },
       { name: 'Bordered', properties: { variant: 'bordered' } },
+      { name: 'Ghost', properties: { variant: 'ghost' } },
     ],
     states: [
       { name: 'Default', properties: { state: 'default' } },
@@ -165,7 +165,7 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
       { name: 'sm', properties: { name: 'sm', height: 32 } },
       { name: 'md', properties: { name: 'md', height: 38 } },
     ],
-    defaultProps: { variant: 'default', state: 'default' },
+    defaultProps: { variant: 'filled', state: 'default' },
   },
   // INPUTS
   {
