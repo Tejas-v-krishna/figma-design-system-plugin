@@ -181,7 +181,7 @@
     {
       "name": "Headings / H1",
       "group": "headings",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 60,
       "fontWeight": 600,
       "lineHeight": 72,
@@ -191,7 +191,7 @@
     {
       "name": "Headings / H2",
       "group": "headings",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 48,
       "fontWeight": 600,
       "lineHeight": 56,
@@ -201,7 +201,7 @@
     {
       "name": "Headings / H3",
       "group": "headings",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 40,
       "fontWeight": 600,
       "lineHeight": 48,
@@ -211,7 +211,7 @@
     {
       "name": "Headings / H4",
       "group": "headings",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 32,
       "fontWeight": 600,
       "lineHeight": 40,
@@ -221,7 +221,7 @@
     {
       "name": "Headings / H5",
       "group": "headings",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 24,
       "fontWeight": 600,
       "lineHeight": 28,
@@ -231,7 +231,7 @@
     {
       "name": "Headings / H6",
       "group": "headings",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 20,
       "fontWeight": 600,
       "lineHeight": 24,
@@ -241,7 +241,7 @@
     {
       "name": "Body / Large",
       "group": "body",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 20,
       "fontWeight": 400,
       "lineHeight": 24,
@@ -251,7 +251,7 @@
     {
       "name": "Body / Large / Semi Bold",
       "group": "body",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 20,
       "fontWeight": 600,
       "lineHeight": 24,
@@ -261,7 +261,7 @@
     {
       "name": "Body / Large / Link",
       "group": "body",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 20,
       "fontWeight": 400,
       "lineHeight": 24,
@@ -271,7 +271,7 @@
     {
       "name": "Body / Medium",
       "group": "body",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 16,
       "fontWeight": 400,
       "lineHeight": 20,
@@ -281,7 +281,7 @@
     {
       "name": "Body / Medium / Semi Bold",
       "group": "body",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 16,
       "fontWeight": 600,
       "lineHeight": 20,
@@ -291,7 +291,7 @@
     {
       "name": "Body / Medium / Link",
       "group": "body",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 16,
       "fontWeight": 400,
       "lineHeight": 20,
@@ -301,7 +301,7 @@
     {
       "name": "Body / Small",
       "group": "body",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 14,
       "fontWeight": 400,
       "lineHeight": 16,
@@ -311,7 +311,7 @@
     {
       "name": "Body / Small / Semi Bold",
       "group": "body",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 14,
       "fontWeight": 600,
       "lineHeight": 16,
@@ -321,7 +321,7 @@
     {
       "name": "Body / Small / Link",
       "group": "body",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 14,
       "fontWeight": 400,
       "lineHeight": 16,
@@ -331,7 +331,7 @@
     {
       "name": "Body / X-Small",
       "group": "body",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 12,
       "fontWeight": 400,
       "lineHeight": 16,
@@ -341,7 +341,7 @@
     {
       "name": "Body / X-Small / Semi Bold",
       "group": "body",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 12,
       "fontWeight": 600,
       "lineHeight": 16,
@@ -351,7 +351,7 @@
     {
       "name": "Body / X-Small / Link",
       "group": "body",
-      "fontFamily": "Geist",
+      "fontFamily": "Google Sans",
       "fontSize": 12,
       "fontWeight": 400,
       "lineHeight": 16,

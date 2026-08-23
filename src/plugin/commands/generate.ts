@@ -581,7 +581,7 @@ async function createBlackHeroBox(
   mainDesc?: string,
   descItems?: { label: string; desc: string }[],
   width: number = 904,
-  fontFamily: string = 'Inter'
+  fontFamily: string = 'Google Sans'
 ): Promise<FrameNode> {
   const box = figma.createFrame();
   box.name = 'Header Black Box';
@@ -1570,7 +1570,7 @@ async function buildCustomCard(
   width: number,
   height: number,
   isLight: boolean,
-  fontFamily: string = 'Inter'
+  fontFamily: string = 'Google Sans'
 ): Promise<FrameNode> {
   const card = figma.createFrame();
   card.name = `${title} Card`;
@@ -1697,7 +1697,7 @@ async function runColorExtensions(
 
   const cleanHex = baseHex.replace('#', '').toUpperCase();
   const apiName = config?.colorNames?.[cleanHex] || getColorName(baseHex);
-  const headingFont = config?.fontFamily.heading ?? 'Inter';
+  const headingFont = config?.fontFamily.heading ?? 'Google Sans';
   const resolvedName = colorName || apiName || `#${cleanHex}`;
   const displayTitle = apiName && apiName.toLowerCase() !== resolvedName.toLowerCase()
     ? `${resolvedName} (${apiName})`
@@ -1836,7 +1836,7 @@ async function buildGradientsBoard(
   displayTitle: string,
   boardName: string,
   customGradientStops?: Record<string, string[]>,
-  fontFamily: string = 'Inter'
+  fontFamily: string = 'Google Sans'
 ): Promise<FrameNode> {
   const gradients = generateGradientsForColor(baseHex);
 

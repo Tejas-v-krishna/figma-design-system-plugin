@@ -1,4 +1,4 @@
-﻿@import '@fontsource-variable/geist/wght.css';
+@import '@fontsource-variable/geist/wght.css';
 @import '@fontsource-variable/geist-mono/wght.css';
 
 :root {
@@ -23,8 +23,8 @@
   --radius-user: 8px;
 
   /* Type scale */
-  --font-ui: 'Geist Variable', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-ui: 'Google Sans', 'Google Sans Text', 'Product Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Google Sans', 'Google Sans Text', 'Product Sans', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --font-specimen: var(--font-ui);
 
   --fs-display: 24px;

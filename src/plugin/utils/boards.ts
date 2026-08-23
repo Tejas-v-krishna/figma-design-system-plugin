@@ -59,7 +59,7 @@ export async function createBlackHeroBox(
   mainDesc?: string,
   descItems?: { label: string; desc: string }[],
   width: number = CW,
-  fontFamily: string = 'Inter'
+  fontFamily: string = 'Google Sans'
 ): Promise<FrameNode> {
   const box = figma.createFrame();
   box.name = 'Header Black Box';
@@ -170,7 +170,7 @@ export async function createBlackHeroBox(
 export async function mkSecHead(
   label: string,
   title: string,
-  fontFamily: string = 'Inter'
+  fontFamily: string = 'Google Sans'
 ): Promise<FrameNode> {
   const h = figma.createFrame();
   h.name = 'SectionHeader';

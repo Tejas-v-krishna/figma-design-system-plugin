@@ -30,7 +30,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
       errorColor: '#EF4444',
       neutralColor: '#64748B',
     },
-    fontFamily: { heading: 'Inter', body: 'Inter', mono: 'IBM Plex Mono' },
+    fontFamily: { heading: 'Google Sans', body: 'Google Sans', mono: 'Google Sans' },
     radiusPreset: 'rounded',
   },
   {
@@ -45,7 +45,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
       errorColor: '#DC2626',
       neutralColor: '#78716C',
     },
-    fontFamily: { heading: 'Poppins', body: 'Inter', mono: 'JetBrains Mono' },
+    fontFamily: { heading: 'Google Sans', body: 'Google Sans', mono: 'Google Sans' },
     radiusPreset: 'rounded',
   },
   {
@@ -60,7 +60,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
       errorColor: '#1E293B',
       neutralColor: '#64748B',
     },
-    fontFamily: { heading: 'DM Sans', body: 'Inter', mono: 'IBM Plex Mono' },
+    fontFamily: { heading: 'Google Sans', body: 'Google Sans', mono: 'Google Sans' },
     radiusPreset: 'sharp',
   },
   {
@@ -75,7 +75,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
       errorColor: '#B91C1C',
       neutralColor: '#57534E',
     },
-    fontFamily: { heading: 'Montserrat', body: 'Source Sans 3', mono: 'Roboto Mono' },
+    fontFamily: { heading: 'Google Sans', body: 'Google Sans', mono: 'Google Sans' },
     radiusPreset: 'rounded',
   },
   {
@@ -90,7 +90,7 @@ export const BRAND_PRESETS: BrandPreset[] = [
       errorColor: '#E11D48',
       neutralColor: '#6B7280',
     },
-    fontFamily: { heading: 'Poppins', body: 'Nunito Sans', mono: 'Fira Code' },
+    fontFamily: { heading: 'Google Sans', body: 'Google Sans', mono: 'Google Sans' },
     radiusPreset: 'pill',
   },
 ];
