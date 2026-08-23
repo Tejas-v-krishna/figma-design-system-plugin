@@ -7,7 +7,7 @@ import {
 } from '../shared/types';
 import { COMPONENT_DEFINITIONS } from '../shared/component-definitions';
 import { BRAND_PRESETS, BrandPreset } from '../shared/presets';
-import { postToPlugin } from './plugin';
+import { postToPlugin, ExistingSummary } from './plugin';
 
 export type View = 'set-tokens' | 'build-components' | 'code' | 'brand' | 'typography' | 'components' | 'review' | 'export' | 'scan';
 export type TokenCategory = 'colors' | 'gradients' | 'typography' | 'spacing' | 'radius' | 'stroke' | 'effects' | 'motion';
@@ -161,6 +161,13 @@ interface UIState {
   generateColorExtensions: (hex?: string, name?: string, customStops?: Record<string, string[]>) => void;
 
   startGeneration: (target?: string) => void;
+  /** Non-null while an overwrite confirmation is on screen. */
+  existingSummary: ExistingSummary | null;
+  /** The target the user asked for, held across the overwrite round trip. */
+  pendingTarget: string | null;
+  confirmGeneration: () => void;
+  cancelGeneration: () => void;
+  existingChecked: (summary: ExistingSummary) => void;
   requestExport: (format: ExportFormat) => void;
   requestScan: () => void;
 }
@@ -224,6 +231,9 @@ export const useStore = create<UIState>((set, get) => ({
   scanBusy: false,
   scanProgress: 0,
   scanMessage: '',
+
+  existingSummary: null,
+  pendingTarget: null,
 
   setView: (v) => set({ view: v, lastError: null }),
   setTokenCategory: (c) => set({ tokenCategory: c }),
@@ -413,11 +423,51 @@ export const useStore = create<UIState>((set, get) => ({
   // handler passing a MouseEvent — but no call site does that; they all pass a
   // category name or nothing. So the check tested a case that could not occur,
   // and the `any` disabled type checking on the one argument that matters.
+  //
+  // Generating overwrites same-named styles and reuses the generator's pages, so
+  // this no longer fires the request directly. It asks the sandbox what is
+  // already there and waits; App resolves the answer into either an immediate
+  // run (nothing to overwrite) or a confirmation dialog.
   startGeneration: (target) => {
-    set({ overlay: 'generating', progress: 0, progressMessage: 'Starting…', statusMessage: '', lastError: null });
-    const targetMode =
-      target ?? (get().view === 'build-components' ? 'components' : get().tokenCategory);
-    postToPlugin({ type: 'GENERATE_DESIGN_SYSTEM', payload: { ...get().config, target: targetMode } });
+    const resolved = target ?? (get().view === 'build-components' ? 'components' : get().tokenCategory);
+    set({ pendingTarget: resolved, lastError: null });
+    postToPlugin({ type: 'CHECK_EXISTING' });
+  },
+
+  /** Run for real. Called once the user has confirmed, or when there was nothing to confirm. */
+  confirmGeneration: () => {
+    const target = get().pendingTarget;
+    set({
+      overlay: 'generating',
+      progress: 0,
+      progressMessage: 'Starting…',
+      statusMessage: '',
+      lastError: null,
+      existingSummary: null,
+      pendingTarget: null,
+    });
+    postToPlugin({
+      type: 'GENERATE_DESIGN_SYSTEM',
+      payload: { ...get().config, target: target ?? 'all' },
+    });
+  },
+
+  cancelGeneration: () => set({ existingSummary: null, pendingTarget: null }),
+
+  /**
+   * The sandbox answered the overwrite check.
+   *
+   * Nothing there means nothing to confirm, so run straight away — a
+   * confirmation dialog on an empty document would be a pointless extra click
+   * on the plugin's single most common action.
+   */
+  existingChecked: (summary) => {
+    if (get().pendingTarget === null) return;
+    if (!summary.hasAny) {
+      get().confirmGeneration();
+      return;
+    }
+    set({ existingSummary: summary });
   },
   requestExport: (format) => {
     set({ exportBusy: true, exportResult: null, exportError: null });

@@ -9,6 +9,7 @@ import { AuditView } from './components/AuditView';
 import { GeneratingOverlay } from './components/Generating';
 import { SuccessOverlay } from './components/Success';
 import { ImportPaletteModal } from './components/ImportPaletteModal';
+import { OverwriteConfirmModal } from './components/OverwriteConfirmModal';
 import { OptionsDrawer } from './components/OptionsDrawer';
 
 export default function App() {
@@ -60,6 +61,9 @@ export default function App() {
         case 'PLUGIN_ERROR':
           st.reportPluginError(msg.payload.message);
           break;
+        case 'EXISTING_SUMMARY':
+          st.existingChecked(msg.payload);
+          break;
       }
     });
     useStore.getState().loadPersisted();
@@ -102,6 +106,7 @@ export default function App() {
       {overlay === 'generating' && <GeneratingOverlay />}
       {overlay === 'success' && <SuccessOverlay />}
       <ImportPaletteModal />
+      <OverwriteConfirmModal />
       <OptionsDrawer />
     </div>
   );

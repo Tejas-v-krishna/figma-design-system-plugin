@@ -864,6 +864,17 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
 .modal-error { background: var(--danger-soft); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 9px 12px; border-radius: 9px; font-size: 12.5px; margin-top: 10px; }
 .modal-hint { color: var(--text-faint); font-size: 11.5px; margin: 8px 0 0; line-height: 1.5; }
 
+/* Overwrite confirmation. Amber rather than red: nothing is destroyed here, the
+   values are updated in place, so the tone is "read this" not "danger". */
+.dsk-confirm-modal { width: 440px; }
+.dsk-confirm-modal .modal-head h3 { display: flex; align-items: center; gap: 8px; }
+.dsk-confirm-icon { color: var(--warn, #f59e0b); flex-shrink: 0; }
+.dsk-confirm-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.dsk-confirm-list li { background: var(--panel-2); border: 1px solid var(--border); border-left: 2px solid rgba(245, 158, 11, 0.55); border-radius: 9px; padding: 10px 12px; font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
+.dsk-confirm-list strong { color: var(--text); font-weight: 600; }
+.dsk-confirm-detail { color: var(--text-faint); }
+.dsk-confirm-note { margin: 12px 0 0; padding: 10px 12px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.28); border-radius: 9px; color: #fcd9a0; font-size: 11.5px; line-height: 1.55; }
+
 .drawer-backdrop { position: fixed; inset: 0; background: rgba(8, 10, 14, 0.55); z-index: 55; animation: fade 0.18s ease; }
 .drawer { position: fixed; top: 0; right: 0; height: 800px; width: 380px; max-width: 90vw; background: var(--panel); border-left: 1px solid var(--border); box-shadow: var(--shadow); z-index: 56; padding: 22px 22px 30px; overflow-y: auto; animation: slidein 0.22s cubic-bezier(0.2, 0.9, 0.3, 1); }
 @keyframes slidein { from { transform: translateX(40px); opacity: 0.4; } to { transform: translateX(0); opacity: 1; } }
