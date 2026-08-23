@@ -11,7 +11,7 @@ import { makeComponent } from '../primitives';
 import { VariableMap, emptyVariableMap } from '../variables';
 import { yieldToUI } from '../yield';
 import { hexToRgb } from '../../../shared/color-utils';
-import { CW, boardShell, createBlackHeroBox, mkDivider } from '../boards';
+import { CW, PAD, boardShell, createBlackHeroBox, mkDivider } from '../boards';
 import { ensureFont } from '../fonts';
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -172,25 +172,21 @@ export async function generateComponents(
   }
 
   const generatedBoards: FrameNode[] = [];
-  let currentY = 0;
-  let lastCategoryFrame: FrameNode | null = null;
+  const BOARD_WIDTH = CW + PAD * 2;
+  const BOARD_GAP = 160;
 
   for (const [index, def] of selected.entries()) {
     let frame = frames[def.category];
     if (!frame) {
-      if (lastCategoryFrame) {
-        currentY += Math.max(lastCategoryFrame.height, 400) + 80;
-      }
       const catLabel = CATEGORY_LABELS[def.category] ?? def.category;
       const catSub = CATEGORY_SUBTITLES[def.category] ?? `Production-ready UI components for ${catLabel.toLowerCase()} styled with active design tokens.`;
 
       frame = boardShell(catLabel);
-      frame.x = 0;
-      frame.y = currentY;
+      frame.x = generatedBoards.length * (BOARD_WIDTH + BOARD_GAP);
+      frame.y = 0;
       componentsPage.appendChild(frame);
       frames[def.category] = frame;
       generatedBoards.push(frame);
-      lastCategoryFrame = frame;
 
       const hero = await createBlackHeroBox(
         'Components',
@@ -349,13 +345,42 @@ export async function generateComponents(
           rowFrame.layoutMode = 'HORIZONTAL';
           rowFrame.layoutWrap = 'WRAP';
           rowFrame.resize(CW - 56, 40);
-          rowFrame.itemSpacing = 24;
-          rowFrame.counterAxisSpacing = 24;
-          rowFrame.counterAxisAlignItems = 'MIN';
+          rowFrame.itemSpacing = 16;
+          rowFrame.counterAxisSpacing = 16;
+          rowFrame.counterAxisAlignItems = 'CENTER';
           rowFrame.fills = [];
           rowFrame.clipsContent = false;
 
-          section.nodes.forEach((n) => rowFrame.appendChild(n));
+          for (const n of section.nodes) {
+            const cell = figma.createFrame();
+            const rawLabel = n.name.split('/').pop() || 'Default';
+            cell.name = `Specimen ${rawLabel}`;
+            cell.layoutMode = 'VERTICAL';
+            cell.primaryAxisSizingMode = 'AUTO';
+            cell.counterAxisSizingMode = 'AUTO';
+            cell.primaryAxisAlignItems = 'CENTER';
+            cell.counterAxisAlignItems = 'CENTER';
+            cell.itemSpacing = 8;
+            cell.paddingTop = 14;
+            cell.paddingBottom = 12;
+            cell.paddingLeft = 18;
+            cell.paddingRight = 18;
+            cell.cornerRadius = 10;
+            cell.fills = [{ type: 'SOLID', color: hexToRgb('#F8FAFC') }];
+            cell.strokes = [{ type: 'SOLID', color: hexToRgb('#E2E8F0') }];
+            cell.strokeWeight = 1;
+            cell.appendChild(n);
+
+            const propLabel = figma.createText();
+            propLabel.fontName = await ensureFont(config.fontFamily.body, 500);
+            propLabel.fontSize = 11;
+            propLabel.characters = rawLabel;
+            propLabel.fills = [{ type: 'SOLID', color: hexToRgb('#64748B') }];
+            cell.appendChild(propLabel);
+
+            rowFrame.appendChild(cell);
+          }
+
           rowFrame.primaryAxisSizingMode = 'FIXED';
           rowFrame.counterAxisSizingMode = 'AUTO';
 
@@ -383,13 +408,10 @@ export async function generateComponents(
     await yieldToUI();
   }
 
-  // Final reflow pass over all generated boards neatly on the canvas with generous spacing.
-  let finalY = 0;
-  generatedBoards.forEach((f) => {
-    f.x = 0;
-    f.y = finalY;
-    const h = Math.max(f.height, 200);
-    finalY += h + 100;
+  // Ensure all category boards are cleanly positioned side-by-side with zero overlap
+  generatedBoards.forEach((f, idx) => {
+    f.x = idx * (BOARD_WIDTH + BOARD_GAP);
+    f.y = 0;
   });
 
   return { count, byName };
