@@ -269,9 +269,8 @@ const Button: Template = (root, ctx) => {
 
   if (isSizeShowcase || isIconShowcase || isLink) {
     root.primaryAxisSizingMode = 'AUTO';
-    root.counterAxisSizingMode = 'FIXED';
-    root.resize(100, height);
-    pad(root, 0, padX);
+    root.counterAxisSizingMode = 'AUTO';
+    pad(root, Math.max(6, Math.round((height - fontSize) / 2) - 1), padX);
     root.itemSpacing = 8;
   } else {
     root.primaryAxisSizingMode = 'FIXED';
