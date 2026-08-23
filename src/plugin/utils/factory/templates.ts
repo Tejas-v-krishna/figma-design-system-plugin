@@ -134,6 +134,8 @@ export const ICONS = {
   close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
   chevronDown: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`,
   chevronUp: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>`,
+  chevronLeft: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>`,
+  chevronRight: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`,
   user: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
   image: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`,
   info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`,
@@ -150,8 +152,28 @@ export const ICONS = {
   minus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
   filter: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>`,
   arrowRight: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`,
+  arrowUp: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>`,
   grid: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
   list: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>`,
+  copy: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`,
+  trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`,
+  bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>`,
+  heart: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`,
+  calendar: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`,
+  clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
+  phone: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>`,
+  globe: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`,
+  play: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`,
+  pause: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`,
+  code: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`,
+  terminal: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>`,
+  folder: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`,
+  zap: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`,
+  dollar: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
+  trendingUp: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>`,
+  trendingDown: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>`,
+  moreHorizontal: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>`,
+  moreVertical: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>`,
 };
 
 export type IconKind = keyof typeof ICONS;
@@ -2513,29 +2535,1222 @@ const Link: Template = (root, ctx) => {
   return root;
 };
 
+
+
+const SegmentedControl: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'AUTO';
+  root.counterAxisAlignItems = 'CENTER';
+  root.itemSpacing = 2;
+  root.cornerRadius = 9999;
+  pad(root, 3, 3);
+  setFill(root, colorShade(ctx.tokens, 'neutral', 100));
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+
+  ['Overview', 'Analytics', 'Reports'].forEach((label, i) => {
+    const item = makeFrame(`seg-${i}`);
+    item.layoutMode = 'HORIZONTAL';
+    item.primaryAxisAlignItems = 'CENTER';
+    item.counterAxisAlignItems = 'CENTER';
+    pad(item, 6, 14);
+    item.cornerRadius = 9999;
+    const isSel = i === 0;
+    if (isSel) {
+      setFill(item, '#FFFFFF');
+      item.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.08 },
+        offset: { x: 0, y: 1 },
+        radius: 3,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    } else {
+      item.fills = [];
+    }
+    item.appendChild(text({
+      characters: label,
+      fontFamily: ctx.config.fontFamily.body,
+      weight: isSel ? 600 : 500,
+      fontSize: 12,
+      fill: isSel ? colorShade(ctx.tokens, 'neutral', 900) : colorShade(ctx.tokens, 'neutral', 600),
+    }));
+    root.appendChild(item);
+  });
+  return root;
+};
+
+const SplitButton: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'AUTO';
+  root.counterAxisAlignItems = 'CENTER';
+  root.cornerRadius = 9999;
+  setFill(root, colorShade(ctx.tokens, 'primary', 500));
+  
+  const mainBtn = makeFrame('mainBtn');
+  mainBtn.layoutMode = 'HORIZONTAL';
+  mainBtn.counterAxisAlignItems = 'CENTER';
+  pad(mainBtn, 8, 16);
+  mainBtn.fills = [];
+  mainBtn.appendChild(text({ characters: 'Publish Action', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 13, fill: '#FFFFFF' }));
+  root.appendChild(mainBtn);
+
+  const sep = line(20, '#FFFFFF', 1);
+  sep.opacity = 0.3;
+  root.appendChild(sep);
+
+  const dropTrigger = makeFrame('dropTrigger');
+  dropTrigger.layoutMode = 'HORIZONTAL';
+  dropTrigger.primaryAxisAlignItems = 'CENTER';
+  dropTrigger.counterAxisAlignItems = 'CENTER';
+  pad(dropTrigger, 8, 10);
+  dropTrigger.fills = [];
+  dropTrigger.appendChild(buildIcon(14, '#FFFFFF', 'chevronDown'));
+  root.appendChild(dropTrigger);
+
+  return root;
+};
+
+const FloatingActionButton: Template = (root, ctx) => {
+  const isExtended = variantKey(ctx).includes('extended');
+  root.layoutMode = 'HORIZONTAL';
+  root.primaryAxisAlignItems = 'CENTER';
+  root.counterAxisAlignItems = 'CENTER';
+  root.cornerRadius = 9999;
+  setFill(root, colorShade(ctx.tokens, 'primary', 500));
+  root.effects = [{
+    type: 'DROP_SHADOW',
+    color: { r: 0, g: 0, b: 0, a: 0.16 },
+    offset: { x: 0, y: 4 },
+    radius: 12,
+    spread: 0,
+    visible: true,
+    blendMode: 'NORMAL',
+  }];
+
+  if (isExtended) {
+    pad(root, 12, 20);
+    root.itemSpacing = 8;
+    root.appendChild(buildIcon(16, '#FFFFFF', 'plus'));
+    root.appendChild(text({ characters: 'Create New', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 14, fill: '#FFFFFF' }));
+  } else {
+    pad(root, 0, 0);
+    root.resize(48, 48);
+    root.appendChild(buildIcon(20, '#FFFFFF', 'plus'));
+  }
+  return root;
+};
+
+const SocialButton: Template = (root, ctx) => {
+  const v = variantKey(ctx);
+  root.layoutMode = 'HORIZONTAL';
+  root.primaryAxisAlignItems = 'CENTER';
+  root.counterAxisAlignItems = 'CENTER';
+  root.itemSpacing = 8;
+  pad(root, 8, 16);
+  root.cornerRadius = 8;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+  
+  let label = 'Continue with Google';
+  let iconName: IconKind = 'user';
+  if (v.includes('apple')) { label = 'Continue with Apple'; iconName = 'lock'; }
+  else if (v.includes('github')) { label = 'Continue with GitHub'; iconName = 'code'; }
+  else if (v.includes('microsoft')) { label = 'Continue with Microsoft'; iconName = 'grid'; }
+
+  root.appendChild(buildIcon(16, colorShade(ctx.tokens, 'neutral', 800), iconName));
+  root.appendChild(text({ characters: label, fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+  return root;
+};
+
+const CopyButton: Template = (root, ctx) => {
+  const isCopied = ctx.stateName.toLowerCase() === 'copied';
+  root.layoutMode = 'HORIZONTAL';
+  root.primaryAxisAlignItems = 'CENTER';
+  root.counterAxisAlignItems = 'CENTER';
+  root.itemSpacing = 6;
+  pad(root, 6, 12);
+  root.cornerRadius = 6;
+  setFill(root, isCopied ? colorShade(ctx.tokens, 'success', 50) : colorShade(ctx.tokens, 'neutral', 100));
+  setStroke(root, isCopied ? colorShade(ctx.tokens, 'success', 300) : colorShade(ctx.tokens, 'neutral', 200), 1);
+  root.appendChild(buildIcon(14, isCopied ? colorShade(ctx.tokens, 'success', 600) : colorShade(ctx.tokens, 'neutral', 700), isCopied ? 'check' : 'copy'));
+  root.appendChild(text({
+    characters: isCopied ? 'Copied!' : 'Copy snippet',
+    fontFamily: ctx.config.fontFamily.body,
+    weight: 500,
+    fontSize: 12,
+    fill: isCopied ? colorShade(ctx.tokens, 'success', 700) : colorShade(ctx.tokens, 'neutral', 700),
+  }));
+  return root;
+};
+
+const PasswordInput: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'FIXED';
+  root.itemSpacing = 6;
+  root.resize(240, 40);
+
+  const box = makeFrame('box');
+  box.layoutMode = 'HORIZONTAL';
+  box.counterAxisAlignItems = 'CENTER';
+  box.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  box.resize(240, 40);
+  pad(box, 8, 12);
+  box.cornerRadius = 8;
+  setFill(box, '#FFFFFF');
+  setStroke(box, colorShade(ctx.tokens, 'neutral', 300), 1);
+
+  const left = hbox('left');
+  left.itemSpacing = 8;
+  left.appendChild(buildIcon(14, colorShade(ctx.tokens, 'neutral', 400), 'lock'));
+  left.appendChild(text({ characters: '••••••••••••', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+  box.appendChild(left);
+  box.appendChild(buildIcon(14, colorShade(ctx.tokens, 'neutral', 500), 'eye'));
+  root.appendChild(box);
+
+  if (variantKey(ctx).includes('strength')) {
+    const bar = makeFrame('strengthBar');
+    bar.layoutMode = 'HORIZONTAL';
+    bar.itemSpacing = 4;
+    bar.resize(240, 4);
+    for (let i = 0; i < 4; i++) {
+      const seg = rect(`seg-${i}`, 56, 4, i < 3 ? colorShade(ctx.tokens, 'success', 500) : colorShade(ctx.tokens, 'neutral', 200));
+      seg.cornerRadius = 9999;
+      bar.appendChild(seg);
+    }
+    root.appendChild(bar);
+  }
+  return root;
+};
+
+const SearchInput: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.resize(260, 40);
+  pad(root, 8, 12);
+  root.cornerRadius = variantKey(ctx).includes('pill') ? 9999 : 8;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+
+  const left = hbox('left');
+  left.itemSpacing = 8;
+  left.appendChild(buildIcon(14, colorShade(ctx.tokens, 'neutral', 400), 'search'));
+  left.appendChild(text({ characters: 'Search anything…', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 400) }));
+  root.appendChild(left);
+
+  const kbd = makeFrame('kbd');
+  kbd.layoutMode = 'HORIZONTAL';
+  pad(kbd, 2, 6);
+  kbd.cornerRadius = 4;
+  setFill(kbd, colorShade(ctx.tokens, 'neutral', 100));
+  setStroke(kbd, colorShade(ctx.tokens, 'neutral', 200), 1);
+  kbd.appendChild(text({ characters: '⌘K', fontFamily: ctx.config.fontFamily.mono, weight: 500, fontSize: 10, fill: colorShade(ctx.tokens, 'neutral', 600) }));
+  root.appendChild(kbd);
+
+  return root;
+};
+
+const NumberInput: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.resize(160, 40);
+  pad(root, 4, 12);
+  root.cornerRadius = 8;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+
+  root.appendChild(text({ characters: '42', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 14, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+
+  const btns = vbox('btns');
+  btns.itemSpacing = 2;
+  const up = makeFrame('up');
+  up.resize(20, 14);
+  up.appendChild(buildIcon(10, colorShade(ctx.tokens, 'neutral', 600), 'chevronUp'));
+  btns.appendChild(up);
+
+  const down = makeFrame('down');
+  down.resize(20, 14);
+  down.appendChild(buildIcon(10, colorShade(ctx.tokens, 'neutral', 600), 'chevronDown'));
+  btns.appendChild(down);
+
+  root.appendChild(btns);
+  return root;
+};
+
+const CurrencyInput: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.itemSpacing = 8;
+  root.resize(200, 40);
+  pad(root, 8, 12);
+  root.cornerRadius = 8;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+
+  const sym = variantKey(ctx).includes('eur') ? '€' : variantKey(ctx).includes('gbp') ? '£' : variantKey(ctx).includes('inr') ? '₹' : '$';
+  root.appendChild(text({ characters: sym, fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 14, fill: colorShade(ctx.tokens, 'neutral', 400) }));
+  root.appendChild(text({ characters: '1,450.00', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 14, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+  return root;
+};
+
+const PhoneInput: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.itemSpacing = 8;
+  root.resize(240, 40);
+  pad(root, 6, 12);
+  root.cornerRadius = 8;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+
+  const flagBox = hbox('flag');
+  flagBox.itemSpacing = 4;
+  flagBox.appendChild(text({ characters: '🇺🇸 +1', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 700) }));
+  flagBox.appendChild(buildIcon(10, colorShade(ctx.tokens, 'neutral', 500), 'chevronDown'));
+  root.appendChild(flagBox);
+
+  const sep = line(20, colorShade(ctx.tokens, 'neutral', 300), 1);
+  root.appendChild(sep);
+
+  root.appendChild(text({ characters: '(555) 019-2834', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+  return root;
+};
+
+const PinInput: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.itemSpacing = 8;
+  const count = variantKey(ctx).includes('6') ? 6 : 4;
+  for (let i = 0; i < count; i++) {
+    const box = makeFrame(`pin-${i}`);
+    box.layoutMode = 'HORIZONTAL';
+    box.primaryAxisAlignItems = 'CENTER';
+    box.counterAxisAlignItems = 'CENTER';
+    box.resize(40, 44);
+    box.cornerRadius = 8;
+    setFill(box, '#FFFFFF');
+    setStroke(box, i === 0 ? colorShade(ctx.tokens, 'primary', 500) : colorShade(ctx.tokens, 'neutral', 300), i === 0 ? 2 : 1);
+    box.appendChild(text({ characters: i < 2 ? String(i + 7) : '', fontFamily: ctx.config.fontFamily.mono, weight: 600, fontSize: 16, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+    root.appendChild(box);
+  }
+  return root;
+};
+
+const RichTextEditor: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'FIXED';
+  root.resize(340, 140);
+  root.cornerRadius = 10;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+  root.clipsContent = true;
+
+  const bar = makeFrame('toolbar');
+  bar.layoutMode = 'HORIZONTAL';
+  bar.counterAxisAlignItems = 'CENTER';
+  bar.itemSpacing = 8;
+  bar.resize(340, 36);
+  pad(bar, 6, 12);
+  setFill(bar, colorShade(ctx.tokens, 'neutral', 50));
+  setStroke(bar, colorShade(ctx.tokens, 'neutral', 200), 1);
+  bar.appendChild(text({ characters: 'B', fontFamily: ctx.config.fontFamily.body, weight: 700, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 700) }));
+  bar.appendChild(text({ characters: 'I', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 700) }));
+  bar.appendChild(buildIcon(12, colorShade(ctx.tokens, 'neutral', 700), 'list'));
+  bar.appendChild(buildIcon(12, colorShade(ctx.tokens, 'neutral', 700), 'image'));
+  root.appendChild(bar);
+
+  const body = makeFrame('body');
+  pad(body, 12, 12);
+  body.appendChild(text({ characters: 'Start drafting your rich document here…', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 400) }));
+  root.appendChild(body);
+  return root;
+};
+
+const TagInput: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.itemSpacing = 6;
+  root.resize(300, 44);
+  pad(root, 6, 10);
+  root.cornerRadius = 8;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+
+  ['Design', 'System'].forEach((tag) => {
+    const chip = makeFrame('chip');
+    chip.layoutMode = 'HORIZONTAL';
+    chip.counterAxisAlignItems = 'CENTER';
+    chip.itemSpacing = 4;
+    pad(chip, 3, 8);
+    chip.cornerRadius = 9999;
+    setFill(chip, colorShade(ctx.tokens, 'primary', 50));
+    chip.appendChild(text({ characters: tag, fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 11, fill: colorShade(ctx.tokens, 'primary', 700) }));
+    chip.appendChild(buildIcon(10, colorShade(ctx.tokens, 'primary', 700), 'close'));
+    root.appendChild(chip);
+  });
+
+  root.appendChild(text({ characters: 'Add tag…', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 400) }));
+  return root;
+};
+
+const CheckboxGroup: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'AUTO';
+  root.itemSpacing = 8;
+  ['Push notifications', 'Email summaries', 'SMS alerts'].forEach((item, i) => {
+    const row = hbox('cbRow');
+    row.itemSpacing = 8;
+    const cb = makeFrame('cb');
+    cb.resize(18, 18);
+    cb.cornerRadius = 4;
+    const isChecked = i < 2;
+    setFill(cb, isChecked ? colorShade(ctx.tokens, 'primary', 500) : '#FFFFFF');
+    setStroke(cb, isChecked ? colorShade(ctx.tokens, 'primary', 500) : colorShade(ctx.tokens, 'neutral', 400), 1.5);
+    if (isChecked) cb.appendChild(buildIcon(12, '#FFFFFF', 'check'));
+    row.appendChild(cb);
+    row.appendChild(text({ characters: item, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+    root.appendChild(row);
+  });
+  return root;
+};
+
+const RadioCard: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.resize(320, 72);
+  pad(root, 14, 16);
+  root.cornerRadius = 12;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'primary', 500), 2);
+
+  const left = hbox('left');
+  left.itemSpacing = 12;
+  const radio = makeFrame('radio');
+  radio.resize(18, 18);
+  radio.cornerRadius = 9999;
+  setFill(radio, '#FFFFFF');
+  setStroke(radio, colorShade(ctx.tokens, 'primary', 500), 2);
+  const dot = makeFrame('dot');
+  dot.resize(8, 8);
+  dot.cornerRadius = 9999;
+  setFill(dot, colorShade(ctx.tokens, 'primary', 500));
+  dot.layoutPositioning = 'ABSOLUTE';
+  dot.x = 5; dot.y = 5;
+  radio.appendChild(dot);
+  left.appendChild(radio);
+
+  const copy = vbox('copy');
+  copy.itemSpacing = 2;
+  copy.appendChild(text({ characters: 'Pro Annual Plan', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+  copy.appendChild(text({ characters: 'Billed yearly at $192 / year', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 500) }));
+  left.appendChild(copy);
+  root.appendChild(left);
+
+  root.appendChild(text({ characters: '$16/mo', fontFamily: ctx.config.fontFamily.body, weight: 700, fontSize: 14, fill: colorShade(ctx.tokens, 'primary', 600) }));
+  return root;
+};
+
+const RangeSlider: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'FIXED';
+  root.itemSpacing = 6;
+  root.resize(240, 32);
+
+  const track = makeFrame('track');
+  track.resize(240, 6);
+  track.cornerRadius = 9999;
+  setFill(track, colorShade(ctx.tokens, 'neutral', 200));
+
+  const bar = rect('fill', 120, 6, colorShade(ctx.tokens, 'primary', 500));
+  bar.x = 40;
+  bar.layoutPositioning = 'ABSOLUTE';
+  track.appendChild(bar);
+
+  const k1 = ellipse('k1', 16, '#FFFFFF');
+  setStroke(k1, colorShade(ctx.tokens, 'primary', 500), 2);
+  k1.x = 36; k1.y = -5; k1.layoutPositioning = 'ABSOLUTE';
+  track.appendChild(k1);
+
+  const k2 = ellipse('k2', 16, '#FFFFFF');
+  setStroke(k2, colorShade(ctx.tokens, 'primary', 500), 2);
+  k2.x = 156; k2.y = -5; k2.layoutPositioning = 'ABSOLUTE';
+  track.appendChild(k2);
+
+  root.appendChild(track);
+  return root;
+};
+
+const MultiSelect: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.resize(280, 42);
+  pad(root, 6, 10);
+  root.cornerRadius = 8;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+
+  const pills = hbox('pills');
+  pills.itemSpacing = 4;
+  ['React', 'TypeScript'].forEach((p) => {
+    const chip = makeFrame('chip');
+    chip.layoutMode = 'HORIZONTAL';
+    chip.counterAxisAlignItems = 'CENTER';
+    chip.itemSpacing = 4;
+    pad(chip, 2, 6);
+    chip.cornerRadius = 4;
+    setFill(chip, colorShade(ctx.tokens, 'neutral', 100));
+    chip.appendChild(text({ characters: p, fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+    chip.appendChild(buildIcon(10, colorShade(ctx.tokens, 'neutral', 500), 'close'));
+    pills.appendChild(chip);
+  });
+  root.appendChild(pills);
+  root.appendChild(buildIcon(14, colorShade(ctx.tokens, 'neutral', 500), 'chevronDown'));
+  return root;
+};
+
+const Cascader: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.resize(240, 40);
+  pad(root, 8, 12);
+  root.cornerRadius = 8;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+  root.appendChild(text({ characters: 'North America / USA / California', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+  root.appendChild(buildIcon(12, colorShade(ctx.tokens, 'neutral', 500), 'arrowRight'));
+  return root;
+};
+
+const Autocomplete: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'FIXED';
+  root.resize(240, 100);
+
+  const inp = makeFrame('inp');
+  inp.layoutMode = 'HORIZONTAL';
+  inp.counterAxisAlignItems = 'CENTER';
+  inp.resize(240, 40);
+  pad(inp, 8, 12);
+  inp.cornerRadius = 8;
+  setFill(inp, '#FFFFFF');
+  setStroke(inp, colorShade(ctx.tokens, 'primary', 500), 2);
+  inp.appendChild(text({ characters: 'San Fra', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+  root.appendChild(inp);
+
+  const pop = makeFrame('pop');
+  pop.layoutMode = 'VERTICAL';
+  pop.itemSpacing = 2;
+  pop.resize(240, 60);
+  pad(pop, 4, 4);
+  pop.cornerRadius = 8;
+  setFill(pop, '#FFFFFF');
+  setStroke(pop, colorShade(ctx.tokens, 'neutral', 200), 1);
+  pop.effects = [{ type: 'DROP_SHADOW', color: { r: 0, g: 0, b: 0, a: 0.1 }, offset: { x: 0, y: 4 }, radius: 10, spread: 0, visible: true, blendMode: 'NORMAL' }];
+  
+  const item1 = hbox('item1');
+  pad(item1, 6, 8); item1.cornerRadius = 4; setFill(item1, colorShade(ctx.tokens, 'primary', 50));
+  item1.appendChild(text({ characters: 'San Francisco, CA', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 12, fill: colorShade(ctx.tokens, 'primary', 700) }));
+  pop.appendChild(item1);
+
+  const item2 = hbox('item2');
+  pad(item2, 6, 8); item2.cornerRadius = 4; item2.fills = [];
+  item2.appendChild(text({ characters: 'San Fernando, CA', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 700) }));
+  pop.appendChild(item2);
+
+  root.appendChild(pop);
+  return root;
+};
+
+const TreeSelect: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.resize(240, 40);
+  pad(root, 8, 12);
+  root.cornerRadius = 8;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+  root.appendChild(text({ characters: 'src / components / Button', fontFamily: ctx.config.fontFamily.mono, weight: 400, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 700) }));
+  root.appendChild(buildIcon(12, colorShade(ctx.tokens, 'neutral', 500), 'chevronDown'));
+  return root;
+};
+
+const DateRangePicker: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.itemSpacing = 8;
+  root.resize(260, 40);
+  pad(root, 8, 12);
+  root.cornerRadius = 8;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+  root.appendChild(buildIcon(14, colorShade(ctx.tokens, 'neutral', 400), 'calendar'));
+  root.appendChild(text({ characters: 'Oct 12, 2026 – Oct 24, 2026', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+  return root;
+};
+
+const Banner: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.resize(320, 44);
+  pad(root, 8, 16);
+  root.cornerRadius = 8;
+  setFill(root, colorShade(ctx.tokens, 'primary', 600));
+
+  const left = hbox('left');
+  left.itemSpacing = 8;
+  left.appendChild(buildIcon(14, '#FFFFFF', 'zap'));
+  left.appendChild(text({ characters: 'System maintenance tonight at 02:00 UTC.', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: '#FFFFFF' }));
+  root.appendChild(left);
+  root.appendChild(buildIcon(14, '#FFFFFF', 'close'));
+  return root;
+};
+
+const ProgressCircle: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.primaryAxisAlignItems = 'CENTER';
+  root.counterAxisAlignItems = 'CENTER';
+  root.resize(64, 64);
+  root.cornerRadius = 9999;
+  setStroke(root, colorShade(ctx.tokens, 'primary', 500), 4);
+  root.appendChild(text({ characters: '75%', fontFamily: ctx.config.fontFamily.body, weight: 700, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+  return root;
+};
+
+const Navbar: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.resize(340, 56);
+  pad(root, 10, 16);
+  root.cornerRadius = 12;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+
+  const brand = hbox('brand');
+  brand.itemSpacing = 8;
+  const logo = ellipse('logo', 24, colorShade(ctx.tokens, 'primary', 500));
+  brand.appendChild(logo);
+  brand.appendChild(text({ characters: 'Instrument', fontFamily: ctx.config.fontFamily.heading, weight: 700, fontSize: 15, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+  root.appendChild(brand);
+
+  const links = hbox('links');
+  links.itemSpacing = 12;
+  ['Overview', 'Docs'].forEach((l, i) => {
+    links.appendChild(text({ characters: l, fontFamily: ctx.config.fontFamily.body, weight: i === 0 ? 600 : 500, fontSize: 12, fill: i === 0 ? colorShade(ctx.tokens, 'primary', 600) : colorShade(ctx.tokens, 'neutral', 600) }));
+  });
+  root.appendChild(links);
+
+  const user = ellipse('user', 28, colorShade(ctx.tokens, 'neutral', 200));
+  root.appendChild(user);
+  return root;
+};
+
+const Sidebar: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'FIXED';
+  root.resize(220, 180);
+  pad(root, 16, 12);
+  root.cornerRadius = 12;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+  root.itemSpacing = 4;
+
+  const items: { label: string; icon: IconKind; active: boolean }[] = [
+    { label: 'Dashboard', icon: 'grid', active: true },
+    { label: 'Projects', icon: 'folder', active: false },
+    { label: 'Analytics', icon: 'trendingUp', active: false },
+    { label: 'Settings', icon: 'lock', active: false },
+  ];
+
+  items.forEach((it) => {
+    const row = makeFrame('row');
+    row.layoutMode = 'HORIZONTAL';
+    row.counterAxisAlignItems = 'CENTER';
+    row.itemSpacing = 10;
+    row.resize(196, 36);
+    pad(row, 8, 10);
+    row.cornerRadius = 8;
+    setFill(row, it.active ? colorShade(ctx.tokens, 'primary', 50) : '#FFFFFF');
+    row.appendChild(buildIcon(14, it.active ? colorShade(ctx.tokens, 'primary', 600) : colorShade(ctx.tokens, 'neutral', 500), it.icon));
+    row.appendChild(text({ characters: it.label, fontFamily: ctx.config.fontFamily.body, weight: it.active ? 600 : 500, fontSize: 13, fill: it.active ? colorShade(ctx.tokens, 'primary', 700) : colorShade(ctx.tokens, 'neutral', 700) }));
+    root.appendChild(row);
+  });
+  return root;
+};
+
+const NavMenu: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.itemSpacing = 20;
+  pad(root, 16, 20);
+  root.cornerRadius = 12;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+  root.effects = [{ type: 'DROP_SHADOW', color: { r: 0, g: 0, b: 0, a: 0.08 }, offset: { x: 0, y: 6 }, radius: 16, spread: 0, visible: true, blendMode: 'NORMAL' }];
+
+  for (let c = 0; c < 2; c++) {
+    const col = vbox(`col-${c}`);
+    col.itemSpacing = 8;
+    col.appendChild(text({ characters: c === 0 ? 'FEATURES' : 'RESOURCES', fontFamily: ctx.config.fontFamily.mono, weight: 600, fontSize: 10, fill: colorShade(ctx.tokens, 'neutral', 400) }));
+    for (let r = 0; r < 3; r++) {
+      col.appendChild(text({ characters: `Menu Item ${c * 3 + r + 1}`, fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+    }
+    root.appendChild(col);
+  }
+  return root;
+};
+
+const PaginationDots: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.itemSpacing = 6;
+  for (let i = 0; i < 4; i++) {
+    if (i === 1) {
+      const pill = rect('dot-active', 20, 6, colorShade(ctx.tokens, 'primary', 500));
+      pill.cornerRadius = 9999;
+      root.appendChild(pill);
+    } else {
+      const dot = ellipse(`dot-${i}`, 6, colorShade(ctx.tokens, 'neutral', 300));
+      root.appendChild(dot);
+    }
+  }
+  return root;
+};
+
+const BackToTop: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.primaryAxisAlignItems = 'CENTER';
+  root.counterAxisAlignItems = 'CENTER';
+  root.resize(44, 44);
+  root.cornerRadius = 9999;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+  root.effects = [{ type: 'DROP_SHADOW', color: { r: 0, g: 0, b: 0, a: 0.1 }, offset: { x: 0, y: 3 }, radius: 8, spread: 0, visible: true, blendMode: 'NORMAL' }];
+  root.appendChild(buildIcon(16, colorShade(ctx.tokens, 'neutral', 700), 'arrowUp'));
+  return root;
+};
+
+const AnchorNav: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.itemSpacing = 8;
+  ['Overview', 'Installation', 'Usage Examples', 'API Reference'].forEach((item, i) => {
+    const row = hbox('item');
+    row.itemSpacing = 8;
+    const indicator = rect('ind', 2, 16, i === 0 ? colorShade(ctx.tokens, 'primary', 500) : 'transparent');
+    row.appendChild(indicator);
+    row.appendChild(text({ characters: item, fontFamily: ctx.config.fontFamily.body, weight: i === 0 ? 600 : 400, fontSize: 12, fill: i === 0 ? colorShade(ctx.tokens, 'primary', 600) : colorShade(ctx.tokens, 'neutral', 500) }));
+    root.appendChild(row);
+  });
+  return root;
+};
+
+const ProfileCard: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'FIXED';
+  root.resize(280, 160);
+  pad(root, 20, 20);
+  root.cornerRadius = 16;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+  root.itemSpacing = 14;
+
+  const top = hbox('top');
+  top.itemSpacing = 12;
+  top.appendChild(ellipse('av', 44, colorShade(ctx.tokens, 'primary', 100)));
+  const meta = vbox('meta');
+  meta.itemSpacing = 2;
+  meta.appendChild(text({ characters: 'Sophia Vance', fontFamily: ctx.config.fontFamily.body, weight: 700, fontSize: 14, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+  meta.appendChild(text({ characters: 'Design Systems Lead', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 500) }));
+  top.appendChild(meta);
+  root.appendChild(top);
+
+  const btn = makeFrame('followBtn');
+  btn.layoutMode = 'HORIZONTAL';
+  btn.primaryAxisAlignItems = 'CENTER';
+  btn.counterAxisAlignItems = 'CENTER';
+  btn.resize(240, 34);
+  btn.cornerRadius = 9999;
+  setFill(btn, '#18181B');
+  btn.appendChild(text({ characters: 'Follow Profile', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 12, fill: '#FFFFFF' }));
+  root.appendChild(btn);
+  return root;
+};
+
+const MetricCard: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'FIXED';
+  root.resize(220, 100);
+  pad(root, 16, 16);
+  root.cornerRadius = 14;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+  root.itemSpacing = 8;
+
+  root.appendChild(text({ characters: 'Total Revenue', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 500) }));
+
+  const btm = hbox('btm');
+  btm.itemSpacing = 8;
+  btm.appendChild(text({ characters: '$48,290', fontFamily: ctx.config.fontFamily.heading, weight: 700, fontSize: 20, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+
+  const badge = makeFrame('badge');
+  badge.layoutMode = 'HORIZONTAL';
+  badge.counterAxisAlignItems = 'CENTER';
+  pad(badge, 2, 6);
+  badge.cornerRadius = 4;
+  setFill(badge, colorShade(ctx.tokens, 'success', 50));
+  badge.appendChild(text({ characters: '+14.2%', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: colorShade(ctx.tokens, 'success', 700) }));
+  btm.appendChild(badge);
+
+  root.appendChild(btm);
+  return root;
+};
+
+const PricingCard: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'FIXED';
+  root.resize(260, 200);
+  pad(root, 20, 20);
+  root.cornerRadius = 16;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'primary', 500), 2);
+  root.itemSpacing = 12;
+
+  root.appendChild(text({ characters: 'Pro Growth', fontFamily: ctx.config.fontFamily.heading, weight: 700, fontSize: 16, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+  
+  const priceRow = hbox('priceRow');
+  priceRow.itemSpacing = 4;
+  priceRow.appendChild(text({ characters: '$29', fontFamily: ctx.config.fontFamily.heading, weight: 800, fontSize: 24, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+  priceRow.appendChild(text({ characters: '/ month', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 500) }));
+  root.appendChild(priceRow);
+
+  const features = vbox('features');
+  features.itemSpacing = 6;
+  ['Unlimited projects', 'Custom tokens export', 'Team collaboration'].forEach((f) => {
+    const fRow = hbox('fRow');
+    fRow.itemSpacing = 6;
+    fRow.appendChild(buildIcon(12, colorShade(ctx.tokens, 'success', 600), 'check'));
+    fRow.appendChild(text({ characters: f, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 700) }));
+    features.appendChild(fRow);
+  });
+  root.appendChild(features);
+  return root;
+};
+
+const BentoCard: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'FIXED';
+  root.resize(260, 140);
+  pad(root, 18, 18);
+  root.cornerRadius = 18;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+  root.effects = [{ type: 'DROP_SHADOW', color: { r: 0, g: 0, b: 0, a: 0.04 }, offset: { x: 0, y: 2 }, radius: 10, spread: 0, visible: true, blendMode: 'NORMAL' }];
+  root.itemSpacing = 8;
+
+  root.appendChild(buildIcon(20, colorShade(ctx.tokens, 'primary', 500), 'zap'));
+  root.appendChild(text({ characters: 'Real-time Sync', fontFamily: ctx.config.fontFamily.heading, weight: 700, fontSize: 15, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+  root.appendChild(text({ characters: 'Synchronise components effortlessly across your entire file.', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 500) }));
+  return root;
+};
+
+const ProductCard: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'FIXED';
+  root.resize(220, 200);
+  root.cornerRadius = 12;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+  root.clipsContent = true;
+
+  const img = makeFrame('img');
+  img.resize(220, 110);
+  setFill(img, colorShade(ctx.tokens, 'neutral', 100));
+  img.appendChild(buildIcon(24, colorShade(ctx.tokens, 'neutral', 400), 'image'));
+  root.appendChild(img);
+
+  const info = vbox('info');
+  info.itemSpacing = 4;
+  pad(info, 10, 12);
+  info.appendChild(text({ characters: 'Wireless Headphones', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+  info.appendChild(text({ characters: '$199.00', fontFamily: ctx.config.fontFamily.body, weight: 700, fontSize: 14, fill: colorShade(ctx.tokens, 'primary', 600) }));
+  root.appendChild(info);
+  return root;
+};
+
+const ReviewCard: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'FIXED';
+  root.resize(260, 110);
+  pad(root, 14, 14);
+  root.cornerRadius = 12;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+  root.itemSpacing = 6;
+
+  const stars = hbox('stars');
+  stars.itemSpacing = 2;
+  for (let i = 0; i < 5; i++) stars.appendChild(buildIcon(12, '#F59E0B', 'star'));
+  root.appendChild(stars);
+
+  root.appendChild(text({ characters: '“The best design token generator for Figma by far.”', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+  root.appendChild(text({ characters: '— Alex R., Product Designer', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 10, fill: colorShade(ctx.tokens, 'neutral', 500) }));
+  return root;
+};
+
+const Collapsible: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'FIXED';
+  root.resize(280, 80);
+  pad(root, 10, 12);
+  root.cornerRadius = 8;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+  root.itemSpacing = 6;
+
+  const h = hbox('header');
+  h.counterAxisAlignItems = 'CENTER';
+  h.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  h.resize(256, 24);
+  h.appendChild(text({ characters: 'Advanced Configuration', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+  h.appendChild(buildIcon(12, colorShade(ctx.tokens, 'neutral', 500), 'chevronDown'));
+  root.appendChild(h);
+
+  root.appendChild(text({ characters: 'Toggle extended settings for styles and variables.', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 500) }));
+  return root;
+};
+
+const Timeline: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.itemSpacing = 12;
+  pad(root, 4, 8);
+
+  const steps = ['Order placed', 'Processing in warehouse', 'Out for delivery'];
+  steps.forEach((st, i) => {
+    const row = hbox('row');
+    row.itemSpacing = 10;
+    row.counterAxisAlignItems = 'CENTER';
+    const dot = ellipse(`dot-${i}`, 10, i === 0 ? colorShade(ctx.tokens, 'primary', 500) : colorShade(ctx.tokens, 'neutral', 300));
+    row.appendChild(dot);
+    row.appendChild(text({ characters: st, fontFamily: ctx.config.fontFamily.body, weight: i === 0 ? 600 : 400, fontSize: 12, fill: i === 0 ? colorShade(ctx.tokens, 'neutral', 900) : colorShade(ctx.tokens, 'neutral', 500) }));
+    root.appendChild(row);
+  });
+  return root;
+};
+
+const DataList: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.itemSpacing = 6;
+  pad(root, 8, 12);
+  root.cornerRadius = 8;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+
+  const data: [string, string][] = [['Version', '1.0.4'], ['License', 'MIT'], ['Status', 'Active']];
+  data.forEach(([k, v]) => {
+    const row = hbox('row');
+    row.primaryAxisAlignItems = 'SPACE_BETWEEN';
+    row.resize(220, 20);
+    row.appendChild(text({ characters: k, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 500) }));
+    row.appendChild(text({ characters: v, fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+    root.appendChild(row);
+  });
+  return root;
+};
+
+const Statistic: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.itemSpacing = 2;
+  root.appendChild(text({ characters: 'Active Subscribers', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 500) }));
+  root.appendChild(text({ characters: '124,800', fontFamily: ctx.config.fontFamily.heading, weight: 800, fontSize: 24, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+  return root;
+};
+
+const Kbd: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  pad(root, 3, 8);
+  root.cornerRadius = 6;
+  setFill(root, colorShade(ctx.tokens, 'neutral', 100));
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+  root.appendChild(text({ characters: '⌘ + Shift + P', fontFamily: ctx.config.fontFamily.mono, weight: 600, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+  return root;
+};
+
+const Tree: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.itemSpacing = 6;
+  ['📁 src', '  📁 components', '    📄 Button.tsx', '  📁 utils'].forEach((lineStr) => {
+    root.appendChild(text({ characters: lineStr, fontFamily: ctx.config.fontFamily.mono, weight: 400, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 700) }));
+  });
+  return root;
+};
+
+const CodeBlock: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.resize(280, 70);
+  pad(root, 10, 12);
+  root.cornerRadius = 8;
+  setFill(root, '#0F172A');
+  root.appendChild(text({ characters: 'import { Button } from "@ds/kit";', fontFamily: ctx.config.fontFamily.mono, weight: 400, fontSize: 11, fill: '#38BDF8' }));
+  root.appendChild(text({ characters: 'export default () => <Button />;', fontFamily: ctx.config.fontFamily.mono, weight: 400, fontSize: 11, fill: '#F8FAFC' }));
+  return root;
+};
+
+const BottomSheet: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.resize(280, 120);
+  pad(root, 8, 16);
+  root.cornerRadius = 16;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+  root.effects = [{ type: 'DROP_SHADOW', color: { r: 0, g: 0, b: 0, a: 0.12 }, offset: { x: 0, y: -4 }, radius: 16, spread: 0, visible: true, blendMode: 'NORMAL' }];
+
+  const handle = rect('handle', 36, 4, colorShade(ctx.tokens, 'neutral', 300));
+  handle.cornerRadius = 9999;
+  root.appendChild(handle);
+  root.appendChild(text({ characters: 'Share options', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+  return root;
+};
+
+const AlertDialog: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.resize(260, 110);
+  pad(root, 14, 16);
+  root.cornerRadius = 12;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'error', 300), 1);
+  root.itemSpacing = 8;
+
+  root.appendChild(text({ characters: 'Delete this project?', fontFamily: ctx.config.fontFamily.body, weight: 700, fontSize: 13, fill: colorShade(ctx.tokens, 'error', 700) }));
+  root.appendChild(text({ characters: 'This action cannot be undone.', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 500) }));
+  return root;
+};
+
+const ContextMenu: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.resize(160, 100);
+  pad(root, 6, 6);
+  root.cornerRadius = 8;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+  root.effects = [{ type: 'DROP_SHADOW', color: { r: 0, g: 0, b: 0, a: 0.1 }, offset: { x: 0, y: 4 }, radius: 12, spread: 0, visible: true, blendMode: 'NORMAL' }];
+
+  ['Edit layer', 'Duplicate', 'Delete'].forEach((act) => {
+    const row = hbox('act');
+    row.itemSpacing = 6;
+    pad(row, 4, 8); row.cornerRadius = 4;
+    row.appendChild(text({ characters: act, fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+    root.appendChild(row);
+  });
+  return root;
+};
+
+const CommandMenu: Template = (root, ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.resize(280, 110);
+  pad(root, 10, 12);
+  root.cornerRadius = 12;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+  root.itemSpacing = 8;
+
+  const searchRow = hbox('sRow');
+  searchRow.itemSpacing = 8;
+  searchRow.appendChild(buildIcon(14, colorShade(ctx.tokens, 'neutral', 400), 'search'));
+  searchRow.appendChild(text({ characters: 'Type a command…', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 400) }));
+  root.appendChild(searchRow);
+
+  const divider = rect('div', 256, 1, colorShade(ctx.tokens, 'neutral', 200));
+  root.appendChild(divider);
+  return root;
+};
+
+const Lightbox: Template = (root, _ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.primaryAxisAlignItems = 'CENTER';
+  root.counterAxisAlignItems = 'CENTER';
+  root.resize(280, 140);
+  root.cornerRadius = 12;
+  setFill(root, '#09090B');
+  root.appendChild(buildIcon(32, '#A1A1AA', 'image'));
+  return root;
+};
+
+const CookieBanner: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.resize(320, 60);
+  pad(root, 10, 14);
+  root.cornerRadius = 10;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+  root.effects = [{ type: 'DROP_SHADOW', color: { r: 0, g: 0, b: 0, a: 0.08 }, offset: { x: 0, y: 4 }, radius: 12, spread: 0, visible: true, blendMode: 'NORMAL' }];
+
+  root.appendChild(text({ characters: 'We use cookies to improve your experience.', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 700) }));
+  return root;
+};
+
+const FileList: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.resize(280, 44);
+  pad(root, 8, 12);
+  root.cornerRadius = 8;
+  setFill(root, colorShade(ctx.tokens, 'neutral', 50));
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+
+  const left = hbox('left');
+  left.itemSpacing = 8;
+  left.appendChild(buildIcon(14, colorShade(ctx.tokens, 'primary', 600), 'file'));
+  left.appendChild(text({ characters: 'design-tokens.json', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+  root.appendChild(left);
+  root.appendChild(buildIcon(12, colorShade(ctx.tokens, 'neutral', 400), 'close'));
+  return root;
+};
+
+const AudioPlayer: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.itemSpacing = 10;
+  root.resize(240, 44);
+  pad(root, 6, 12);
+  root.cornerRadius = 9999;
+  setFill(root, '#FFFFFF');
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+
+  const playBtn = makeFrame('playBtn');
+  playBtn.resize(28, 28);
+  playBtn.cornerRadius = 9999;
+  playBtn.layoutMode = 'HORIZONTAL';
+  playBtn.primaryAxisAlignItems = 'CENTER';
+  playBtn.counterAxisAlignItems = 'CENTER';
+  setFill(playBtn, colorShade(ctx.tokens, 'primary', 500));
+  playBtn.appendChild(buildIcon(12, '#FFFFFF', 'play'));
+  root.appendChild(playBtn);
+
+  const wave = rect('wave', 130, 4, colorShade(ctx.tokens, 'neutral', 300));
+  wave.cornerRadius = 9999;
+  root.appendChild(wave);
+  root.appendChild(text({ characters: '02:45', fontFamily: ctx.config.fontFamily.mono, weight: 500, fontSize: 10, fill: colorShade(ctx.tokens, 'neutral', 500) }));
+  return root;
+};
+
+const VideoPlayer: Template = (root, _ctx) => {
+  root.layoutMode = 'VERTICAL';
+  root.primaryAxisAlignItems = 'CENTER';
+  root.counterAxisAlignItems = 'CENTER';
+  root.resize(260, 140);
+  root.cornerRadius = 10;
+  setFill(root, '#0F172A');
+
+  const pBtn = makeFrame('pBtn');
+  pBtn.resize(40, 40);
+  pBtn.cornerRadius = 9999;
+  pBtn.layoutMode = 'HORIZONTAL';
+  pBtn.primaryAxisAlignItems = 'CENTER';
+  pBtn.counterAxisAlignItems = 'CENTER';
+  setFill(pBtn, '#FFFFFF');
+  pBtn.appendChild(buildIcon(16, '#0F172A', 'play'));
+  root.appendChild(pBtn);
+  return root;
+};
+
+const Carousel: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.resize(260, 120);
+  pad(root, 8, 10);
+  root.cornerRadius = 10;
+  setFill(root, colorShade(ctx.tokens, 'neutral', 100));
+
+  root.appendChild(buildIcon(16, colorShade(ctx.tokens, 'neutral', 600), 'chevronLeft'));
+  root.appendChild(text({ characters: 'Slide Feature Showcase', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+  root.appendChild(buildIcon(16, colorShade(ctx.tokens, 'neutral', 600), 'chevronRight'));
+  return root;
+};
+
+const AspectRatio: Template = (root, ctx) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.primaryAxisAlignItems = 'CENTER';
+  root.counterAxisAlignItems = 'CENTER';
+  root.resize(240, 135); // 16:9
+  root.cornerRadius = 8;
+  setFill(root, colorShade(ctx.tokens, 'neutral', 100));
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+  root.appendChild(text({ characters: '16 : 9 Aspect Ratio', fontFamily: ctx.config.fontFamily.mono, weight: 500, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 600) }));
+  return root;
+};
+
 // ---------------- registry ----------------
 
 export const TEMPLATES: Record<string, Template> = {
   Button,
   IconButton,
   ButtonGroup,
+  SegmentedControl,
+  SplitButton,
+  FloatingActionButton,
+  SocialButton,
+  CopyButton,
   Input,
+  PasswordInput,
+  SearchInput,
+  NumberInput,
+  CurrencyInput,
+  PhoneInput,
+  PinInput,
   Textarea,
-  Select,
+  RichTextEditor,
+  TagInput,
   Checkbox,
+  CheckboxGroup,
   Radio,
+  RadioCard,
   Switch,
   Slider,
-  Card,
-  CardHeader,
-  CardContent,
-  CardFooter,
+  RangeSlider,
+  Rating,
+  Select,
+  MultiSelect,
+  Cascader,
+  Autocomplete,
+  TreeSelect,
+  ColorPicker,
+  DatePicker,
+  DateRangePicker,
   Alert,
-  Toast,
   Badge,
   Tag,
-  Avatar,
-  AvatarStack,
+  Toast,
+  Banner,
+  ProgressBar: Progress,
+  ProgressCircle,
   Progress,
   Spinner,
   Skeleton,
@@ -2543,23 +3758,59 @@ export const TEMPLATES: Record<string, Template> = {
   Tabs,
   Breadcrumb,
   Pagination,
+  Navbar,
+  Sidebar,
+  NavMenu,
   Stepper,
+  PaginationDots,
+  BackToTop,
+  AnchorNav,
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+  ProfileCard,
+  MetricCard,
+  PricingCard,
+  BentoCard,
+  ProductCard,
+  ReviewCard,
+  Accordion,
+  Collapsible,
+  Timeline,
   Table,
   DataGrid,
+  DataList,
   List,
-  Divider,
-  Modal,
-  Drawer,
+  Avatar,
+  AvatarGroup: AvatarStack,
+  AvatarStack,
   Tooltip,
   Popover,
-  DropdownMenu,
-  Image,
-  Accordion,
-  Rating,
+  Statistic,
+  Kbd,
+  Tree,
+  CodeBlock,
+  Modal,
+  Drawer,
+  BottomSheet,
+  AlertDialog,
+  ContextMenu,
+  CommandMenu,
+  Lightbox,
+  CookieBanner,
+  FileUploader: FileUpload,
   FileUpload,
-  DatePicker,
+  FileList,
+  ImageGallery: Image,
+  Image,
+  AudioPlayer,
+  VideoPlayer,
+  Carousel,
+  AspectRatio,
+  Divider,
+  DropdownMenu,
   TimePicker,
-  ColorPicker,
   Grid,
   Stack,
   Container,
