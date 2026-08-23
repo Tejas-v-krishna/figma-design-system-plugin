@@ -528,7 +528,8 @@
       "y": 2,
       "blur": 3,
       "spread": 0,
-      "color": "rgba(0, 0, 0, 0.065)"
+      "color": "rgba(0, 0, 0, 0.065)",
+      "alpha": 0.065
     },
     {
       "name": "sm",
@@ -537,7 +538,8 @@
       "y": 3,
       "blur": 6,
       "spread": 0,
-      "color": "rgba(0, 0, 0, 0.13)"
+      "color": "rgba(0, 0, 0, 0.13)",
+      "alpha": 0.13
     },
     {
       "name": "md",
@@ -546,7 +548,8 @@
       "y": 6,
       "blur": 12,
       "spread": -1,
-      "color": "rgba(0, 0, 0, 0.156)"
+      "color": "rgba(0, 0, 0, 0.156)",
+      "alpha": 0.156
     },
     {
       "name": "lg",
@@ -555,7 +558,8 @@
       "y": 15,
       "blur": 30,
       "spread": -4,
-      "color": "rgba(0, 0, 0, 0.195)"
+      "color": "rgba(0, 0, 0, 0.195)",
+      "alpha": 0.195
     },
     {
       "name": "xl",
@@ -564,7 +568,8 @@
       "y": 30,
       "blur": 60,
       "spread": -12,
-      "color": "rgba(0, 0, 0, 0.234)"
+      "color": "rgba(0, 0, 0, 0.234)",
+      "alpha": 0.234
     }
   ],
   "borderRadius": [
