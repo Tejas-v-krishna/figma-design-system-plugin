@@ -14,7 +14,7 @@
 // a diff, valid JSON, and completely broken for a consumer.
 import { DEFAULT_CONFIG, GenerationConfig } from '../src/shared/types';
 import { buildTokens } from '../src/shared/build-tokens';
-import { buildDtcgDocument, DtcgGroup } from '../src/shared/dtcg';
+import { buildDtcgDocument } from '../src/shared/dtcg';
 
 const RESERVED = new Set(['$schema', '$type', '$description', '$value', '$extensions', '$deprecated']);
 
