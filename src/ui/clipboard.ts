@@ -16,6 +16,11 @@
 export async function copyText(text: string): Promise<boolean> {
   if (!text) return false;
 
+  // lib.dom.d.ts declares navigator.clipboard as always present, which is not
+  // true of the environment this runs in: outside a secure context the property
+  // is absent entirely, so reading .writeText off it throws before the try block
+  // can catch anything. The types describe the spec; this describes the iframe.
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (navigator.clipboard?.writeText) {
     try {
       await navigator.clipboard.writeText(text);
