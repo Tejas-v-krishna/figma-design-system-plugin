@@ -13,21 +13,31 @@ import { yieldToUI } from '../yield';
 import { hexToRgb } from '../../../shared/color-utils';
 import { CW, boardShell, createBlackHeroBox, mkDivider } from '../boards';
 import { ensureFont } from '../fonts';
-import { buildDesignSystemBentoBoard } from './bentoBoard';
-import { buildButtonMatrixBoard } from './buttonMatrix';
-import { buildInputMatrixBoard } from './inputMatrix';
 
 const CATEGORY_LABELS: Record<string, string> = {
-  buttons: 'Buttons',
-  inputs: 'Inputs',
-  forms: 'Forms',
-  cards: 'Cards',
-  feedback: 'Feedback',
+  buttons: 'Buttons & Actions',
+  inputs: 'Inputs & Form Controls',
+  forms: 'Forms & Pickers',
+  cards: 'Cards & Containers',
+  feedback: 'Feedback & Status',
   navigation: 'Navigation',
   'data-display': 'Data Display',
-  overlays: 'Overlays',
+  overlays: 'Overlays & Modals',
   media: 'Media',
   typography: 'Typography',
+};
+
+const CATEGORY_SUBTITLES: Record<string, string> = {
+  buttons: 'Production-ready interactive buttons, icon buttons, and segmented control groups.',
+  inputs: 'Text fields, textareas, search bars, and selection controls with full interactive states.',
+  forms: 'Date pickers, time pickers, color pickers, and multi-step form widgets.',
+  cards: 'Content containers, profile cards, and modular bento layout cards.',
+  feedback: 'Alert banners, badges, tags, toast notifications, and progress indicators.',
+  navigation: 'Tabs, breadcrumbs, pagination, and navigation bars.',
+  'data-display': 'Data tables, stat cards, avatars, tooltips, and popovers.',
+  overlays: 'Dialog modals, slide-over drawers, and interactive bottom sheets.',
+  media: 'Image containers, media cards, and icon assets.',
+  typography: 'Headings, body copy, captions, and code blocks.',
 };
 
 // ComponentVariant, ComponentState and ComponentSize are structurally the same
@@ -163,63 +173,18 @@ export async function generateComponents(
 
   const generatedBoards: FrameNode[] = [];
   let currentY = 0;
-
-  // 1. Always generate the Design System Bento Master Board (Image 5)
-  try {
-    const bentoBoard = await buildDesignSystemBentoBoard(tokens, config, styleMap, varMap);
-    bentoBoard.x = 0;
-    bentoBoard.y = currentY;
-    componentsPage.appendChild(bentoBoard);
-    generatedBoards.push(bentoBoard);
-    currentY += Math.max(bentoBoard.height, 1050) + 80;
-  } catch (err) {
-    console.error('[design-system-kit] Bento board failed to generate:', err);
-  }
-
-  // 2. Generate the 04. Buttons State Matrix Board (Image 4)
-  if (config.componentsToGenerate.includes('Button')) {
-    try {
-      const buttonBoard = await buildButtonMatrixBoard(tokens, config, styleMap, varMap);
-      buttonBoard.x = 0;
-      buttonBoard.y = currentY;
-      componentsPage.appendChild(buttonBoard);
-      generatedBoards.push(buttonBoard);
-      currentY += Math.max(buttonBoard.height, 1150) + 80;
-    } catch (err) {
-      console.error('[design-system-kit] Button matrix failed to generate:', err);
-    }
-  }
-
-  // 3. Generate the 05. Inputs & Form Controls Matrix Board
-  if (config.componentsToGenerate.includes('Input') || config.componentsToGenerate.includes('Textarea')) {
-    try {
-      const inputBoard = await buildInputMatrixBoard(tokens, config, styleMap, varMap);
-      inputBoard.x = 0;
-      inputBoard.y = currentY;
-      componentsPage.appendChild(inputBoard);
-      generatedBoards.push(inputBoard);
-      currentY += Math.max(inputBoard.height, 550) + 80;
-    } catch (err) {
-      console.error('[design-system-kit] Input matrix failed to generate:', err);
-    }
-  }
-
-  // 4. Generate all remaining component categories in clean boards
-  // Exclude components that are rendered in their own dedicated matrix boards
-  // or are sub-components of matrix-board components (ButtonGroup → covered by Button matrix)
-  const MATRIX_HANDLED = new Set(['Button', 'IconButton', 'ButtonGroup', 'Input', 'Textarea', 'Select']);
-  const nonMatrixComponents = selected.filter((d) => !MATRIX_HANDLED.has(d.name));
-
   let lastCategoryFrame: FrameNode | null = null;
 
-  for (const [index, def] of nonMatrixComponents.entries()) {
+  for (const [index, def] of selected.entries()) {
     let frame = frames[def.category];
     if (!frame) {
       if (lastCategoryFrame) {
-        currentY += Math.max(lastCategoryFrame.height, 300) + 80;
+        currentY += Math.max(lastCategoryFrame.height, 400) + 80;
       }
       const catLabel = CATEGORY_LABELS[def.category] ?? def.category;
-      frame = boardShell(`${catLabel} Library`);
+      const catSub = CATEGORY_SUBTITLES[def.category] ?? `Production-ready UI components for ${catLabel.toLowerCase()} styled with active design tokens.`;
+
+      frame = boardShell(catLabel);
       frame.x = 0;
       frame.y = currentY;
       componentsPage.appendChild(frame);
@@ -229,11 +194,11 @@ export async function generateComponents(
 
       const hero = await createBlackHeroBox(
         'Components',
-        `${catLabel} Library`,
-        `Production-ready UI components for ${catLabel.toLowerCase()} styled with active design tokens.`,
+        catLabel,
+        catSub,
         undefined,
         CW,
-        config.fontFamily.heading
+        'Google Sans'
       );
       frame.appendChild(hero);
       frame.appendChild(mkDivider());
