@@ -145,8 +145,23 @@ export function shiftHue(hex: string, degrees: number): string {
   return hslToHex((hsl.h + degrees + 360) % 360, hsl.s, hsl.l);
 }
 
+/**
+ * Structurally identical to the Figma typings' global `RGB`, declared locally
+ * because src/shared is imported from three places — the plugin sandbox, the UI
+ * webview and the Node check scripts — and only the first of those has the
+ * plugin typings in scope. Reaching for the global made this file fail to
+ * compile under any tsconfig that did not include @figma/plugin-typings.
+ * Structural identity means the result still assigns straight to Figma's
+ * SolidPaint.color and friends.
+ */
+export interface Rgb {
+  r: number;
+  g: number;
+  b: number;
+}
+
 /** Convert #rrggbb to Figma RGB (0-1). */
-export function hexToRgb(hex: string): RGB {
+export function hexToRgb(hex: string): Rgb {
   const clean = hex.replace('#', '');
   const r = parseInt(clean.slice(0, 2), 16) / 255;
   const g = parseInt(clean.slice(2, 4), 16) / 255;
