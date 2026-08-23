@@ -18,6 +18,16 @@ import { COMPONENT_DEFINITIONS } from '../src/shared/component-definitions';
 import { countComponentsForAll } from '../src/shared/variant-count';
 
 const STORAGE_KEY = 'dsk.dev.config';
+/**
+ * Whether a mock generate has already run in this browser.
+ *
+ * There is no document here, so the harness has to fake "this file already has a
+ * design system" somehow. Doing it off the first generate is the closest analogue
+ * and makes the overwrite dialog reachable — otherwise the confirmation gate
+ * would be invisible outside Figma and could only be checked by reading code.
+ * Clear it from the console with `localStorage.removeItem('dsk.dev.generated')`.
+ */
+const GENERATED_KEY = 'dsk.dev.generated';
 
 /** Stand-in for figma.listAvailableFontsAsync() — the families most desktops have. */
 const MOCK_FONTS = [
@@ -122,8 +132,18 @@ export function installMockPlugin(): void {
 
       case 'SCAN_USAGE':
         // A scan needs a real document, so this is fixed sample data whose only
-        // job is to exercise the Audit view's layout and number formatting.
-        await wait(700);
+        // job is to exercise the Audit view's layout and number formatting. The
+        // progress steps mirror scanUsage's own reporting points so the harness
+        // shows the same sequence a large file does.
+        for (const [progress, message] of [
+          [2, 'Loading pages…'],
+          [30, 'Scanning Cover…'],
+          [60, 'Identifying components (0 of 846)…'],
+          [92, 'Counting styles…'],
+        ] as [number, string][]) {
+          reply('SCAN_PROGRESS', { progress, message });
+          await wait(180);
+        }
         reply('SCAN_COMPLETE', {
           success: true,
           report: {
@@ -146,7 +166,35 @@ export function installMockPlugin(): void {
         });
         break;
 
+      case 'CHECK_EXISTING': {
+        // The real check reads local styles and page names. Here the answer is
+        // "nothing" until a generate has run, then a plausible non-empty summary.
+        const generated = localStorage.getItem(GENERATED_KEY) === '1';
+        reply(
+          'EXISTING_SUMMARY',
+          generated
+            ? {
+                pages: ['🎨 Tokens', '🧩 Components', '📐 Patterns', '📚 Documentation', '🎮 Playground'],
+                paintStyles: 214,
+                textStyles: 26,
+                effectStyles: 4,
+                duplicateStyles: 0,
+                hasAny: true,
+              }
+            : {
+                pages: [],
+                paintStyles: 0,
+                textStyles: 0,
+                effectStyles: 0,
+                duplicateStyles: 0,
+                hasAny: false,
+              },
+        );
+        break;
+      }
+
       case 'GENERATE_DESIGN_SYSTEM':
+        localStorage.setItem(GENERATED_KEY, '1');
         await fakeGenerate(msg.payload);
         break;
 
