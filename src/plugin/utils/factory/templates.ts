@@ -323,19 +323,15 @@ const Button: Template = (root, ctx) => {
       }];
     }
   } else if (isBrand) {
-    const brandColor = colorShade(ctx.tokens, 'primary', 500);
-    const brandHover = colorShade(ctx.tokens, 'primary', 600);
-    const brandDisabled = colorShade(ctx.tokens, 'primary', 200);
-
     if (isDisabled) {
-      setFill(root, brandDisabled);
+      setFill(root, '#71717A');
       textHex = '#FFFFFF';
     } else if (isHover) {
-      setFill(root, brandHover);
+      setFill(root, '#27272A');
       textHex = '#FFFFFF';
       root.effects = [{
         type: 'DROP_SHADOW',
-        color: { r: 0.15, g: 0.39, b: 0.92, a: 0.35 },
+        color: { r: 0, g: 0, b: 0, a: 0.25 },
         offset: { x: 0, y: 3 },
         radius: 6,
         spread: 0,
@@ -343,11 +339,11 @@ const Button: Template = (root, ctx) => {
         blendMode: 'NORMAL',
       }];
     } else if (isFocused) {
-      setFill(root, brandColor);
+      setFill(root, '#09090B');
       textHex = '#FFFFFF';
       root.effects = [{
         type: 'DROP_SHADOW',
-        color: { r: 0.15, g: 0.39, b: 0.92, a: 0.25 },
+        color: { r: 0, g: 0, b: 0, a: 0.15 },
         offset: { x: 0, y: 0 },
         radius: 0,
         spread: 4,
@@ -355,11 +351,11 @@ const Button: Template = (root, ctx) => {
         blendMode: 'NORMAL',
       }];
     } else {
-      setFill(root, brandColor);
+      setFill(root, '#09090B');
       textHex = '#FFFFFF';
       root.effects = [{
         type: 'DROP_SHADOW',
-        color: { r: 0.15, g: 0.39, b: 0.92, a: 0.28 },
+        color: { r: 0, g: 0, b: 0, a: 0.2 },
         offset: { x: 0, y: 2 },
         radius: 4,
         spread: 0,
@@ -375,7 +371,7 @@ const Button: Template = (root, ctx) => {
     } else if (isHover) {
       setFill(root, '#F4F4F5');
       setStroke(root, '#D4D4D8', 1);
-      textHex = '#1C1C1E';
+      textHex = '#18181B';
       root.effects = [{
         type: 'DROP_SHADOW',
         color: { r: 0, g: 0, b: 0, a: 0.08 },
@@ -388,7 +384,7 @@ const Button: Template = (root, ctx) => {
     } else if (isFocused) {
       setFill(root, '#FFFFFF');
       setStroke(root, '#D4D4D8', 1);
-      textHex = '#1C1C1E';
+      textHex = '#18181B';
       root.effects = [{
         type: 'DROP_SHADOW',
         color: { r: 0, g: 0, b: 0, a: 0.06 },
@@ -401,7 +397,7 @@ const Button: Template = (root, ctx) => {
     } else {
       setFill(root, '#FFFFFF');
       setStroke(root, '#E4E4E7', 1);
-      textHex = '#1C1C1E';
+      textHex = '#18181B';
       root.effects = [{
         type: 'DROP_SHADOW',
         color: { r: 0, g: 0, b: 0, a: 0.05 },
@@ -414,17 +410,17 @@ const Button: Template = (root, ctx) => {
     }
   } else if (isTonal) {
     if (isDisabled) {
-      setFill(root, '#F1F5F9');
-      textHex = '#94A3B8';
+      setFill(root, '#FAFAFA');
+      textHex = '#A1A1AA';
     } else if (isHover) {
-      setFill(root, '#DBEAFE');
-      textHex = '#1D4ED8';
+      setFill(root, '#E4E4E7');
+      textHex = '#18181B';
     } else if (isFocused) {
-      setFill(root, '#EFF6FF');
-      textHex = '#1D4ED8';
+      setFill(root, '#F4F4F5');
+      textHex = '#18181B';
       root.effects = [{
         type: 'DROP_SHADOW',
-        color: { r: 0.15, g: 0.39, b: 0.92, a: 0.15 },
+        color: { r: 0, g: 0, b: 0, a: 0.08 },
         offset: { x: 0, y: 0 },
         radius: 0,
         spread: 4,
@@ -432,8 +428,8 @@ const Button: Template = (root, ctx) => {
         blendMode: 'NORMAL',
       }];
     } else {
-      setFill(root, '#EFF6FF');
-      textHex = '#1D4ED8';
+      setFill(root, '#F4F4F5');
+      textHex = '#18181B';
     }
   } else if (isGhost) {
     if (isDisabled) {
@@ -441,11 +437,11 @@ const Button: Template = (root, ctx) => {
       textHex = '#A1A1AA';
     } else if (isHover) {
       setFill(root, '#F4F4F5');
-      textHex = '#1C1C1E';
+      textHex = '#18181B';
     } else if (isFocused) {
       setFill(root, '#FFFFFF');
       setStroke(root, '#E4E4E7', 1);
-      textHex = '#1C1C1E';
+      textHex = '#18181B';
       root.effects = [{
         type: 'DROP_SHADOW',
         color: { r: 0, g: 0, b: 0, a: 0.06 },
@@ -457,7 +453,7 @@ const Button: Template = (root, ctx) => {
       }];
     } else {
       root.fills = [];
-      textHex = '#1C1C1E';
+      textHex = '#18181B';
     }
   } else if (isDestructive) {
     if (isDisabled) {
@@ -502,7 +498,7 @@ const Button: Template = (root, ctx) => {
     }
   } else if (isLink) {
     root.fills = [];
-    textHex = '#2563EB';
+    textHex = '#18181B';
   }
 
   // Icons & Contextual items
@@ -619,15 +615,15 @@ const IconButton: Template = (root, ctx) => {
       blendMode: 'NORMAL',
     }];
   } else {
-    if (isActive) setFill(root, colorShade(ctx.tokens, 'primary', 700));
-    else if (isHover) setFill(root, colorShade(ctx.tokens, 'primary', 600));
-    else setFill(root, colorShade(ctx.tokens, 'primary', 500));
+    if (isActive) setFill(root, '#09090B');
+    else if (isHover) setFill(root, '#27272A');
+    else setFill(root, '#18181B');
     fgHex = '#FFFFFF';
     root.effects = [{
       type: 'DROP_SHADOW',
-      color: { r: 0.1, g: 0.2, b: 0.4, a: 0.12 },
-      offset: { x: 0, y: 1 },
-      radius: 2,
+      color: { r: 0, g: 0, b: 0, a: 0.18 },
+      offset: { x: 0, y: 2 },
+      radius: 4,
       spread: 0,
       visible: true,
       blendMode: 'NORMAL',
@@ -639,7 +635,7 @@ const IconButton: Template = (root, ctx) => {
       ...(root.effects || []),
       {
         type: 'DROP_SHADOW',
-        color: { r: 0.15, g: 0.45, b: 0.95, a: 0.35 },
+        color: { r: 0, g: 0, b: 0, a: 0.15 },
         offset: { x: 0, y: 0 },
         radius: 0,
         spread: 3,
@@ -747,8 +743,8 @@ const ButtonGroup: Template = (root, ctx) => {
 
       const selected = i === 1;
       if (selected) {
-        setFill(b, colorShade(ctx.tokens, 'primary', 500), colorStyleKey('primary', 500), ctx.styleMap, ctx.varMap);
-        setStroke(b, colorShade(ctx.tokens, 'primary', 600), 1);
+        setFill(b, '#18181B');
+        setStroke(b, '#18181B', 1);
       } else {
         setFill(b, '#FFFFFF');
         setStroke(b, colorShade(ctx.tokens, 'neutral', 300), 1, colorStyleKey('neutral', 300), ctx.styleMap, ctx.varMap);
@@ -781,7 +777,7 @@ const ButtonGroup: Template = (root, ctx) => {
 
       const selected = i === 1;
       if (selected) {
-        setFill(b, colorShade(ctx.tokens, 'primary', 500), colorStyleKey('primary', 500), ctx.styleMap, ctx.varMap);
+        setFill(b, '#18181B');
       } else {
         setFill(b, '#FFFFFF');
         setStroke(b, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
@@ -1769,9 +1765,9 @@ const Tabs: Template = (root, ctx) => {
 
     if (isUnderline) {
       pad(tab, 8, 4);
-      tab.appendChild(text({ characters: label, fontFamily: ctx.config.fontFamily.body, weight: active ? 600 : 400, fontSize: 14, fill: active ? colorShade(ctx.tokens, 'primary', 600) : colorShade(ctx.tokens, 'neutral', 600) }));
+      tab.appendChild(text({ characters: label, fontFamily: ctx.config.fontFamily.body, weight: active ? 600 : 400, fontSize: 14, fill: active ? '#18181B' : colorShade(ctx.tokens, 'neutral', 600) }));
       if (active) {
-        const bar = rect('indicator', 60, 2, colorShade(ctx.tokens, 'primary', 500));
+        const bar = rect('indicator', 60, 2, '#18181B');
         tab.appendChild(bar);
       }
     } else {
@@ -1779,7 +1775,7 @@ const Tabs: Template = (root, ctx) => {
       tab.cornerRadius = containerRadius(ctx, 'sm', 6);
       setFill(tab, active ? '#FFFFFF' : colorShade(ctx.tokens, 'neutral', 100), active ? undefined : colorStyleKey('neutral', 100), ctx.styleMap, ctx.varMap);
       if (active) setEffect(tab, shadow(ctx.tokens, 'xs'), effectStyleKey('xs'), ctx.styleMap, ctx.varMap);
-      tab.appendChild(text({ characters: label, fontFamily: ctx.config.fontFamily.body, weight: active ? 600 : 400, fontSize: 14, fill: active ? colorShade(ctx.tokens, 'primary', 700) : colorShade(ctx.tokens, 'neutral', 600) }));
+      tab.appendChild(text({ characters: label, fontFamily: ctx.config.fontFamily.body, weight: active ? 600 : 400, fontSize: 14, fill: active ? '#18181B' : colorShade(ctx.tokens, 'neutral', 600) }));
     }
     root.appendChild(tab);
   });
@@ -1809,7 +1805,12 @@ const Pagination: Template = (root, ctx) => {
     cell.counterAxisAlignItems = 'CENTER';
     cell.resize(36, 36);
     cell.cornerRadius = containerRadius(ctx, 'md', 8);
-    if (active) setFill(cell, colorShade(ctx.tokens, 'primary', 500), colorStyleKey('primary', 500), ctx.styleMap, ctx.varMap);
+    if (active) {
+      setFill(cell, '#18181B');
+    } else {
+      setFill(cell, '#FFFFFF');
+      setStroke(cell, colorShade(ctx.tokens, 'neutral', 200), 1);
+    }
     cell.appendChild(text({ characters: label, fontFamily: ctx.config.fontFamily.body, weight: active ? 600 : 400, fontSize: 14, fill: active ? '#FFFFFF' : colorShade(ctx.tokens, 'neutral', 700) }));
     root.appendChild(cell);
   });
@@ -1827,11 +1828,11 @@ const Stepper: Template = (root, ctx) => {
     dot.counterAxisAlignItems = 'CENTER';
     dot.resize(28, 28);
     dot.cornerRadius = 9999;
-    setFill(dot, i <= 1 ? colorShade(ctx.tokens, 'primary', 500) : colorShade(ctx.tokens, 'neutral', 200));
+    setFill(dot, i <= 1 ? '#18181B' : colorShade(ctx.tokens, 'neutral', 200));
     dot.appendChild(text({ characters: String(i + 1), fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 13, fill: i <= 1 ? '#FFFFFF' : colorShade(ctx.tokens, 'neutral', 500), align: 'CENTER' }));
     root.appendChild(dot);
     if (i < 2) {
-      const conn = rect(`conn-${i}`, 40, 2, i === 0 ? colorShade(ctx.tokens, 'primary', 500) : colorShade(ctx.tokens, 'neutral', 200));
+      const conn = rect(`conn-${i}`, 40, 2, i === 0 ? '#18181B' : colorShade(ctx.tokens, 'neutral', 200));
       root.appendChild(conn);
     }
   });
