@@ -2854,8 +2854,11 @@ const SegmentedControl: Template = (root, ctx) => {
   setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
 
   ['Overview', 'Analytics', 'Reports'].forEach((label, i) => {
-    const item = makeFrame(`seg-${i}`);
+    const item = figma.createFrame();
+    item.name = `seg-${i}`;
     item.layoutMode = 'HORIZONTAL';
+    item.primaryAxisSizingMode = 'AUTO';
+    item.counterAxisSizingMode = 'AUTO';
     item.primaryAxisAlignItems = 'CENTER';
     item.counterAxisAlignItems = 'CENTER';
     pad(item, padY, padX);
@@ -2880,7 +2883,7 @@ const SegmentedControl: Template = (root, ctx) => {
       fontFamily: ctx.config.fontFamily.body,
       weight: isSel ? 600 : 500,
       fontSize,
-      fill: isSel ? colorShade(ctx.tokens, 'neutral', 900) : colorShade(ctx.tokens, 'neutral', 600),
+      fill: isSel ? '#18181B' : colorShade(ctx.tokens, 'neutral', 600),
     }));
     root.appendChild(item);
   });

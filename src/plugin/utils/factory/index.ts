@@ -438,6 +438,8 @@ export async function generateComponents(
             rowLine.layoutMode = 'HORIZONTAL';
             rowLine.primaryAxisAlignItems = 'MIN';
             rowLine.counterAxisAlignItems = 'CENTER';
+            rowLine.primaryAxisSizingMode = 'FIXED';
+            rowLine.counterAxisSizingMode = 'AUTO';
             rowLine.itemSpacing = 36;
             rowLine.fills = [];
             rowLine.clipsContent = false;
@@ -457,6 +459,8 @@ export async function generateComponents(
             buttonsContainer.layoutMode = 'HORIZONTAL';
             buttonsContainer.primaryAxisAlignItems = 'MIN';
             buttonsContainer.counterAxisAlignItems = 'CENTER';
+            buttonsContainer.primaryAxisSizingMode = 'AUTO';
+            buttonsContainer.counterAxisSizingMode = 'AUTO';
             buttonsContainer.itemSpacing = 28;
             buttonsContainer.fills = [];
             buttonsContainer.clipsContent = false;

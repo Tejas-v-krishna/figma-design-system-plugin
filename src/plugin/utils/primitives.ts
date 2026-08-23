@@ -15,6 +15,8 @@ export function makeFrame(name: string): FrameNode {
   f.name = name;
   f.fills = [];
   f.clipsContent = false;
+  f.primaryAxisSizingMode = 'AUTO';
+  f.counterAxisSizingMode = 'AUTO';
   return f;
 }
 
