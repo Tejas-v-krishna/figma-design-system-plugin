@@ -7,16 +7,19 @@ import {
 } from '../shared/types';
 import { COMPONENT_DEFINITIONS } from '../shared/component-definitions';
 import { BRAND_PRESETS, BrandPreset } from '../shared/presets';
+import { DestinationId, destination } from './destinations';
 import { postToPlugin, ExistingSummary } from './plugin';
 
-// Exactly the four panels the header offers, and nothing else. There used to be
-// four more members — 'brand', 'typography', 'components' and 'export' — that
-// App routed to one of these four anyway, plus a 'review' that routed nowhere
-// and rendered an empty main area. They were kept on the theory that persisted
-// state might still hold one, but `persist` only ever saves `config`, so a view
-// name has never survived a reload.
-export type View = 'set-tokens' | 'build-components' | 'code' | 'scan';
-export type TokenCategory = 'colors' | 'gradients' | 'typography' | 'spacing' | 'radius' | 'stroke' | 'effects' | 'motion';
+// Navigation is one piece of state, not two.
+//
+// There used to be a `View` union over four panels and a `TokenCategory` union
+// over eight token scales, with the active panel being some function of both —
+// plus a third level, a footer action per view. docs/DESIGN.md collapses all of
+// that into one rail, so one `DestinationId` is now the whole of it. See
+// ./destinations.ts for the table that drives it.
+//
+// Nothing is lost to a reload: `persist` only ever saved `config`, so a
+// navigation position has never survived one.
 export type Overlay = 'none' | 'generating' | 'success';
 export type ExportFormat = 'json' | 'css' | 'tailwind' | 'dtcg';
 
@@ -63,8 +66,7 @@ export interface CustomColorGroup {
 }
 
 interface UIState {
-  view: View;
-  tokenCategory: TokenCategory;
+  destination: DestinationId;
   componentSearch: string;
   overlay: Overlay;
   optionsOpen: boolean;
@@ -98,8 +100,7 @@ interface UIState {
   scanProgress: number;
   scanMessage: string;
 
-  setView: (v: View) => void;
-  setTokenCategory: (c: TokenCategory) => void;
+  setDestination: (d: DestinationId) => void;
   setComponentSearch: (q: string) => void;
   setOverlay: (o: Overlay) => void;
   setOptionsOpen: (b: boolean) => void;
@@ -168,8 +169,10 @@ export const isGenerateBusy = (s: UIState): boolean =>
   s.checkingExisting || s.existingSummary !== null;
 
 export const useStore = create<UIState>((set, get) => ({
-  view: 'set-tokens',
-  tokenCategory: 'radius',
+  // Colour, not the old 'radius' default. The rail puts every foundation one
+  // click away, so the landing destination should be the one the whole system is
+  // derived from rather than the smallest scale in it.
+  destination: 'colour',
   componentSearch: '',
   overlay: 'none',
   optionsOpen: false,
@@ -207,8 +210,11 @@ export const useStore = create<UIState>((set, get) => ({
   checkingExisting: false,
   pendingTarget: null,
 
-  setView: (v) => set({ view: v, lastError: null }),
-  setTokenCategory: (c) => set({ tokenCategory: c }),
+  // Clearing lastError on navigation is inherited from setView and still right:
+  // the banner reports what went wrong doing something here, so it stops being
+  // relevant once "here" changes. setTokenCategory did not clear it, which meant
+  // an error raised on Colour followed you to Radius.
+  setDestination: (d) => set({ destination: d, lastError: null }),
   setSelectedColor: (hex, name) => set({ selectedColor: { hex, name: name || hex } }),
   generateColorExtensions: (hex, name, customStops) => {
     const targetHex = hex || get().selectedColor?.hex || get().config.primaryColor;
@@ -315,15 +321,16 @@ export const useStore = create<UIState>((set, get) => ({
     get().persist();
   },
   importPalette: (patch) => {
-    // Lands on the Colors panel, not just on Set Tokens. The view alone left the
-    // token category wherever it was, so importing a palette while Radius was
-    // open closed the dialog onto a list of corner radii — nothing on screen had
-    // changed, and the only way to see the imported colours was to go looking.
+    // Lands on the Colour sheet. This used to need two fields — a view and a
+    // token category — and setting only the view left the category wherever it
+    // was, so importing a palette while Radius was open closed the dialog onto a
+    // list of corner radii: nothing on screen had changed, and the only way to
+    // see the imported colours was to go looking. One destination, one field, no
+    // half-navigated state to get wrong.
     set((s) => ({
       config: { ...s.config, ...patch },
       importOpen: false,
-      view: 'set-tokens',
-      tokenCategory: 'colors',
+      destination: 'colour',
     }));
     get().persist();
   },
@@ -394,7 +401,15 @@ export const useStore = create<UIState>((set, get) => ({
     // The same applies once the confirmation is up: that press is still pending
     // an answer from the user, it just isn't waiting on the sandbox any more.
     if (isGenerateBusy(get())) return;
-    const resolved = target ?? (get().view === 'build-components' ? 'components' : get().tokenCategory);
+    // The active destination names its own target, so the caller normally passes
+    // nothing. Reading it from the table rather than deriving it here is what
+    // keeps Shape — one destination over two token scales — expressible at all.
+    const resolved = target ?? destination(get().destination).target;
+    // Motion, Audit and Export have no target. The rail draws no Build for them,
+    // so this is a backstop rather than a path: returning is the safe answer
+    // because the alternative is posting an unrecognised target, which the
+    // sandbox falls through into a full five-page rebuild.
+    if (resolved === undefined) return;
     set({ pendingTarget: resolved, lastError: null, checkingExisting: true });
     startCheckWatchdog();
     postToPlugin({ type: 'CHECK_EXISTING' });

@@ -77,12 +77,6 @@ export const CodeExportView: React.FC = () => {
         <div className="dsk-code-illustration">
           <Code size={48} className="dsk-code-icon" />
         </div>
-        <div className="dsk-code-header-badge">
-          <h2>Export Code</h2>
-        </div>
-        <p className="dsk-code-desc">
-          Export your tokens and components for development use across web, mobile, and design tools.
-        </p>
 
         <div className="dsk-code-format-pills">
           {formats.map((fmt) => (

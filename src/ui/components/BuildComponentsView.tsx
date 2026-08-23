@@ -1,17 +1,14 @@
 import React from 'react';
-import { useStore, isGenerateBusy } from '../store';
+import { useStore } from '../store';
 import { COMPONENT_DEFINITIONS } from '../../shared/component-definitions';
 import { countComponentsFor } from '../../shared/variant-count';
-import { Search, SearchX, CheckSquare, XSquare, CheckCircle, ChevronUp, Loader2 } from 'lucide-react';
+import { Search, SearchX, CheckSquare, XSquare, CheckCircle } from 'lucide-react';
 
 export const BuildComponentsView: React.FC = () => {
   const search = useStore((s) => s.componentSearch);
   const setSearch = useStore((s) => s.setComponentSearch);
   const config = useStore((s) => s.config);
   const toggleComponent = useStore((s) => s.toggleComponent);
-  const startGeneration = useStore((s) => s.startGeneration);
-  const checkingExisting = useStore((s) => s.checkingExisting);
-  const generateBusy = useStore(isGenerateBusy);
   const selectAll = useStore((s) => s.selectAll);
 
   const selectedSet = new Set(config.componentsToGenerate);
@@ -58,15 +55,17 @@ export const BuildComponentsView: React.FC = () => {
         </button>
       </div>
 
-      <p className="dsk-components-desc">
-        Pick the components to generate. Each one is built from your tokens, so
-        colors, type, radius and elevation match the system you configured.
-      </p>
-
       <div className="dsk-components-count">
-        {search
-          ? `${filteredComponents.length} of ${COMPONENT_DEFINITIONS.length} match “${search}”`
-          : `Showing all ${COMPONENT_DEFINITIONS.length} components`}
+        {/* Was "0 components selected" in a footer next to an enabled Generate
+            button. The run then built an empty page and reported success, so the
+            only honest options were to explain or to disable — this does both,
+            with the rail's Build disabled to match. It reads here rather than in
+            the footer because the footer is gone: the rail owns the action, and a
+            disabled button in the rail cannot explain its own precondition. */}
+        {selectedSet.size === 0
+          ? 'Select at least one component to build.'
+          : `${selectedSet.size} of ${COMPONENT_DEFINITIONS.length} selected · ${totalVariants} variants`}
+        {search && ` · ${filteredComponents.length} match “${search}”`}
       </div>
 
       {filteredComponents.length === 0 ? (
@@ -110,48 +109,6 @@ export const BuildComponentsView: React.FC = () => {
           })}
         </div>
       )}
-
-      <footer className="dsk-bottom-bar">
-        <div className="dsk-selection-count">
-          {/* Was "0 components selected" next to an enabled Generate button. The
-              run then built an empty page and reported success, so the only
-              honest options were to explain or to disable — this does both. */}
-          <span>
-            {selectedSet.size === 0
-              ? 'Select at least one component'
-              : `${selectedSet.size} of ${COMPONENT_DEFINITIONS.length} selected · ${totalVariants} variants`}
-          </span>
-        </div>
-
-        <div className="dsk-split-action">
-          {/* Generate does not start the run: it asks the sandbox what is already
-              in the file first, and on a large file that answer takes seconds.
-              Without a label change the button looked idle for the whole wait. */}
-          <button
-            className="dsk-primary-btn"
-            onClick={() => startGeneration('components')}
-            disabled={selectedSet.size === 0 || generateBusy}
-          >
-            {checkingExisting ? (
-              <>
-                <Loader2 size={15} className="dsk-spin" />
-                Checking this file…
-              </>
-            ) : (
-              <>
-                Generate Components in <span className="figma-icon">❖</span>
-              </>
-            )}
-          </button>
-          <button
-            className="dsk-split-caret"
-            onClick={() => startGeneration('components')}
-            disabled={selectedSet.size === 0 || generateBusy}
-          >
-            <ChevronUp size={16} />
-          </button>
-        </div>
-      </footer>
     </div>
   );
 };

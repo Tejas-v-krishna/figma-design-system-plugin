@@ -12,7 +12,6 @@ export const AuditView: React.FC = () => {
   return (
     <div className="dsk-audit-container">
       <div className="dsk-token-header">
-        <h2>Audit</h2>
         <button className="dsk-secondary-btn" onClick={() => requestScan()} disabled={busy}>
           <RefreshCw size={15} className={busy ? 'dsk-spin' : undefined} />
           {busy ? 'Scanning…' : result ? 'Re-scan' : 'Run scan'}
