@@ -3,11 +3,11 @@ import { useState, useEffect, forwardRef } from 'react';
 import { useStore } from '../store';
 
 const HEADING_FONTS = [
-  'Geist', 'Inter', 'Roboto', 'Poppins', 'Montserrat', 'Open Sans', 'Playfair Display',
+  'Google Sans', 'Google Sans Text', 'Product Sans', 'Geist', 'Inter', 'Roboto', 'Poppins', 'Montserrat', 'Open Sans', 'Playfair Display',
   'IBM Plex Sans', 'Lato', 'Source Sans 3', 'Nunito Sans', 'DM Sans',
 ];
 const BODY_FONTS = HEADING_FONTS;
-const MONO_FONTS = ['Geist Mono', 'IBM Plex Mono', 'Roboto Mono', 'JetBrains Mono', 'Fira Code', 'Source Code Pro'];
+const MONO_FONTS = ['Google Sans', 'Google Sans Text', 'Product Sans', 'Geist Mono', 'IBM Plex Mono', 'Roboto Mono', 'JetBrains Mono', 'Fira Code', 'Source Code Pro'];
 
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 

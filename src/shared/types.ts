@@ -151,9 +151,8 @@ export interface GenerationOptions {
 export const DEFAULT_CONFIG: GenerationConfig = {
   brandName: 'My Design System',
   primaryColor: '#2563EB',
-  // Geist and Geist Mono are distributed on Google Fonts and bundled with
-  // Figma, and resolve cleanly in both web and desktop runtimes.
-  fontFamily: { heading: 'Geist', body: 'Geist', mono: 'Geist Mono' },
+  // Google Sans is the exclusive font family for the design system and plugin
+  fontFamily: { heading: 'Google Sans', body: 'Google Sans', mono: 'Google Sans' },
   typographyScale: 'material',
   baseFontSize: 16,
   baseSpacing: 4,

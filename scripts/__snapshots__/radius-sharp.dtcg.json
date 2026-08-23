@@ -2497,19 +2497,19 @@
     "$type": "fontFamily",
     "heading": {
       "$value": [
-        "Geist",
+        "Google Sans",
         "sans-serif"
       ]
     },
     "body": {
       "$value": [
-        "Geist",
+        "Google Sans",
         "sans-serif"
       ]
     },
     "mono": {
       "$value": [
-        "Geist Mono",
+        "Google Sans",
         "monospace"
       ]
     }
@@ -2521,7 +2521,7 @@
       "h1": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2539,7 +2539,7 @@
       "h2": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2557,7 +2557,7 @@
       "h3": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2575,7 +2575,7 @@
       "h4": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2593,7 +2593,7 @@
       "h5": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2611,7 +2611,7 @@
       "h6": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2631,7 +2631,7 @@
       "large": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2649,7 +2649,7 @@
       "large-semi-bold": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2667,7 +2667,7 @@
       "large-link": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2686,7 +2686,7 @@
       "medium": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2704,7 +2704,7 @@
       "medium-semi-bold": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2722,7 +2722,7 @@
       "medium-link": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2741,7 +2741,7 @@
       "small": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2759,7 +2759,7 @@
       "small-semi-bold": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2777,7 +2777,7 @@
       "small-link": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2796,7 +2796,7 @@
       "x-small": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2814,7 +2814,7 @@
       "x-small-semi-bold": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
@@ -2832,7 +2832,7 @@
       "x-small-link": {
         "$value": {
           "fontFamily": [
-            "Geist",
+            "Google Sans",
             "sans-serif"
           ],
           "fontSize": {
