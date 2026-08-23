@@ -500,8 +500,14 @@ export async function generateComponents(
           let subtitle = '';
           if (section.title === 'Sizes Scale') {
             subtitle = 'Proportional scale from XS (28px) to XL (56px)';
+          } else if (section.title === 'Sizes') {
+            subtitle = 'Proportional scale across available dimensions';
           } else if (section.title === 'Icons & Contextual') {
             subtitle = 'Adornments, counter badges & async feedback';
+          } else if (section.title === 'Variants') {
+            subtitle = 'Visual styles and semantic color themes';
+          } else if (section.title === 'Interactive States') {
+            subtitle = 'Default, hover, focus, active, and disabled feedback';
           }
 
           if (subtitle) {
