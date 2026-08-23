@@ -273,6 +273,192 @@ h1, h2, h3, h4, h5, h6,
 .dsk-token-input.text-input { width: 180px; text-align: left; }
 .dsk-token-input:focus { border-color: #000000; box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08); outline: none; }
 
+/* ---------------------------------------------------------------------------
+   Scale panels: Radius, Stroke, Effects.
+
+   These three read a derived scale rather than editing one, so they are laid
+   out as a spec sheet — specimen on the left, token name, resolved value in
+   monospace on the right — not as a form. The markup existed before the CSS
+   did: .dsk-token-rows, .dsk-token-row and .dsk-token-name were referenced by
+   SetTokensView and defined nowhere, so all three panels rendered as bare
+   stacked divs.
+   --------------------------------------------------------------------------- */
+
+.dsk-token-count {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: #6b6b73;
+  letter-spacing: 0.02em;
+}
+
+.dsk-token-group-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #6b6b73;
+}
+
+.dsk-token-note,
+.dsk-preset-hint {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #6b6b73;
+  margin: 0 0 16px;
+  max-width: 52ch;
+}
+
+.dsk-preset-switch-wrap { margin-bottom: 4px; }
+
+.dsk-preset-switch {
+  display: inline-flex;
+  background: #f4f4f6;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  padding: 3px;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.dsk-preset-btn {
+  border: none;
+  background: transparent;
+  color: #55555d;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 16px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+.dsk-preset-btn:hover { color: #000000; }
+.dsk-preset-btn.active {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+/* Keyboard focus has to stay visible on the active button too, where the white
+   fill would otherwise hide a default outline against the white sheet. */
+.dsk-preset-btn:focus-visible { outline: 2px solid #000000; outline-offset: 1px; }
+
+.dsk-token-rows {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+}
+
+.dsk-token-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  min-height: 46px;
+}
+.dsk-token-row + .dsk-token-row { border-top: 1px solid rgba(0, 0, 0, 0.05); }
+.dsk-token-row-tall { min-height: 62px; }
+
+.dsk-token-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #000000;
+  /* Fixed width so the value column lines up down the sheet — a ragged right
+     edge in a list of eight numbers is harder to compare than it looks. */
+  width: 72px;
+  flex: 0 0 auto;
+}
+
+.dsk-token-value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #55555d;
+  margin-left: auto;
+  text-align: right;
+}
+/* Shadow values are a full CSS shadow string. Left-aligned in a fixed column so
+   the four numbers that change between steps stay in the same place down the
+   sheet; right-aligning them made every line break at a different word. */
+.dsk-token-value-wide {
+  width: 27ch;
+  flex: 0 0 auto;
+  text-align: left;
+  white-space: normal;
+  line-height: 1.5;
+  font-size: 11.5px;
+}
+
+.dsk-radius-swatch {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  background: #ececed;
+  border: 1.5px solid #17171b;
+  /* One rounded corner against three square ones, so the row reads as a corner
+     sample and the step is legible on its own. Rounding all four made lg, xl,
+     2xl and full converge on a circle at swatch size — 12px and 24px looked
+     identical, which is the opposite of what a scale panel is for. */
+  border-radius: 0;
+  border-top-left-radius: var(--dsk-corner, 0);
+}
+
+.dsk-stroke-swatch {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dsk-stroke-swatch > span {
+  display: block;
+  width: 100%;
+  background: #17171b;
+  border-radius: 1px;
+}
+
+/* A white tile carrying a real shadow, on a tinted plinth. Without the plinth
+   the tile is white-on-white and the xs and sm steps — the two subtlest, and
+   the two a user most needs to compare — are invisible. */
+.dsk-shadow-plinth {
+  width: 52px;
+  height: 46px;
+  flex: 0 0 auto;
+  background: #f1f1f3;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dsk-shadow-swatch {
+  width: 30px;
+  height: 30px;
+  background: #ffffff;
+  border-radius: 7px;
+}
+
+.dsk-token-empty {
+  background: #f4f4f6;
+  border: 1px dashed rgba(0, 0, 0, 0.14);
+  border-radius: 16px;
+  padding: 28px 24px;
+  text-align: center;
+}
+.dsk-token-empty p { margin: 0; font-size: 13.5px; font-weight: 600; color: #000000; }
+.dsk-token-empty-sub {
+  margin-top: 6px !important;
+  font-weight: 400 !important;
+  font-size: 12.5px !important;
+  color: #6b6b73 !important;
+  line-height: 1.5;
+  max-width: 44ch;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
 .dsk-color-base-controls {
   margin-bottom: 20px;
   background: #ffffff;
