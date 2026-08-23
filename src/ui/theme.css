@@ -28,7 +28,16 @@
   --on-ink-faint: #5c636d;
   --on-paper: #16181c;
   --on-paper-dim: #5f646c;
-  --on-paper-faint: #9298a1;
+  /* 4.69:1 on --paper-sunk, 5.03:1 on --paper. This tier is used for 9px–13px
+     text (ramp step labels, field hints, sheet meta, spec notes), all of which
+     needs 4.5:1 — the old #9298a1 measured 2.61:1 and 2.80:1, so every one of
+     them failed. The tier still reads as subordinate because those elements
+     already carry it by size, uppercase and letter-spacing rather than by
+     colour; there is no value that is both legible on near-white paper and
+     visibly fainter than --on-paper-dim, so the hierarchy has to come from
+     somewhere other than the grey. Its three other uses are :hover border
+     colours, which only get clearer. */
+  --on-paper-faint: #676d77;
 
   /* ---- Brand. Overwritten at runtime from the user's primary colour.
           These are only the pre-hydration values. ---- */

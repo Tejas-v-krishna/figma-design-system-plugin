@@ -7,7 +7,9 @@
   --border-strong: rgba(0, 0, 0, 0.12);
   --text: #09090b;
   --text-dim: #666666;
-  --text-faint: #999999;
+  /* Kept in step with theme.css's --on-paper-faint, which overrides this at
+     runtime. Both clear 4.5:1 on their own panel colour; #999999 did not. */
+  --text-faint: #676d77;
   --accent: #09090b;
   --accent-hover: #1c1c1e;
   --accent-glow: rgba(0, 0, 0, 0.1);
