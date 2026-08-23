@@ -96,13 +96,11 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
   const [hue, setHue] = useState<number>(initialHsv.h);
   const [sat, setSat] = useState<number>(initialHsv.s);
   const [val, setVal] = useState<number>(initialHsv.v);
-  const [alpha, setAlpha] = useState<number>(100);
 
   const areaRef = useRef<HTMLDivElement>(null);
   const hueRef = useRef<HTMLDivElement>(null);
-  const alphaRef = useRef<HTMLDivElement>(null);
   /** Which track the pointer captured on press, or null when not dragging. */
-  const drag = useRef<'area' | 'hue' | 'alpha' | null>(null);
+  const drag = useRef<'area' | 'hue' | null>(null);
 
   // Computed current RGB and Hex
   const currentRgb = hsvToRgb(hue, sat, val);
@@ -152,17 +150,11 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
     emit(h, sat, val);
   };
 
-  const applyAlpha = (clientX: number) => {
-    const el = alphaRef.current;
-    if (!el) return;
-    setAlpha(Math.round(ratio(el, clientX, 0).x * 100));
-  };
-
   // The window listeners below are installed once and read the current handlers
   // through this ref. Putting [hue, sat, val] in the dependency array instead
   // meant every frame of a drag tore down and reinstalled two window listeners.
-  const live = useRef({ applyArea, applyHue, applyAlpha, onClose });
-  live.current = { applyArea, applyHue, applyAlpha, onClose };
+  const live = useRef({ applyArea, applyHue, onClose });
+  live.current = { applyArea, applyHue, onClose };
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
@@ -171,10 +163,9 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
       // Listening on window, not on the track, is what lets a drag continue
       // once the pointer leaves the 200px-wide slider — which is most of the
       // time. Previously only the 2D area was wired up here at all, so the hue
-      // and alpha sliders responded to a click but not to a drag.
+      // slider responded to a click but not to a drag.
       if (mode === 'area') live.current.applyArea(e.clientX, e.clientY);
-      else if (mode === 'hue') live.current.applyHue(e.clientX);
-      else live.current.applyAlpha(e.clientX);
+      else live.current.applyHue(e.clientX);
     };
     const onUp = () => {
       drag.current = null;
@@ -256,44 +247,19 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
           />
         </div>
 
-        {/* Sliders Section */}
-        <div className="dsk-picker-sliders">
-          <div className="dsk-picker-slider-row">
-            <div className="dsk-slider-spacer" />
-            <div
-              ref={hueRef}
-              className="dsk-slider-bar dsk-hue-slider"
-              onPointerDown={(e) => {
-                drag.current = 'hue';
-                applyHue(e.clientX);
-              }}
-            >
-              <div
-                className="dsk-slider-handle"
-                style={{ left: `${(hue / 360) * 100}%`, backgroundColor: pureHueHex }}
-              />
-            </div>
-          </div>
-
-          <div className="dsk-picker-slider-row">
-            <div className="dsk-slider-spacer" />
-            <div
-              ref={alphaRef}
-              className="dsk-slider-bar dsk-alpha-slider"
-              style={{
-                backgroundImage: `linear-gradient(to right, transparent, ${currentHex}), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="4" height="4" fill="%23ccc"/><rect x="4" width="4" height="4" fill="%23fff"/><rect y="4" width="4" height="4" fill="%23fff"/><rect x="4" y="4" width="4" height="4" fill="%23ccc"/></svg>')`,
-              }}
-              onPointerDown={(e) => {
-                drag.current = 'alpha';
-                applyAlpha(e.clientX);
-              }}
-            >
-              <div
-                className="dsk-slider-handle"
-                style={{ left: `${alpha}%`, backgroundColor: currentHex }}
-              />
-            </div>
-          </div>
+        {/* Hue */}
+        <div
+          ref={hueRef}
+          className="dsk-slider-bar dsk-hue-slider"
+          onPointerDown={(e) => {
+            drag.current = 'hue';
+            applyHue(e.clientX);
+          }}
+        >
+          <div
+            className="dsk-slider-handle"
+            style={{ left: `${(hue / 360) * 100}%`, backgroundColor: pureHueHex }}
+          />
         </div>
 
         {/* Value Inputs Row */}
@@ -350,8 +316,6 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
               <label>L <input type="number" value={currentHsl.l} min={0} max={100} readOnly /></label>
             </div>
           )}
-
-          <div className="dsk-alpha-val">{alpha}%</div>
         </div>
       </div>
     </div>
