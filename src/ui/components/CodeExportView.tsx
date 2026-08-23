@@ -34,6 +34,16 @@ export const CodeExportView: React.FC = () => {
   ];
 
   const handleExport = (fmt: ExportFormat) => {
+    // The notice belongs to the output that was on screen, not to the view. It
+    // used to survive a format switch, so "Copy was blocked" sat above a freshly
+    // generated CSS export that nobody had tried to copy yet — a stale warning
+    // about a different thing entirely. Same for the "Copied!" tick.
+    setNotice(null);
+    setCopied(false);
+    if (copyResetTimer.current !== null) {
+      clearTimeout(copyResetTimer.current);
+      copyResetTimer.current = null;
+    }
     setExportFormat(fmt);
     requestExport(fmt);
   };
