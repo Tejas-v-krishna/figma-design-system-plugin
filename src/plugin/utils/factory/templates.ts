@@ -155,7 +155,7 @@ const Button: Template = (root, ctx) => {
   root.counterAxisAlignItems = 'CENTER';
   root.itemSpacing = 8;
   pad(root, Math.round(m.height / 2 - m.fontSize * 0.7), m.padX);
-  root.cornerRadius = ctx.config.radiusPreset === 'pill' ? 9999 : ctx.config.radiusPreset === 'sharp' ? 0 : radiusPx(ctx.tokens, 'md');
+  root.cornerRadius = radiusPx(ctx.tokens, 'md');
   setFill(root, fillHex, colorStyleKey(t, baseShade), ctx.styleMap, ctx.varMap);
   if (outlined) setStroke(root, colorShade(ctx.tokens, t, 300), 1, colorStyleKey(t, 300), ctx.styleMap, ctx.varMap);
   root.opacity = disabledOpacity(ctx);
@@ -183,7 +183,7 @@ const IconButton: Template = (root, ctx) => {
   root.counterAxisAlignItems = 'CENTER';
   pad(root, 0);
   root.resize(m.height, m.height);
-  root.cornerRadius = ctx.config.radiusPreset === 'pill' ? 9999 : radiusPx(ctx.tokens, 'md');
+  root.cornerRadius = radiusPx(ctx.tokens, 'md');
   setFill(root, outlined ? '#FFFFFF' : colorShade(ctx.tokens, t, baseShade), colorStyleKey(t, baseShade), ctx.styleMap, ctx.varMap);
   if (outlined) setStroke(root, colorShade(ctx.tokens, t, 300), 1, colorStyleKey(t, 300), ctx.styleMap, ctx.varMap);
   root.opacity = disabledOpacity(ctx);
@@ -434,7 +434,7 @@ const Badge: Template = (root, ctx) => {
   root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
   pad(root, 2, 8);
-  root.cornerRadius = ctx.config.radiusPreset === 'pill' ? 9999 : radiusPx(ctx.tokens, 'sm');
+  root.cornerRadius = radiusPx(ctx.tokens, 'sm');
   setFill(root, colorShade(ctx.tokens, t, 100), colorStyleKey(t, 100), ctx.styleMap, ctx.varMap);
   root.appendChild(text({ characters: 'Badge', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 11, fill: colorShade(ctx.tokens, t, 700) }));
   return root;
@@ -447,7 +447,7 @@ const Tag: Template = (root, ctx) => {
   root.counterAxisAlignItems = 'CENTER';
   root.itemSpacing = 6;
   pad(root, 4, 10);
-  root.cornerRadius = ctx.config.radiusPreset === 'pill' ? 9999 : radiusPx(ctx.tokens, 'sm');
+  root.cornerRadius = radiusPx(ctx.tokens, 'sm');
   setFill(root, colorShade(ctx.tokens, t, 100), colorStyleKey(t, 100), ctx.styleMap, ctx.varMap);
   root.appendChild(text({ characters: 'Tag', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: colorShade(ctx.tokens, t, 700) }));
   if (variantKey(ctx).includes('removable')) {
