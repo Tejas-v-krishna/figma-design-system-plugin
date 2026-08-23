@@ -1,0 +1,25 @@
+{
+  "//": "The build tooling and the check scripts, which tsconfig.json's include leaves out. They were unchecked code: an invalid config object in check-token-snapshot.ts (typographyScale: 1.333, when the field is a string union) compiled without complaint and produced a snapshot that silently exercised nothing. Separate from tsconfig.json because these run in Node and need its globals, while src/ runs in the Figma sandbox and deliberately restricts `types` to the plugin typings so a stray `process.env` in plugin code is an error.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["scripts", "vite.config.ts", "vite.ui.config.ts", "vite.dev.config.ts"]
+}
