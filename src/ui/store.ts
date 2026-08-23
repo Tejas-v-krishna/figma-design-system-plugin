@@ -9,7 +9,11 @@ import { COMPONENT_DEFINITIONS } from '../shared/component-definitions';
 import { BRAND_PRESETS, BrandPreset } from '../shared/presets';
 import { postToPlugin, ExistingSummary } from './plugin';
 
-export type View = 'set-tokens' | 'build-components' | 'code' | 'brand' | 'typography' | 'components' | 'review' | 'export' | 'scan';
+// 'brand', 'typography', 'components' and 'export' are aliases for the four real
+// panels, kept because App routes them and older saved state may still hold one.
+// 'review' was in this union with no route and nothing setting it, so
+// setView('review') type-checked and rendered an empty main area.
+export type View = 'set-tokens' | 'build-components' | 'code' | 'brand' | 'typography' | 'components' | 'export' | 'scan';
 export type TokenCategory = 'colors' | 'gradients' | 'typography' | 'spacing' | 'radius' | 'stroke' | 'effects' | 'motion';
 export type Overlay = 'none' | 'generating' | 'success';
 export type ExportFormat = 'json' | 'css' | 'tailwind' | 'dtcg';
