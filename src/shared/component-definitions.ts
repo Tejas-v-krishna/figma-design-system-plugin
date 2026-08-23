@@ -11,6 +11,8 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
       { name: 'Secondary', properties: { variant: 'secondary' } },
       { name: 'Ghost', properties: { variant: 'ghost' } },
       { name: 'Destructive', properties: { variant: 'destructive' } },
+      { name: 'Brand', properties: { variant: 'brand' } },
+      { name: 'Tonal', properties: { variant: 'tonal' } },
     ],
     states: [
       { name: 'Default', properties: { state: 'default' } },
@@ -19,9 +21,11 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
       { name: 'Disabled', properties: { state: 'disabled' } },
     ],
     sizes: [
-      { name: 'sm', properties: { name: 'sm', height: 32, paddingX: 12, fontSize: 12 } },
-      { name: 'md', properties: { name: 'md', height: 40, paddingX: 16, fontSize: 13 } },
-      { name: 'lg', properties: { name: 'lg', height: 48, paddingX: 22, fontSize: 14 } },
+      { name: 'xs', properties: { name: 'xs', height: 28, paddingX: 12, fontSize: 11 } },
+      { name: 'sm', properties: { name: 'sm', height: 34, paddingX: 16, fontSize: 12 } },
+      { name: 'md', properties: { name: 'md', height: 40, paddingX: 20, fontSize: 14 } },
+      { name: 'lg', properties: { name: 'lg', height: 48, paddingX: 26, fontSize: 15 } },
+      { name: 'xl', properties: { name: 'xl', height: 56, paddingX: 32, fontSize: 16 } },
     ],
     defaultProps: { variant: 'primary', state: 'default' },
   },

@@ -74,7 +74,7 @@ function buildOne(
   sLabel?: string,
   szLabel?: string,
   varMap?: VariableMap,
-  showcaseType?: 'variant' | 'size' | 'state'
+  showcaseType?: 'variant' | 'size' | 'state' | 'icon'
 ): ComponentNode {
   const name = formatComponentName(def.category, def.name, vLabel, sLabel, szLabel, DEFAULT_NAMING);
   const root = makeComponent(name);
@@ -135,6 +135,36 @@ function buildComponentShowcase(
       sections.push({ title: v.name, nodes: rowNodes });
       totalCount += rowNodes.length;
     }
+
+    // Sizes Scale
+    const sizeNodes: ComponentNode[] = [];
+    for (const sz of def.sizes) {
+      sizeNodes.push(buildOne(def, tokens, config, styleMap, tmpl, dv, ds, sz, undefined, undefined, sz.name, varMap, 'size'));
+    }
+    sections.push({ title: 'Sizes Scale', nodes: sizeNodes });
+    totalCount += sizeNodes.length;
+
+    // Icons & Contextual Actions
+    const iconDefs = [
+      { label: 'Create New', iconType: 'leading', variant: 'primary', caption: 'Leading Icon' },
+      { label: 'Continue', iconType: 'trailing', variant: 'primary', caption: 'Trailing Icon' },
+      { label: 'Star', iconType: 'badge', variant: 'secondary', caption: 'Badge Counter' },
+      { label: 'Docs', iconType: 'external', variant: 'ghost', caption: 'External Link' },
+      { label: 'Copy Link', iconType: 'copy', variant: 'secondary', caption: 'Copy Action' },
+      { label: 'Copied!', iconType: 'copied', variant: 'tonal', caption: 'Copied State' },
+      { label: 'Saving…', iconType: 'loading', variant: 'primary', caption: 'Async Loading' },
+    ];
+
+    const iconNodes: ComponentNode[] = [];
+    for (const ic of iconDefs) {
+      const v = def.variants.find((x) => x.name.toLowerCase() === ic.variant) ?? dv;
+      const vProps = { ...v.properties, iconType: ic.iconType, customLabel: ic.label };
+      const customVariant = { name: ic.caption, properties: vProps };
+      const node = buildOne(def, tokens, config, styleMap, tmpl, customVariant, ds, dz, ic.caption, undefined, undefined, varMap, 'icon');
+      iconNodes.push(node);
+    }
+    sections.push({ title: 'Icons & Contextual', nodes: iconNodes });
+    totalCount += iconNodes.length;
 
     const primary = sections[0]?.nodes[0] ?? buildOne(def, tokens, config, styleMap, tmpl, dv, ds, dz, undefined, undefined, undefined, varMap);
     return { sections, primary, totalCount };
@@ -345,7 +375,9 @@ export async function generateComponents(
         const isButtonComp = def.name === 'Button';
 
         for (const [sIdx, section] of showcase.sections.entries()) {
-          if (sIdx > 0 && !isButtonComp) {
+          const isButtonMatrixRow = isButtonComp && !['Sizes Scale', 'Icons & Contextual'].includes(section.title);
+
+          if (sIdx > 0 && !isButtonMatrixRow) {
             const innerDiv = figma.createFrame();
             innerDiv.name = 'SubDivider';
             innerDiv.resize(CW - 56, 1);
@@ -353,7 +385,7 @@ export async function generateComponents(
             cardBody.appendChild(innerDiv);
           }
 
-          if (isButtonComp) {
+          if (isButtonMatrixRow) {
             // Horizontal row with left label and right state buttons matching the reference image!
             const rowLine = figma.createFrame();
             rowLine.name = `Row ${section.title}`;

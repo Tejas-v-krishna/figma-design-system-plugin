@@ -30,7 +30,7 @@ export interface TemplateCtx {
   stateProps: Record<string, string | number | boolean>;
   sizeName: string;
   sizeProps: Record<string, string | number | boolean>;
-  showcaseType?: 'variant' | 'size' | 'state';
+  showcaseType?: 'variant' | 'size' | 'state' | 'icon';
 }
 
 export type Template = (root: ComponentNode, ctx: TemplateCtx) => ComponentNode;
@@ -221,17 +221,62 @@ const Button: Template = (root, ctx) => {
   const isSecondary = vKey === 'secondary' || vKey === 'outline';
   const isGhost = vKey === 'ghost';
   const isDestructive = vKey === 'destructive' || vKey === 'danger';
-  const isPrimary = !isSecondary && !isGhost && !isDestructive;
+  const isBrand = vKey === 'brand' || vKey === 'accent';
+  const isTonal = vKey === 'tonal' || vKey === 'soft' || vKey === 'tertiary';
+  const isLink = vKey === 'link';
+  const isPrimary = !isSecondary && !isGhost && !isDestructive && !isBrand && !isTonal && !isLink;
 
   root.layoutMode = 'HORIZONTAL';
-  root.primaryAxisSizingMode = 'FIXED';
-  root.counterAxisSizingMode = 'FIXED';
   root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
-  root.resize(108, 40);
   root.cornerRadius = 9999;
   root.strokes = [];
   root.effects = [];
+
+  const isSizeShowcase = ctx.showcaseType === 'size';
+  const isIconShowcase = ctx.showcaseType === 'icon' || Boolean(ctx.variantProps.iconType);
+
+  // Sizing
+  const szKey = String(ctx.sizeName || ctx.sizeProps.name || 'md').toLowerCase();
+  let height = 40;
+  let padX = 20;
+  let fontSize = 14;
+  let iconSize = 15;
+
+  if (szKey === 'xs') {
+    height = 28;
+    padX = 12;
+    fontSize = 11;
+    iconSize = 12;
+  } else if (szKey === 'sm') {
+    height = 34;
+    padX = 16;
+    fontSize = 12;
+    iconSize = 13;
+  } else if (szKey === 'lg') {
+    height = 48;
+    padX = 26;
+    fontSize = 15;
+    iconSize = 17;
+  } else if (szKey === 'xl') {
+    height = 56;
+    padX = 32;
+    fontSize = 16;
+    iconSize = 18;
+  }
+
+  if (isSizeShowcase || isIconShowcase || isLink) {
+    root.primaryAxisSizingMode = 'AUTO';
+    root.counterAxisSizingMode = 'FIXED';
+    root.resize(100, height);
+    pad(root, 0, padX);
+    root.itemSpacing = 8;
+  } else {
+    root.primaryAxisSizingMode = 'FIXED';
+    root.counterAxisSizingMode = 'FIXED';
+    root.resize(108, 40);
+    root.itemSpacing = 8;
+  }
 
   let textHex = '#FFFFFF';
 
@@ -269,6 +314,51 @@ const Button: Template = (root, ctx) => {
       root.effects = [{
         type: 'DROP_SHADOW',
         color: { r: 0, g: 0, b: 0, a: 0.16 },
+        offset: { x: 0, y: 2 },
+        radius: 4,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    }
+  } else if (isBrand) {
+    const brandColor = colorShade(ctx.tokens, 'primary', 500);
+    const brandHover = colorShade(ctx.tokens, 'primary', 600);
+    const brandDisabled = colorShade(ctx.tokens, 'primary', 200);
+
+    if (isDisabled) {
+      setFill(root, brandDisabled);
+      textHex = '#FFFFFF';
+    } else if (isHover) {
+      setFill(root, brandHover);
+      textHex = '#FFFFFF';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0.15, g: 0.39, b: 0.92, a: 0.35 },
+        offset: { x: 0, y: 3 },
+        radius: 6,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    } else if (isFocused) {
+      setFill(root, brandColor);
+      textHex = '#FFFFFF';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0.15, g: 0.39, b: 0.92, a: 0.25 },
+        offset: { x: 0, y: 0 },
+        radius: 0,
+        spread: 4,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    } else {
+      setFill(root, brandColor);
+      textHex = '#FFFFFF';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0.15, g: 0.39, b: 0.92, a: 0.28 },
         offset: { x: 0, y: 2 },
         radius: 4,
         spread: 0,
@@ -320,6 +410,29 @@ const Button: Template = (root, ctx) => {
         visible: true,
         blendMode: 'NORMAL',
       }];
+    }
+  } else if (isTonal) {
+    if (isDisabled) {
+      setFill(root, '#F1F5F9');
+      textHex = '#94A3B8';
+    } else if (isHover) {
+      setFill(root, '#DBEAFE');
+      textHex = '#1D4ED8';
+    } else if (isFocused) {
+      setFill(root, '#EFF6FF');
+      textHex = '#1D4ED8';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0.15, g: 0.39, b: 0.92, a: 0.15 },
+        offset: { x: 0, y: 0 },
+        radius: 0,
+        spread: 4,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    } else {
+      setFill(root, '#EFF6FF');
+      textHex = '#1D4ED8';
     }
   } else if (isGhost) {
     if (isDisabled) {
@@ -386,17 +499,64 @@ const Button: Template = (root, ctx) => {
         blendMode: 'NORMAL',
       }];
     }
+  } else if (isLink) {
+    root.fills = [];
+    textHex = '#2563EB';
   }
 
-  const btnLabel = ctx.stateName || 'Button';
+  // Icons & Contextual items
+  const iconType = ctx.variantProps.iconType ? String(ctx.variantProps.iconType) : '';
+
+  if (iconType === 'leading') {
+    root.appendChild(buildIcon(iconSize, textHex, 'plus'));
+  } else if (iconType === 'copy') {
+    root.appendChild(buildIcon(iconSize, textHex, 'copy'));
+  } else if (iconType === 'copied') {
+    root.appendChild(buildIcon(iconSize, textHex, 'check'));
+  } else if (iconType === 'loading') {
+    const spinner = ellipse('spinnerRing', iconSize);
+    spinner.fills = [];
+    spinner.strokes = [{ type: 'SOLID', color: hexToRgbSafe(textHex) }];
+    spinner.strokeWeight = 2;
+    root.appendChild(spinner);
+  }
+
+  let btnLabel = ctx.stateName || 'Button';
+  if (isSizeShowcase) {
+    btnLabel = `Button (${szKey.toUpperCase()})`;
+  } else if (ctx.variantProps.customLabel) {
+    btnLabel = String(ctx.variantProps.customLabel);
+  }
+
   const label = text({
     characters: btnLabel,
     fontFamily: ctx.config.fontFamily.body,
     weight: 500,
-    fontSize: 14,
+    fontSize,
     fill: textHex,
   });
   root.appendChild(label);
+
+  if (iconType === 'trailing') {
+    root.appendChild(buildIcon(iconSize, textHex, 'arrowRight'));
+  } else if (iconType === 'external') {
+    root.appendChild(buildIcon(iconSize, textHex, 'arrowUp'));
+  } else if (iconType === 'badge') {
+    const badge = makeFrame('badge');
+    badge.layoutMode = 'HORIZONTAL';
+    badge.counterAxisAlignItems = 'CENTER';
+    badge.cornerRadius = 9999;
+    pad(badge, 2, 6);
+    badge.fills = [{ type: 'SOLID', color: hexToRgbSafe(isSecondary ? '#F1F5F9' : '#323236') }];
+    badge.appendChild(text({
+      characters: '1.2k',
+      fontFamily: ctx.config.fontFamily.body,
+      weight: 600,
+      fontSize: fontSize - 2,
+      fill: isSecondary ? '#64748B' : '#FFFFFF',
+    }));
+    root.appendChild(badge);
+  }
 
   return root;
 };
