@@ -453,37 +453,43 @@ const ButtonGroup: Template = (root, ctx) => {
 };
 
 const Input: Template = (root, ctx) => {
+  const isMatrix = Boolean(ctx.variantProps.isMatrix);
   const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
   const fieldHeight = Number(ctx.sizeProps.height ?? 40);
-  const fontSize = Number(ctx.sizeProps.fontSize ?? (fieldHeight <= 32 ? 12 : fieldHeight >= 48 ? 15 : 14));
-  const padX = fieldHeight <= 32 ? 10 : fieldHeight >= 48 ? 16 : 12;
-  const iconSz = fieldHeight <= 32 ? 14 : fieldHeight >= 48 ? 18 : 16;
+  const fieldWidth = Number(ctx.sizeProps.width ?? (isMatrix ? 128 : 260));
+  const fontSize = Number(ctx.sizeProps.fontSize ?? (fieldHeight <= 32 ? 11 : fieldHeight >= 48 ? 15 : 13));
+  const padX = isMatrix ? 8 : (fieldHeight <= 32 ? 10 : fieldHeight >= 48 ? 16 : 12);
+  const iconSz = isMatrix ? 13 : (fieldHeight <= 32 ? 14 : fieldHeight >= 48 ? 18 : 16);
   const isPill = ctx.config.radiusPreset === 'pill';
   const isSharp = ctx.config.radiusPreset === 'sharp';
 
-  root.layoutMode = 'VERTICAL';
+  root.layoutMode = isMatrix ? 'HORIZONTAL' : 'VERTICAL';
   root.primaryAxisSizingMode = 'AUTO';
   root.counterAxisSizingMode = 'AUTO';
+  root.primaryAxisAlignItems = 'CENTER';
+  root.counterAxisAlignItems = 'CENTER';
   root.itemSpacing = 6;
   root.fills = [];
 
-  let fallbackLabel = 'First Name';
-  if (vKey === 'email') fallbackLabel = 'Email Address';
-  else if (vKey === 'password') fallbackLabel = 'Password';
-  else if (vKey === 'search') fallbackLabel = 'Search';
-  else if (vKey === 'number') fallbackLabel = 'Quantity';
-  else if (vKey === 'url') fallbackLabel = 'Website URL';
+  if (!isMatrix) {
+    let fallbackLabel = 'First Name';
+    if (vKey === 'email') fallbackLabel = 'Email Address';
+    else if (vKey === 'password') fallbackLabel = 'Password';
+    else if (vKey === 'search') fallbackLabel = 'Search';
+    else if (vKey === 'number') fallbackLabel = 'Quantity';
+    else if (vKey === 'url') fallbackLabel = 'Website URL';
 
-  const labelText = specimenLabel(ctx, fallbackLabel);
-  const lbl = text({
-    characters: labelText,
-    fontFamily: ctx.config.fontFamily.body,
-    weight: 500,
-    fontSize: 12,
-    fill: colorShade(ctx.tokens, 'neutral', 700),
-  });
-  root.appendChild(lbl);
+    const labelText = specimenLabel(ctx, fallbackLabel);
+    const lbl = text({
+      characters: labelText,
+      fontFamily: ctx.config.fontFamily.body,
+      weight: 500,
+      fontSize: 12,
+      fill: colorShade(ctx.tokens, 'neutral', 700),
+    });
+    root.appendChild(lbl);
+  }
 
   const control = makeFrame('control');
   control.layoutMode = 'HORIZONTAL';
@@ -491,20 +497,20 @@ const Input: Template = (root, ctx) => {
   control.counterAxisSizingMode = 'FIXED';
   control.primaryAxisAlignItems = 'MIN';
   control.counterAxisAlignItems = 'CENTER';
-  control.itemSpacing = 8;
+  control.itemSpacing = 6;
   pad(control, 0, padX);
-  control.resize(260, fieldHeight);
+  control.resize(fieldWidth, fieldHeight);
   control.cornerRadius = isPill ? 9999 : isSharp ? 0 : radiusPx(ctx.tokens, 'md');
   control.clipsContent = true;
 
   const isError = sKey === 'error' || sKey === 'invalid';
-  const isFocus = sKey === 'focus';
+  const isFocus = sKey === 'focus' || sKey === 'focused';
   const isHover = sKey === 'hover';
   const isDisabled = sKey === 'disabled';
   const isReadOnly = sKey === 'readonly';
 
   if (isDisabled) {
-    setFill(control, colorShade(ctx.tokens, 'neutral', 50));
+    setFill(control, colorShade(ctx.tokens, 'neutral', 100));
     setStroke(control, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
     root.opacity = 0.6;
   } else if (isReadOnly) {
@@ -545,42 +551,42 @@ const Input: Template = (root, ctx) => {
   const placeholderFill = colorShade(ctx.tokens, 'neutral', 400);
 
   if (ctx.showcaseType === 'size') {
-    control.appendChild(text({ characters: `Sample text (${fieldHeight}px)`, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: placeholderFill }));
+    control.appendChild(text({ characters: `Sample (${fieldHeight}px)`, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: placeholderFill }));
   } else if (vKey === 'email') {
-    control.appendChild(buildIcon(iconSz, colorShade(ctx.tokens, 'neutral', 400), 'mail'));
-    control.appendChild(text({ characters: 'alex@example.com', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: textFill }));
+    control.appendChild(buildIcon(iconSz, isError ? colorShade(ctx.tokens, 'error', 500) : colorShade(ctx.tokens, 'neutral', 400), 'mail'));
+    control.appendChild(text({ characters: isMatrix ? 'alex@ex.com' : 'alex@example.com', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: textFill }));
   } else if (vKey === 'password') {
-    control.appendChild(buildIcon(iconSz, colorShade(ctx.tokens, 'neutral', 400), 'lock'));
-    const val = text({ characters: '••••••••••••', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: textFill });
+    control.appendChild(buildIcon(iconSz, isError ? colorShade(ctx.tokens, 'error', 500) : colorShade(ctx.tokens, 'neutral', 400), 'lock'));
+    const val = text({ characters: '••••••••', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: textFill });
     control.appendChild(val);
     val.layoutSizingHorizontal = 'FILL';
     control.appendChild(buildIcon(iconSz, colorShade(ctx.tokens, 'neutral', 400), 'eye'));
   } else if (vKey === 'search') {
     control.appendChild(buildIcon(iconSz, colorShade(ctx.tokens, 'neutral', 400), 'search'));
-    control.appendChild(text({ characters: 'Search components…', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: placeholderFill }));
+    control.appendChild(text({ characters: isMatrix ? 'Search…' : 'Search components…', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: placeholderFill }));
   } else if (vKey === 'number') {
-    const val = text({ characters: '42', fontFamily: ctx.config.fontFamily.mono, weight: 500, fontSize, fill: textFill });
+    const val = text({ characters: '42', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize, fill: textFill });
     control.appendChild(val);
     val.layoutSizingHorizontal = 'FILL';
     const stepper = hbox('stepper');
-    stepper.itemSpacing = 4;
-    stepper.appendChild(buildIcon(12, colorShade(ctx.tokens, 'neutral', 500), 'minus'));
-    stepper.appendChild(buildIcon(12, colorShade(ctx.tokens, 'neutral', 500), 'plus'));
+    stepper.itemSpacing = 2;
+    stepper.appendChild(buildIcon(11, colorShade(ctx.tokens, 'neutral', 500), 'minus'));
+    stepper.appendChild(buildIcon(11, colorShade(ctx.tokens, 'neutral', 500), 'plus'));
     control.appendChild(stepper);
   } else if (vKey === 'url') {
-    const prefix = text({ characters: 'https://', fontFamily: ctx.config.fontFamily.mono, weight: 500, fontSize: Math.max(11, fontSize - 2), fill: colorShade(ctx.tokens, 'neutral', 400) });
+    const prefix = text({ characters: 'https://', fontFamily: ctx.config.fontFamily.mono, weight: 500, fontSize: Math.max(10, fontSize - 2), fill: colorShade(ctx.tokens, 'neutral', 400) });
     control.appendChild(prefix);
     control.appendChild(text({ characters: 'acme.com', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: textFill }));
   } else {
     let placeholderStr = 'Enter text…';
     let isValue = false;
-    if (sKey === 'focus') {
+    if (isFocus) {
       placeholderStr = 'typing…|';
       isValue = true;
     } else if (sKey === 'readonly') {
-      placeholderStr = 'API_KEY_89412';
+      placeholderStr = 'API_KEY';
       isValue = true;
-    } else if (sKey === 'error') {
+    } else if (isError) {
       placeholderStr = 'invalid-input';
       isValue = true;
     }
@@ -589,7 +595,7 @@ const Input: Template = (root, ctx) => {
 
   root.appendChild(control);
 
-  if (isError) {
+  if (!isMatrix && isError) {
     const errRow = hbox('err');
     errRow.itemSpacing = 4;
     errRow.counterAxisAlignItems = 'CENTER';
@@ -601,45 +607,54 @@ const Input: Template = (root, ctx) => {
 };
 
 const Textarea: Template = (root, ctx) => {
+  const isMatrix = Boolean(ctx.variantProps.isMatrix);
   const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
-  const minH = Number(ctx.sizeProps.minHeight ?? 96);
-  const fontSize = Number(ctx.sizeProps.fontSize ?? (minH <= 64 ? 12 : minH >= 128 ? 15 : 14));
+  const minH = Number(ctx.sizeProps.height ?? (isMatrix ? 58 : 96));
+  const fieldWidth = Number(ctx.sizeProps.width ?? (isMatrix ? 128 : 260));
+  const fontSize = Number(ctx.sizeProps.fontSize ?? (minH <= 64 ? 11 : minH >= 128 ? 15 : 13));
 
-  root.layoutMode = 'VERTICAL';
+  root.layoutMode = isMatrix ? 'HORIZONTAL' : 'VERTICAL';
   root.primaryAxisSizingMode = 'AUTO';
   root.counterAxisSizingMode = 'AUTO';
+  root.primaryAxisAlignItems = 'CENTER';
+  root.counterAxisAlignItems = 'CENTER';
   root.itemSpacing = 6;
   root.fills = [];
 
-  let fallbackLabel = 'Description';
-  if (vKey === 'auto-resize' || vKey === 'autoresize') fallbackLabel = 'Auto-Resize Feedback';
+  if (!isMatrix) {
+    let fallbackLabel = 'Description';
+    if (vKey === 'auto-resize' || vKey === 'autoresize') fallbackLabel = 'Auto-Resize Feedback';
 
-  const labelText = specimenLabel(ctx, fallbackLabel);
-  const lbl = text({
-    characters: labelText,
-    fontFamily: ctx.config.fontFamily.body,
-    weight: 500,
-    fontSize: 12,
-    fill: colorShade(ctx.tokens, 'neutral', 700),
-  });
-  root.appendChild(lbl);
+    const labelText = specimenLabel(ctx, fallbackLabel);
+    const lbl = text({
+      characters: labelText,
+      fontFamily: ctx.config.fontFamily.body,
+      weight: 500,
+      fontSize: 12,
+      fill: colorShade(ctx.tokens, 'neutral', 700),
+    });
+    root.appendChild(lbl);
+  }
 
   const control = makeFrame('control');
   control.layoutMode = 'VERTICAL';
+  control.primaryAxisSizingMode = 'FIXED';
+  control.counterAxisSizingMode = 'FIXED';
   control.primaryAxisAlignItems = 'MIN';
   control.counterAxisAlignItems = 'MIN';
-  pad(control, 10, 12);
-  control.cornerRadius = containerRadius(ctx, 'md', 10);
-  control.resize(260, minH);
+  pad(control, 8, 10);
+  control.cornerRadius = containerRadius(ctx, 'md', 8);
+  control.resize(fieldWidth, minH);
+  control.clipsContent = true;
 
   const isError = sKey === 'error';
-  const isFocus = sKey === 'focus';
+  const isFocus = sKey === 'focus' || sKey === 'focused';
   const isHover = sKey === 'hover';
   const isDisabled = sKey === 'disabled';
 
   if (isDisabled) {
-    setFill(control, colorShade(ctx.tokens, 'neutral', 50));
+    setFill(control, colorShade(ctx.tokens, 'neutral', 100));
     setStroke(control, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
     root.opacity = 0.6;
   } else {
@@ -673,33 +688,39 @@ const Textarea: Template = (root, ctx) => {
     }
   }
 
-  let taMsg = 'Enter your description or message…';
+  let taMsg = isMatrix ? 'Enter text…' : 'Enter your description or message…';
   let isVal = false;
   if (ctx.showcaseType === 'size') {
     taMsg = `Textarea (${minH}px)`;
-  } else if (sKey === 'focus') {
-    taMsg = 'Here is my thoughtful feedback so far…|';
+  } else if (isFocus) {
+    taMsg = isMatrix ? 'Typing feedback…|' : 'Here is my thoughtful feedback so far…|';
     isVal = true;
-  } else if (sKey === 'error') {
-    taMsg = 'Exceeded the maximum allowed 500 characters in this form field…';
+  } else if (isError) {
+    taMsg = isMatrix ? 'Exceeded limit…' : 'Exceeded the maximum allowed 500 characters in this form field…';
     isVal = true;
   }
 
-  const ta = text({ characters: taMsg, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: isVal ? colorShade(ctx.tokens, 'neutral', 900) : colorShade(ctx.tokens, 'neutral', 400) });
+  const ta = text({
+    characters: taMsg,
+    fontFamily: ctx.config.fontFamily.body,
+    weight: 400,
+    fontSize,
+    fill: isVal ? (isError ? colorShade(ctx.tokens, 'error', 600) : colorShade(ctx.tokens, 'neutral', 900)) : colorShade(ctx.tokens, 'neutral', 400),
+  });
   ta.textAutoResize = 'HEIGHT';
   control.appendChild(ta);
 
   if (vKey === 'auto-resize' || vKey === 'autoresize') {
     const handle = hbox('gripper');
     handle.primaryAxisAlignItems = 'MAX';
-    handle.resize(236, 12);
+    handle.resize(fieldWidth - 20, 12);
     handle.appendChild(text({ characters: '◿', fontFamily: ctx.config.fontFamily.mono, weight: 400, fontSize: 10, fill: colorShade(ctx.tokens, 'neutral', 400) }));
     control.appendChild(handle);
   }
 
   root.appendChild(control);
 
-  if (isError) {
+  if (!isMatrix && isError) {
     const errRow = hbox('err');
     errRow.itemSpacing = 4;
     errRow.counterAxisAlignItems = 'CENTER';
