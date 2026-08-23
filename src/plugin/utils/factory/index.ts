@@ -449,7 +449,7 @@ export async function generateComponents(
           rowFrame.resize(CW - 56, 40);
           rowFrame.itemSpacing = 24;
           rowFrame.counterAxisSpacing = 20;
-          rowFrame.counterAxisAlignItems = 'CENTER';
+          rowFrame.counterAxisAlignItems = 'MAX';
           rowFrame.fills = [];
           rowFrame.clipsContent = false;
 
@@ -460,11 +460,11 @@ export async function generateComponents(
             cell.layoutMode = 'VERTICAL';
             cell.primaryAxisSizingMode = 'AUTO';
             cell.counterAxisSizingMode = 'AUTO';
-            cell.primaryAxisAlignItems = 'CENTER';
+            cell.primaryAxisAlignItems = 'MAX';
             cell.counterAxisAlignItems = 'CENTER';
-            cell.itemSpacing = 10;
-            cell.paddingTop = 6;
-            cell.paddingBottom = 6;
+            cell.itemSpacing = 8;
+            cell.paddingTop = 4;
+            cell.paddingBottom = 4;
             cell.paddingLeft = 4;
             cell.paddingRight = 4;
             cell.fills = [];
