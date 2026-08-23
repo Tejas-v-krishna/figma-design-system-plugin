@@ -231,15 +231,18 @@ const Button: Template = (root, ctx) => {
   root.counterAxisAlignItems = 'CENTER';
   root.itemSpacing = 6;
   pad(root, Math.max(6, Math.round((m.height - m.fontSize) / 2)), m.padX);
-  root.cornerRadius = ctx.config.radiusPreset === 'pill' || vKey === 'pill' ? 9999 : ctx.config.radiusPreset === 'sharp' ? 0 : radiusPx(ctx.tokens, 'md');
+  const isPill = Boolean(ctx.variantProps.isPill) || ctx.config.radiusPreset === 'pill' || vKey === 'pill';
+  root.cornerRadius = isPill ? 9999 : ctx.config.radiusPreset === 'sharp' ? 0 : radiusPx(ctx.tokens, 'md');
 
   if (isBlack) {
     if (isHover) {
-      setFill(root, '#292524');
+      setFill(root, '#27272A');
     } else if (isActive) {
-      setFill(root, '#0C0A09');
+      setFill(root, '#09090B');
+    } else if (sKey === 'disabled') {
+      setFill(root, '#D4D4D8');
     } else {
-      setFill(root, '#1C1917');
+      setFill(root, '#18181B');
     }
     if (isFocused) {
       root.effects = [{
@@ -254,7 +257,9 @@ const Button: Template = (root, ctx) => {
     }
   } else if (isGhost) {
     if (isHover) {
-      setFill(root, colorShade(ctx.tokens, 'neutral', 100), colorStyleKey('neutral', 100), ctx.styleMap, ctx.varMap);
+      setFill(root, colorShade(ctx.tokens, 'primary', 50), colorStyleKey('primary', 50), ctx.styleMap, ctx.varMap);
+    } else if (isActive) {
+      setFill(root, colorShade(ctx.tokens, 'primary', 100), colorStyleKey('primary', 100), ctx.styleMap, ctx.varMap);
     } else {
       root.fills = [];
     }
@@ -264,8 +269,10 @@ const Button: Template = (root, ctx) => {
   } else if (isOutline) {
     if (isHover) {
       setFill(root, colorShade(ctx.tokens, 'neutral', 100), colorStyleKey('neutral', 100), ctx.styleMap, ctx.varMap);
+    } else if (isActive) {
+      setFill(root, colorShade(ctx.tokens, 'neutral', 200), colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
     } else {
-      root.fills = [];
+      setFill(root, '#FFFFFF');
     }
     setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1.5, colorStyleKey('neutral', 300), ctx.styleMap, ctx.varMap);
     if (isFocused) {
@@ -276,21 +283,32 @@ const Button: Template = (root, ctx) => {
     setFill(root, colorShade(ctx.tokens, 'information', secShade), colorStyleKey('information', secShade), ctx.styleMap, ctx.varMap);
   } else {
     const baseShade = isHover ? 600 : isActive ? 700 : 500;
-    setFill(root, colorShade(ctx.tokens, t, baseShade), colorStyleKey(t, baseShade), ctx.styleMap, ctx.varMap);
+    if (sKey === 'disabled') {
+      setFill(root, colorShade(ctx.tokens, 'primary', 200), colorStyleKey(t, 200), ctx.styleMap, ctx.varMap);
+    } else {
+      setFill(root, colorShade(ctx.tokens, t, baseShade), colorStyleKey(t, baseShade), ctx.styleMap, ctx.varMap);
+    }
     if (isFocused) {
       root.effects = [{
         type: 'DROP_SHADOW',
-        color: { r: 0.23, g: 0.51, b: 0.96, a: 0.3 },
+        color: { r: 0.23, g: 0.51, b: 0.96, a: 0.35 },
         offset: { x: 0, y: 0 },
         radius: 4,
-        spread: 2,
+        spread: 3,
         visible: true,
         blendMode: 'NORMAL',
       }];
     }
   }
 
-  const textHex = (isGhost || isOutline) ? (vKey === 'tertiary' ? colorShade(ctx.tokens, 'primary', 600) : colorShade(ctx.tokens, 'neutral', 800)) : '#FFFFFF';
+  const textHex = isBlack
+    ? '#FFFFFF'
+    : isGhost
+    ? colorShade(ctx.tokens, 'primary', 600)
+    : isOutline
+    ? colorShade(ctx.tokens, 'neutral', 900)
+    : '#FFFFFF';
+
   root.opacity = disabledOpacity(ctx);
 
   const loading = sKey === 'loading';
@@ -305,16 +323,14 @@ const Button: Template = (root, ctx) => {
     btnLabel = 'Loading…';
   } else if (ctx.showcaseType === 'size') {
     btnLabel = `Button (${m.height}px)`;
-  } else if (ctx.showcaseType === 'state') {
-    btnLabel = specimenLabel(ctx, 'Button');
-  } else {
-    btnLabel = specimenLabel(ctx, titleCase(ctx.variantName || 'Button'));
+  } else if (ctx.variantProps.customLabel) {
+    btnLabel = String(ctx.variantProps.customLabel);
   }
 
   const label = text({
     characters: btnLabel,
     fontFamily: ctx.config.fontFamily.body,
-    weight: 500,
+    weight: 600,
     fontSize: m.fontSize,
     fill: textHex,
   });
@@ -329,46 +345,61 @@ const Button: Template = (root, ctx) => {
 
 const IconButton: Template = (root, ctx) => {
   const t = tone(ctx);
-  const m = sizeMetrics(ctx);
   const vKey = variantKey(ctx);
-  const isHover = ctx.stateName.toLowerCase() === 'hover';
+  const sKey = ctx.stateName.toLowerCase();
+  const isHover = sKey === 'hover';
+  const isActive = sKey === 'active';
+  const isFocused = sKey === 'focused' || sKey === 'focus';
+  const isBlack = vKey === 'black' || vKey === 'dark' || Boolean(ctx.variantProps.isBlack);
   const isGhost = vKey === 'ghost';
   const isOutline = vKey === 'outline' || vKey === 'tertiary';
-  const isSecondary = vKey === 'secondary' || vKey === 'information';
-  const baseShade = isHover ? 600 : ctx.stateName.toLowerCase() === 'active' ? 700 : 500;
+  const baseShade = isHover ? 600 : isActive ? 700 : 500;
 
   root.layoutMode = 'HORIZONTAL';
   root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
   pad(root, 0);
-  root.resize(m.height, m.height);
-  root.cornerRadius = ctx.config.radiusPreset === 'pill' ? 9999 : ctx.config.radiusPreset === 'sharp' ? 0 : radiusPx(ctx.tokens, 'md');
+  const iconBtnSize = ctx.sizeName === 'sm' ? 32 : 40;
+  root.resize(iconBtnSize, iconBtnSize);
+  root.cornerRadius = 9999;
 
-  if (isGhost) {
-    if (isHover) {
-      setFill(root, colorShade(ctx.tokens, 'neutral', 100), colorStyleKey('neutral', 100), ctx.styleMap, ctx.varMap);
-    } else {
-      root.fills = [];
-    }
+  let fgHex = '#FFFFFF';
+
+  if (isBlack) {
+    if (isHover) setFill(root, '#27272A');
+    else if (isActive) setFill(root, '#09090B');
+    else if (sKey === 'disabled') setFill(root, '#D4D4D8');
+    else setFill(root, '#18181B');
+    fgHex = '#FFFFFF';
+  } else if (isGhost) {
+    if (isHover) setFill(root, colorShade(ctx.tokens, 'neutral', 100));
+    else root.fills = [];
+    fgHex = colorShade(ctx.tokens, 'neutral', 700);
   } else if (isOutline) {
-    if (isHover) {
-      setFill(root, colorShade(ctx.tokens, 'neutral', 100), colorStyleKey('neutral', 100), ctx.styleMap, ctx.varMap);
-    } else {
-      root.fills = [];
-    }
-    setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1, colorStyleKey('neutral', 300), ctx.styleMap, ctx.varMap);
-  } else if (isSecondary) {
-    setFill(root, colorShade(ctx.tokens, 'information', baseShade), colorStyleKey('information', baseShade), ctx.styleMap, ctx.varMap);
+    if (isHover) setFill(root, colorShade(ctx.tokens, 'neutral', 100));
+    else setFill(root, '#FFFFFF');
+    setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1.5);
+    fgHex = colorShade(ctx.tokens, 'neutral', 700);
   } else {
-    setFill(root, colorShade(ctx.tokens, t, baseShade), colorStyleKey(t, baseShade), ctx.styleMap, ctx.varMap);
+    setFill(root, colorShade(ctx.tokens, t, baseShade));
+    fgHex = '#FFFFFF';
   }
 
-  root.opacity = disabledOpacity(ctx);
-  let iconType: IconKind = 'search';
-  if (t === 'error') iconType = 'close';
-  if (t === 'success') iconType = 'check';
-  const iconColor = (isGhost || isOutline) ? colorShade(ctx.tokens, 'neutral', 800) : '#FFFFFF';
-  root.appendChild(buildIcon(Math.round(m.height * 0.45), iconColor, iconType));
+  if (isFocused) {
+    root.effects = [{
+      type: 'DROP_SHADOW',
+      color: { r: 0.23, g: 0.51, b: 0.96, a: 0.35 },
+      offset: { x: 0, y: 0 },
+      radius: 4,
+      spread: 3,
+      visible: true,
+      blendMode: 'NORMAL',
+    }];
+  }
+
+  root.opacity = sKey === 'disabled' ? 0.6 : 1;
+  root.appendChild(buildIcon(ctx.sizeName === 'sm' ? 14 : 16, fgHex, 'star'));
+
   return root;
 };
 
