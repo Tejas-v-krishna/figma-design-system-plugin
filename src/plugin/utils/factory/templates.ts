@@ -3717,15 +3717,16 @@ const CurrencyInput: Template = (root, ctx) => {
 };
 
 const PhoneInput: Template = (root, ctx) => {
+  const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
   const fieldHeight = 44;
   const fieldWidth = ctx.showcaseType === 'size' ? 240 : 176;
 
   root.layoutMode = 'HORIZONTAL';
   root.counterAxisAlignItems = 'CENTER';
-  root.itemSpacing = 8;
+  root.itemSpacing = 6;
   root.resize(fieldWidth, fieldHeight);
-  pad(root, 0, 12);
+  pad(root, 0, 10);
   root.cornerRadius = 10;
 
   const isFocus = sKey === 'focus' || sKey === 'focused';
@@ -3754,17 +3755,36 @@ const PhoneInput: Template = (root, ctx) => {
   root.strokes = [];
   root.effects = [];
 
-  const flagBox = hbox('flag');
-  flagBox.itemSpacing = 4;
-  flagBox.counterAxisAlignItems = 'CENTER';
-  flagBox.appendChild(text({ characters: '🇺🇸 +1', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: '#18181B' }));
-  flagBox.appendChild(buildIcon(10, chevronColor, 'chevronDown'));
-  root.appendChild(flagBox);
+  const prefixBox = hbox('prefix');
+  prefixBox.itemSpacing = 3;
+  prefixBox.counterAxisAlignItems = 'CENTER';
 
-  const sep = line(16, '#E4E4E7', 1);
+  if (vKey.includes('country')) {
+    prefixBox.appendChild(text({ characters: '🇺🇸 US', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 11, fill: textFill }));
+    prefixBox.appendChild(buildIcon(10, chevronColor, 'chevronDown'));
+  } else if (vKey.includes('flag') || (!vKey.includes('simple') && !vKey.includes('country'))) {
+    prefixBox.appendChild(text({ characters: '🇺🇸 +1', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 11, fill: textFill }));
+    prefixBox.appendChild(buildIcon(10, chevronColor, 'chevronDown'));
+  } else {
+    // SimplePrefix: pure text "+1" without flag and without chevron
+    prefixBox.appendChild(text({ characters: '+1', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 12, fill: textFill }));
+  }
+  root.appendChild(prefixBox);
+
+  // Vertical Separator Divider (not horizontal line!)
+  const sep = makeFrame('sep');
+  sep.resize(1, 14);
+  setFill(sep, isFocus ? '#BFDBFE' : '#D4D4D8');
   root.appendChild(sep);
 
-  root.appendChild(text({ characters: isFocus ? '(555) 019-|' : '(555) 019-2834', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: textFill }));
+  root.appendChild(text({
+    characters: isFocus ? '(555) 019-|' : '(555) 019-2834',
+    fontFamily: ctx.config.fontFamily.body,
+    weight: 400,
+    fontSize: 11,
+    fill: textFill,
+  }));
+
   return root;
 };
 

@@ -274,8 +274,9 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
     name: 'PhoneInput',
     category: 'inputs',
     variants: [
-      { name: 'WithFlagDropdown', properties: { variant: 'withflagdropdown' } },
+      { name: 'WithFlag', properties: { variant: 'withflag' } },
       { name: 'SimplePrefix', properties: { variant: 'simpleprefix' } },
+      { name: 'CountryCode', properties: { variant: 'countrycode' } },
     ],
     states: [
       { name: 'Default', properties: { state: 'default' } },
@@ -284,9 +285,9 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
       { name: 'Disabled', properties: { state: 'disabled' } },
     ],
     sizes: [
-      { name: 'md', properties: { name: 'md', height: 40 } },
+      { name: 'md', properties: { name: 'md', height: 44 } },
     ],
-    defaultProps: { variant: 'withflagdropdown', state: 'default' },
+    defaultProps: { variant: 'withflag', state: 'default' },
   },
   {
     name: 'PinInput',
