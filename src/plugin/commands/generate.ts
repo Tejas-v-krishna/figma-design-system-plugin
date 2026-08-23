@@ -109,6 +109,16 @@ async function runGeneration(
   }
 
   if (targetMode === 'components') {
+    // An empty selection here is not the "build everything" sentinel it is on the
+    // full run: the user came from the components picker and chose nothing.
+    // Without this the run created an empty page and reported "Components
+    // generated successfully!", which is a silent no-op dressed up as a success.
+    if (config.componentsToGenerate.length === 0) {
+      throw new Error(
+        'No components are selected. Pick at least one in Build Components, or use Select all.'
+      );
+    }
+
     update('creating-pages', 50, 'Generating Components page…');
     const compPage = await openPage('🧩 Components');
 
