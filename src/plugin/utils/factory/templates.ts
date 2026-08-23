@@ -788,52 +788,53 @@ const ButtonGroup: Template = (root, ctx) => {
 };
 
 const Input: Template = (root, ctx) => {
-  const isMatrix = Boolean(ctx.variantProps.isMatrix);
   const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
   const fieldHeight = Number(ctx.sizeProps.height ?? 40);
-  const fieldWidth = Number(ctx.sizeProps.width ?? (isMatrix ? 128 : 260));
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 176;
   const fontSize = Number(ctx.sizeProps.fontSize ?? (fieldHeight <= 32 ? 11 : fieldHeight >= 48 ? 15 : 13));
-  const padX = isMatrix ? 8 : (fieldHeight <= 32 ? 10 : fieldHeight >= 48 ? 16 : 12);
-  const iconSz = isMatrix ? 13 : (fieldHeight <= 32 ? 14 : fieldHeight >= 48 ? 18 : 16);
+  const padX = fieldHeight <= 32 ? 10 : fieldHeight >= 48 ? 14 : 12;
+  const iconSz = fieldHeight <= 32 ? 13 : fieldHeight >= 48 ? 17 : 15;
   const isPill = ctx.config.radiusPreset === 'pill';
   const isSharp = ctx.config.radiusPreset === 'sharp';
 
-  root.layoutMode = isMatrix ? 'HORIZONTAL' : 'VERTICAL';
+  root.layoutMode = 'VERTICAL';
   root.primaryAxisSizingMode = 'AUTO';
   root.counterAxisSizingMode = 'AUTO';
-  root.primaryAxisAlignItems = 'CENTER';
-  root.counterAxisAlignItems = 'CENTER';
-  root.itemSpacing = 6;
+  root.primaryAxisAlignItems = 'MIN';
+  root.counterAxisAlignItems = 'MIN';
+  root.itemSpacing = 4;
   root.fills = [];
 
-  if (!isMatrix) {
-    let fallbackLabel = 'First Name';
-    if (vKey === 'email') fallbackLabel = 'Email Address';
-    else if (vKey === 'password') fallbackLabel = 'Password';
-    else if (vKey === 'search') fallbackLabel = 'Search';
-    else if (vKey === 'number') fallbackLabel = 'Quantity';
-    else if (vKey === 'url') fallbackLabel = 'Website URL';
+  const isFloating = vKey.includes('floating');
 
-    const labelText = specimenLabel(ctx, fallbackLabel);
+  // Label above field (only if not floating, and clean contextual name per variant)
+  if (!isFloating && ctx.showcaseType !== 'size') {
+    let fieldLabel = 'Text Field';
+    if (vKey.includes('email')) fieldLabel = 'Email Address';
+    else if (vKey.includes('url')) fieldLabel = 'Website URL';
+    else if (vKey.includes('phone') || vKey.includes('tel')) fieldLabel = 'Phone Number';
+    else if (vKey.includes('withicon') || vKey.includes('search')) fieldLabel = 'Search';
+    else if (vKey.includes('password')) fieldLabel = 'Password';
+
     const lbl = text({
-      characters: labelText,
+      characters: fieldLabel,
       fontFamily: ctx.config.fontFamily.body,
       weight: 500,
-      fontSize: 12,
-      fill: colorShade(ctx.tokens, 'neutral', 700),
+      fontSize: 11,
+      fill: '#71717A',
     });
     root.appendChild(lbl);
   }
 
   const control = makeFrame('control');
-  control.layoutMode = 'HORIZONTAL';
+  control.layoutMode = isFloating ? 'VERTICAL' : 'HORIZONTAL';
   control.primaryAxisSizingMode = 'FIXED';
   control.counterAxisSizingMode = 'FIXED';
-  control.primaryAxisAlignItems = 'MIN';
+  control.primaryAxisAlignItems = isFloating ? 'CENTER' : 'MIN';
   control.counterAxisAlignItems = 'CENTER';
   control.itemSpacing = 6;
-  pad(control, 0, padX);
+  pad(control, isFloating ? 4 : 0, padX);
   control.resize(fieldWidth, fieldHeight);
   control.cornerRadius = isPill ? 9999 : isSharp ? 0 : radiusPx(ctx.tokens, 'md');
   control.clipsContent = true;
@@ -845,19 +846,19 @@ const Input: Template = (root, ctx) => {
   const isReadOnly = sKey === 'readonly';
 
   if (isDisabled) {
-    setFill(control, colorShade(ctx.tokens, 'neutral', 100));
-    setStroke(control, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
+    setFill(control, '#FAFAFA');
+    setStroke(control, '#E4E4E7', 1);
     root.opacity = 0.6;
   } else if (isReadOnly) {
-    setFill(control, colorShade(ctx.tokens, 'neutral', 50));
-    setStroke(control, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
+    setFill(control, '#F4F4F5');
+    setStroke(control, '#E4E4E7', 1);
   } else {
     setFill(control, '#FFFFFF');
     if (isError) {
-      setStroke(control, colorShade(ctx.tokens, 'error', 500), 1.5, colorStyleKey('error', 500), ctx.styleMap, ctx.varMap);
+      setStroke(control, '#DC2626', 1.5);
       control.effects = [{
         type: 'DROP_SHADOW',
-        color: { r: 0.94, g: 0.27, b: 0.27, a: 0.15 },
+        color: { r: 0.86, g: 0.15, b: 0.15, a: 0.15 },
         offset: { x: 0, y: 0 },
         radius: 4,
         spread: 0,
@@ -865,10 +866,10 @@ const Input: Template = (root, ctx) => {
         blendMode: 'NORMAL',
       }];
     } else if (isFocus) {
-      setStroke(control, colorShade(ctx.tokens, 'primary', 500), 1.5, colorStyleKey('primary', 500), ctx.styleMap, ctx.varMap);
+      setStroke(control, '#18181B', 1.5);
       control.effects = [{
         type: 'DROP_SHADOW',
-        color: { r: 0.23, g: 0.51, b: 0.96, a: 0.18 },
+        color: { r: 0.09, g: 0.09, b: 0.11, a: 0.14 },
         offset: { x: 0, y: 0 },
         radius: 4,
         spread: 0,
@@ -876,68 +877,59 @@ const Input: Template = (root, ctx) => {
         blendMode: 'NORMAL',
       }];
     } else if (isHover) {
-      setStroke(control, colorShade(ctx.tokens, 'neutral', 400), 1, colorStyleKey('neutral', 400), ctx.styleMap, ctx.varMap);
+      setStroke(control, '#71717A', 1);
     } else {
-      setStroke(control, colorShade(ctx.tokens, 'neutral', 300), 1, colorStyleKey('neutral', 300), ctx.styleMap, ctx.varMap);
+      setStroke(control, '#E4E4E7', 1);
     }
   }
 
-  const textFill = isDisabled ? colorShade(ctx.tokens, 'neutral', 400) : isReadOnly ? colorShade(ctx.tokens, 'neutral', 700) : colorShade(ctx.tokens, 'neutral', 900);
-  const placeholderFill = colorShade(ctx.tokens, 'neutral', 400);
+  const textFill = isDisabled ? '#A1A1AA' : '#18181B';
+  const placeholderFill = '#A1A1AA';
 
   if (ctx.showcaseType === 'size') {
     control.appendChild(text({ characters: `Sample (${fieldHeight}px)`, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: placeholderFill }));
-  } else if (vKey === 'email') {
-    control.appendChild(buildIcon(iconSz, isError ? colorShade(ctx.tokens, 'error', 500) : colorShade(ctx.tokens, 'neutral', 400), 'mail'));
-    control.appendChild(text({ characters: isMatrix ? 'alex@ex.com' : 'alex@example.com', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: textFill }));
-  } else if (vKey === 'password') {
-    control.appendChild(buildIcon(iconSz, isError ? colorShade(ctx.tokens, 'error', 500) : colorShade(ctx.tokens, 'neutral', 400), 'lock'));
+  } else if (isFloating) {
+    const floatLabel = text({ characters: 'Full Name', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 9, fill: isFocus ? '#18181B' : isError ? '#DC2626' : '#71717A' });
+    control.appendChild(floatLabel);
+    const floatVal = text({ characters: isFocus ? 'Alex Morgan|' : isError ? 'alex_99' : 'Alex Morgan', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: textFill });
+    control.appendChild(floatVal);
+  } else if (vKey.includes('email')) {
+    control.appendChild(buildIcon(iconSz, isError ? '#DC2626' : isFocus ? '#18181B' : '#71717A', 'mail'));
+    control.appendChild(text({ characters: isFocus ? 'alex@|' : isError ? 'invalid-email' : 'alex@domain.com', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: Math.max(11, fontSize - 1), fill: textFill }));
+  } else if (vKey.includes('phone') || vKey.includes('tel')) {
+    control.appendChild(buildIcon(iconSz, isError ? '#DC2626' : isFocus ? '#18181B' : '#71717A', 'phone'));
+    control.appendChild(text({ characters: isFocus ? '+1 (555) |' : '+1 (555) 019-2834', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: Math.max(11, fontSize - 1), fill: textFill }));
+  } else if (vKey.includes('withicon') || vKey.includes('search')) {
+    control.appendChild(buildIcon(iconSz, isError ? '#DC2626' : isFocus ? '#18181B' : '#71717A', 'search'));
+    control.appendChild(text({ characters: isFocus ? 'Search query|' : 'Search components…', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: Math.max(11, fontSize - 1), fill: isFocus ? textFill : placeholderFill }));
+  } else if (vKey.includes('password')) {
+    control.appendChild(buildIcon(iconSz, isError ? '#DC2626' : '#71717A', 'lock'));
     const val = text({ characters: '••••••••', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: textFill });
     control.appendChild(val);
     val.layoutSizingHorizontal = 'FILL';
-    control.appendChild(buildIcon(iconSz, colorShade(ctx.tokens, 'neutral', 400), 'eye'));
-  } else if (vKey === 'search') {
-    control.appendChild(buildIcon(iconSz, colorShade(ctx.tokens, 'neutral', 400), 'search'));
-    control.appendChild(text({ characters: isMatrix ? 'Search…' : 'Search components…', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: placeholderFill }));
-  } else if (vKey === 'number') {
-    const val = text({ characters: '42', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize, fill: textFill });
-    control.appendChild(val);
-    val.layoutSizingHorizontal = 'FILL';
-    const stepper = hbox('stepper');
-    stepper.itemSpacing = 2;
-    stepper.appendChild(buildIcon(11, colorShade(ctx.tokens, 'neutral', 500), 'minus'));
-    stepper.appendChild(buildIcon(11, colorShade(ctx.tokens, 'neutral', 500), 'plus'));
-    control.appendChild(stepper);
-  } else if (vKey === 'url') {
-    const prefix = text({ characters: 'https://', fontFamily: ctx.config.fontFamily.mono, weight: 500, fontSize: Math.max(10, fontSize - 2), fill: colorShade(ctx.tokens, 'neutral', 400) });
+    control.appendChild(buildIcon(iconSz, '#71717A', 'eye'));
+  } else if (vKey.includes('url')) {
+    const prefix = text({ characters: 'https://', fontFamily: ctx.config.fontFamily.mono, weight: 500, fontSize: Math.max(10, fontSize - 2), fill: isFocus ? '#18181B' : '#71717A' });
     control.appendChild(prefix);
-    control.appendChild(text({ characters: 'acme.com', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: textFill }));
+    control.appendChild(text({ characters: isFocus ? 'acme.|' : 'acme.design', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: Math.max(11, fontSize - 1), fill: textFill }));
   } else {
+    // Plain Text
     let placeholderStr = 'Enter text…';
     let isValue = false;
     if (isFocus) {
-      placeholderStr = 'typing…|';
+      placeholderStr = 'Typing…|';
       isValue = true;
     } else if (sKey === 'readonly') {
-      placeholderStr = 'API_KEY';
+      placeholderStr = 'Read-only value';
       isValue = true;
     } else if (isError) {
-      placeholderStr = 'invalid-input';
+      placeholderStr = 'Invalid input';
       isValue = true;
     }
     control.appendChild(text({ characters: placeholderStr, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: isValue ? textFill : placeholderFill }));
   }
 
   root.appendChild(control);
-
-  if (!isMatrix && isError) {
-    const errRow = hbox('err');
-    errRow.itemSpacing = 4;
-    errRow.counterAxisAlignItems = 'CENTER';
-    errRow.appendChild(buildIcon(12, colorShade(ctx.tokens, 'error', 500), 'warning'));
-    errRow.appendChild(text({ characters: 'This field is required', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: colorShade(ctx.tokens, 'error', 600) }));
-    root.appendChild(errRow);
-  }
   return root;
 };
 
