@@ -395,7 +395,16 @@ export const useStore = create<UIState>((set, get) => ({
     get().persist();
   },
   importPalette: (patch) => {
-    set((s) => ({ config: { ...s.config, ...patch }, importOpen: false, view: 'brand' }));
+    // Lands on the Colors panel, not just on Set Tokens. The view alone left the
+    // token category wherever it was, so importing a palette while Radius was
+    // open closed the dialog onto a list of corner radii — nothing on screen had
+    // changed, and the only way to see the imported colours was to go looking.
+    set((s) => ({
+      config: { ...s.config, ...patch },
+      importOpen: false,
+      view: 'brand',
+      tokenCategory: 'colors',
+    }));
     get().persist();
   },
   hydrateConfig: (saved) => {
