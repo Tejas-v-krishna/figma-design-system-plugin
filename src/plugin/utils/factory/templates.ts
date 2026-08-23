@@ -966,25 +966,18 @@ const Radio: Template = (root, ctx) => {
   ring.primaryAxisAlignItems = 'CENTER';
   ring.counterAxisAlignItems = 'CENTER';
   ring.resize(d, d);
+  ring.cornerRadius = 9999;
+  setFill(ring, '#FFFFFF');
 
-  const ringShape = ellipse('ring-shape', d, '#FFFFFF');
   if (isDisabled) {
-    setStroke(ringShape, colorShade(ctx.tokens, 'neutral', 300), 1.5, colorStyleKey('neutral', 300), ctx.styleMap, ctx.varMap);
+    setStroke(ring, colorShade(ctx.tokens, 'neutral', 300), 1.5, colorStyleKey('neutral', 300), ctx.styleMap, ctx.varMap);
     root.opacity = 0.5;
   } else if (isChecked) {
-    setStroke(ringShape, colorShade(ctx.tokens, 'primary', 500), 2, colorStyleKey('primary', 500), ctx.styleMap, ctx.varMap);
-  } else {
-    setStroke(ringShape, colorShade(ctx.tokens, 'neutral', 400), 1.5, colorStyleKey('neutral', 400), ctx.styleMap, ctx.varMap);
-  }
-  ring.appendChild(ringShape);
-  ringShape.layoutPositioning = 'ABSOLUTE';
-
-  if (isChecked) {
+    setStroke(ring, colorShade(ctx.tokens, 'primary', 500), 2, colorStyleKey('primary', 500), ctx.styleMap, ctx.varMap);
     const dot = ellipse('dot', Math.round(d * 0.5), colorShade(ctx.tokens, 'primary', 500));
     ring.appendChild(dot);
-    dot.layoutPositioning = 'ABSOLUTE';
-    dot.x = Math.round(d * 0.25);
-    dot.y = Math.round(d * 0.25);
+  } else {
+    setStroke(ring, colorShade(ctx.tokens, 'neutral', 400), 1.5, colorStyleKey('neutral', 400), ctx.styleMap, ctx.varMap);
   }
 
   root.appendChild(ring);
@@ -1011,7 +1004,9 @@ const Switch: Template = (root, ctx) => {
   const track = makeFrame('track');
   track.layoutMode = 'HORIZONTAL';
   track.counterAxisAlignItems = 'CENTER';
+  track.primaryAxisAlignItems = on ? 'MAX' : 'MIN';
   track.resize(w, h);
+  pad(track, 3, 3);
   track.cornerRadius = 9999;
 
   if (isDisabled) {
@@ -1024,9 +1019,6 @@ const Switch: Template = (root, ctx) => {
   }
 
   const knob = ellipse('knob', knobSz, '#FFFFFF');
-  knob.x = on ? (w - knobSz - 3) : 3;
-  knob.y = 3;
-  knob.layoutPositioning = 'ABSOLUTE';
   track.appendChild(knob);
   root.appendChild(track);
 
@@ -1055,7 +1047,6 @@ const Slider: Template = (root, ctx) => {
   root.itemSpacing = 6;
   root.fills = [];
 
-  const isRange = vKey === 'range';
   const withLabels = vKey === 'withlabels' || vKey === 'with-labels';
   const isDisabled = sKey === 'disabled';
 
@@ -1069,44 +1060,21 @@ const Slider: Template = (root, ctx) => {
     root.appendChild(topLabels);
   }
 
-  const bar = makeFrame('bar');
-  bar.layoutMode = 'HORIZONTAL';
+  const bar = hbox('bar');
+  bar.resize(220, 20);
+  bar.itemSpacing = 0;
   bar.counterAxisAlignItems = 'CENTER';
-  bar.resize(220, 24);
 
-  const track = makeFrame('track');
-  track.resize(220, 6);
-  track.cornerRadius = 9999;
-  setFill(track, colorShade(ctx.tokens, 'neutral', 200));
+  const fill = rect('fillTrack', 110, 6, colorShade(ctx.tokens, 'primary', 500));
+  fill.cornerRadius = 9999;
+  const knob = ellipse('knob', 16, '#FFFFFF');
+  setStroke(knob, colorShade(ctx.tokens, 'primary', 500), 2);
+  const empty = rect('emptyTrack', 94, 6, colorShade(ctx.tokens, 'neutral', 200));
+  empty.cornerRadius = 9999;
 
-  if (isRange) {
-    const fill = rect('fill', 100, 6, colorShade(ctx.tokens, 'primary', 500));
-    fill.cornerRadius = 9999;
-    fill.x = 40;
-    fill.layoutPositioning = 'ABSOLUTE';
-    track.appendChild(fill);
-    bar.appendChild(track);
-
-    const knob1 = ellipse('knob-min', 18, '#FFFFFF');
-    setStroke(knob1, colorShade(ctx.tokens, 'primary', 500), 2);
-    knob1.x = 32; knob1.y = 3; knob1.layoutPositioning = 'ABSOLUTE';
-    bar.appendChild(knob1);
-
-    const knob2 = ellipse('knob-max', 18, '#FFFFFF');
-    setStroke(knob2, colorShade(ctx.tokens, 'primary', 500), 2);
-    knob2.x = 132; knob2.y = 3; knob2.layoutPositioning = 'ABSOLUTE';
-    bar.appendChild(knob2);
-  } else {
-    const fill = rect('fill', 130, 6, colorShade(ctx.tokens, 'primary', 500));
-    fill.cornerRadius = 9999;
-    track.appendChild(fill);
-    bar.appendChild(track);
-
-    const knob = ellipse('knob', 18, '#FFFFFF');
-    setStroke(knob, colorShade(ctx.tokens, 'primary', 500), 2);
-    knob.x = 121; knob.y = 3; knob.layoutPositioning = 'ABSOLUTE';
-    bar.appendChild(knob);
-  }
+  bar.appendChild(fill);
+  bar.appendChild(knob);
+  bar.appendChild(empty);
 
   if (isDisabled) root.opacity = 0.5;
   root.appendChild(bar);
@@ -1330,10 +1298,9 @@ const AvatarStack: Template = (root, ctx) => {
     a.primaryAxisAlignItems = 'CENTER';
     a.counterAxisAlignItems = 'CENTER';
     a.resize(36, 36);
-    const shape = ellipse('shape', 36, colorShade(ctx.tokens, member.tone, 400));
-    setStroke(shape, '#FFFFFF', 2);
-    a.appendChild(shape);
-    shape.layoutPositioning = 'ABSOLUTE';
+    a.cornerRadius = 9999;
+    setFill(a, colorShade(ctx.tokens, member.tone, 400));
+    setStroke(a, '#FFFFFF', 2);
     a.appendChild(text({ characters: member.initial, fontFamily: ctx.config.fontFamily.heading, weight: 600, fontSize: 14, fill: '#FFFFFF', align: 'CENTER' }));
     root.appendChild(a);
   }
@@ -1532,9 +1499,8 @@ const Stepper: Template = (root, ctx) => {
     dot.primaryAxisAlignItems = 'CENTER';
     dot.counterAxisAlignItems = 'CENTER';
     dot.resize(28, 28);
-    const circle = ellipse('shape', 28, i <= 1 ? colorShade(ctx.tokens, 'primary', 500) : colorShade(ctx.tokens, 'neutral', 200));
-    dot.appendChild(circle);
-    circle.layoutPositioning = 'ABSOLUTE';
+    dot.cornerRadius = 9999;
+    setFill(dot, i <= 1 ? colorShade(ctx.tokens, 'primary', 500) : colorShade(ctx.tokens, 'neutral', 200));
     dot.appendChild(text({ characters: String(i + 1), fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 13, fill: i <= 1 ? '#FFFFFF' : colorShade(ctx.tokens, 'neutral', 500), align: 'CENTER' }));
     root.appendChild(dot);
     if (i < 2) {
@@ -2935,16 +2901,14 @@ const RadioCard: Template = (root, ctx) => {
   const left = hbox('left');
   left.itemSpacing = 12;
   const radio = makeFrame('radio');
+  radio.layoutMode = 'HORIZONTAL';
+  radio.primaryAxisAlignItems = 'CENTER';
+  radio.counterAxisAlignItems = 'CENTER';
   radio.resize(18, 18);
   radio.cornerRadius = 9999;
   setFill(radio, '#FFFFFF');
   setStroke(radio, colorShade(ctx.tokens, 'primary', 500), 2);
-  const dot = makeFrame('dot');
-  dot.resize(8, 8);
-  dot.cornerRadius = 9999;
-  setFill(dot, colorShade(ctx.tokens, 'primary', 500));
-  dot.layoutPositioning = 'ABSOLUTE';
-  dot.x = 5; dot.y = 5;
+  const dot = ellipse('dot', 8, colorShade(ctx.tokens, 'primary', 500));
   radio.appendChild(dot);
   left.appendChild(radio);
 
@@ -2966,27 +2930,29 @@ const RangeSlider: Template = (root, ctx) => {
   root.itemSpacing = 6;
   root.resize(240, 32);
 
-  const track = makeFrame('track');
-  track.resize(240, 6);
-  track.cornerRadius = 9999;
-  setFill(track, colorShade(ctx.tokens, 'neutral', 200));
+  const bar = hbox('bar');
+  bar.resize(240, 20);
+  bar.itemSpacing = 0;
+  bar.counterAxisAlignItems = 'CENTER';
 
-  const bar = rect('fill', 120, 6, colorShade(ctx.tokens, 'primary', 500));
-  bar.x = 40;
-  bar.layoutPositioning = 'ABSOLUTE';
-  track.appendChild(bar);
-
+  const tLeft = rect('tLeft', 40, 6, colorShade(ctx.tokens, 'neutral', 200));
+  tLeft.cornerRadius = 9999;
   const k1 = ellipse('k1', 16, '#FFFFFF');
   setStroke(k1, colorShade(ctx.tokens, 'primary', 500), 2);
-  k1.x = 36; k1.y = -5; k1.layoutPositioning = 'ABSOLUTE';
-  track.appendChild(k1);
-
+  const tActive = rect('tActive', 110, 6, colorShade(ctx.tokens, 'primary', 500));
+  tActive.cornerRadius = 9999;
   const k2 = ellipse('k2', 16, '#FFFFFF');
   setStroke(k2, colorShade(ctx.tokens, 'primary', 500), 2);
-  k2.x = 156; k2.y = -5; k2.layoutPositioning = 'ABSOLUTE';
-  track.appendChild(k2);
+  const tRight = rect('tRight', 58, 6, colorShade(ctx.tokens, 'neutral', 200));
+  tRight.cornerRadius = 9999;
 
-  root.appendChild(track);
+  bar.appendChild(tLeft);
+  bar.appendChild(k1);
+  bar.appendChild(tActive);
+  bar.appendChild(k2);
+  bar.appendChild(tRight);
+
+  root.appendChild(bar);
   return root;
 };
 
