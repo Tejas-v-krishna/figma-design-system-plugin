@@ -13,6 +13,9 @@ import { yieldToUI } from '../yield';
 import { hexToRgb } from '../../../shared/color-utils';
 import { CW, boardShell, createBlackHeroBox, mkDivider } from '../boards';
 import { ensureFont } from '../fonts';
+import { buildDesignSystemBentoBoard } from './bentoBoard';
+import { buildButtonMatrixBoard } from './buttonMatrix';
+import { buildInputMatrixBoard } from './inputMatrix';
 
 const CATEGORY_LABELS: Record<string, string> = {
   buttons: 'Buttons',
@@ -152,27 +155,60 @@ export async function generateComponents(
   const frames: Record<string, FrameNode> = {};
   const byName = new Map<string, ComponentNode | ComponentSetNode>();
   let count = 0;
-  let catIndex = 0;
-  const boardWidth = CW + 48 * 2;
-  const gutter = 120;
 
   // Remove previous category frames so repeated runs update cleanly
   for (const child of [...componentsPage.children]) {
-    if (Object.values(CATEGORY_LABELS).includes(child.name) || child.name === 'Components Master') {
-      child.remove();
+    child.remove();
+  }
+
+  const generatedBoards: FrameNode[] = [];
+
+  // 1. Always generate the Design System Bento Master Board (Image 5)
+  try {
+    const bentoBoard = await buildDesignSystemBentoBoard(tokens, config, styleMap, varMap);
+    componentsPage.appendChild(bentoBoard);
+    generatedBoards.push(bentoBoard);
+  } catch (err) {
+    console.error('[design-system-kit] Bento board failed to generate:', err);
+  }
+
+  // 2. Generate the 04. Buttons State Matrix Board (Image 4)
+  if (config.componentsToGenerate.includes('Button')) {
+    try {
+      const buttonBoard = await buildButtonMatrixBoard(tokens, config, styleMap, varMap);
+      componentsPage.appendChild(buttonBoard);
+      generatedBoards.push(buttonBoard);
+    } catch (err) {
+      console.error('[design-system-kit] Button matrix failed to generate:', err);
     }
   }
 
-  for (const [index, def] of selected.entries()) {
+  // 3. Generate the 05. Inputs & Form Controls Matrix Board
+  if (config.componentsToGenerate.includes('Input') || config.componentsToGenerate.includes('Textarea')) {
+    try {
+      const inputBoard = await buildInputMatrixBoard(tokens, config, styleMap, varMap);
+      componentsPage.appendChild(inputBoard);
+      generatedBoards.push(inputBoard);
+    } catch (err) {
+      console.error('[design-system-kit] Input matrix failed to generate:', err);
+    }
+  }
+
+  // 4. Generate all remaining component categories in clean boards
+  const nonMatrixComponents = selected.filter(
+    (d) => !['Button', 'IconButton', 'Input', 'Textarea'].includes(d.name)
+  );
+
+  for (const [index, def] of nonMatrixComponents.entries()) {
     let frame = frames[def.category];
     if (!frame) {
       const catLabel = CATEGORY_LABELS[def.category] ?? def.category;
-      frame = boardShell(`${catLabel} Components`);
-      frame.x = catIndex * (boardWidth + gutter);
+      frame = boardShell(`${catLabel} Library`);
+      frame.x = 0;
       frame.y = 0;
-      catIndex++;
       componentsPage.appendChild(frame);
       frames[def.category] = frame;
+      generatedBoards.push(frame);
 
       const hero = await createBlackHeroBox(
         'Components',
@@ -216,7 +252,7 @@ export async function generateComponents(
           },
         ];
 
-        // 1. Integrated Header inside the card
+        // 1. Integrated Header inside the card with auto-sizing badge
         const cardHead = figma.createFrame();
         cardHead.name = 'Card Header';
         cardHead.layoutMode = 'HORIZONTAL';
@@ -224,11 +260,11 @@ export async function generateComponents(
         cardHead.counterAxisSizingMode = 'AUTO';
         cardHead.primaryAxisAlignItems = 'SPACE_BETWEEN';
         cardHead.counterAxisAlignItems = 'CENTER';
-        cardHead.resize(CW, 64);
-        cardHead.paddingTop = 18;
-        cardHead.paddingBottom = 18;
-        cardHead.paddingLeft = 28;
-        cardHead.paddingRight = 28;
+        cardHead.resize(CW, 56);
+        cardHead.paddingTop = 14;
+        cardHead.paddingBottom = 14;
+        cardHead.paddingLeft = 24;
+        cardHead.paddingRight = 24;
         cardHead.fills = [{ type: 'SOLID', color: hexToRgb('#F8FAFC') }];
         cardHead.strokes = [{ type: 'SOLID', color: hexToRgb('#E2E8F0') }];
         cardHead.strokeWeight = 1;
@@ -238,12 +274,14 @@ export async function generateComponents(
         titleLeft.name = 'Title & Badge';
         titleLeft.layoutMode = 'HORIZONTAL';
         titleLeft.counterAxisAlignItems = 'CENTER';
-        titleLeft.itemSpacing = 12;
+        titleLeft.itemSpacing = 10;
         titleLeft.fills = [];
 
         const catBadge = figma.createFrame();
         catBadge.name = 'Category Badge';
         catBadge.layoutMode = 'HORIZONTAL';
+        catBadge.primaryAxisSizingMode = 'AUTO';
+        catBadge.counterAxisSizingMode = 'AUTO';
         catBadge.paddingTop = 3;
         catBadge.paddingBottom = 3;
         catBadge.paddingLeft = 8;
@@ -263,7 +301,7 @@ export async function generateComponents(
 
         const compTitle = figma.createText();
         compTitle.fontName = await ensureFont(config.fontFamily.heading, 700);
-        compTitle.fontSize = 20;
+        compTitle.fontSize = 18;
         compTitle.letterSpacing = { value: -1, unit: 'PERCENT' };
         compTitle.characters = def.name;
         compTitle.fills = [{ type: 'SOLID', color: hexToRgb('#0F172A') }];
@@ -361,8 +399,9 @@ export async function generateComponents(
     await yieldToUI();
   }
 
+  // Layout all generated boards neatly on the canvas
   let currentY = 0;
-  Object.values(frames).forEach((f) => {
+  generatedBoards.forEach((f) => {
     f.x = 0;
     f.y = currentY;
     currentY += f.height + 80;
