@@ -1,5 +1,5 @@
 import type { ReactNode, CSSProperties } from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { useStore } from '../store';
 
 const HEADING_FONTS = [
@@ -118,17 +118,21 @@ export function Toggle({ label, checked, onChange }: { label: string; checked: b
   );
 }
 
-export function Button({ children, onClick, variant = 'primary', disabled, type = 'button', style }: {
+// forwardRef so a dialog can move focus to its primary action on open. Without
+// it a keyboard user landing in a modal has to tab in from wherever focus
+// happened to be, which for a confirmation dialog means the destructive button
+// is reachable before the text explaining it has been read out.
+export const Button = forwardRef<HTMLButtonElement, {
   children: ReactNode;
   onClick?: () => void;
   variant?: 'primary' | 'secondary' | 'ghost';
   disabled?: boolean;
   type?: 'button' | 'submit';
   style?: CSSProperties;
-}) {
+}>(function Button({ children, onClick, variant = 'primary', disabled, type = 'button', style }, ref) {
   return (
-    <button className={`btn ${variant}`} onClick={onClick} disabled={disabled} type={type} style={style}>
+    <button ref={ref} className={`btn ${variant}`} onClick={onClick} disabled={disabled} type={type} style={style}>
       {children}
     </button>
   );
-}
+});
