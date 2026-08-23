@@ -168,7 +168,11 @@ export async function generateComponents(
   onProgress?: (fraction: number) => void,
   varMap: VariableMap = emptyVariableMap()
 ): Promise<{ count: number; byName: Map<string, ComponentNode | ComponentSetNode> }> {
-  const selected = COMPONENT_DEFINITIONS.filter((d) => config.componentsToGenerate.includes(d.name));
+  const rawList =
+    config.componentsToGenerate.length > 0
+      ? config.componentsToGenerate
+      : COMPONENT_DEFINITIONS.map((c) => c.name);
+  const selected = COMPONENT_DEFINITIONS.filter((d) => rawList.includes(d.name));
   const frames: Record<string, FrameNode> = {};
   const byName = new Map<string, ComponentNode | ComponentSetNode>();
   let count = 0;

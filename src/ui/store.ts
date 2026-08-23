@@ -397,22 +397,18 @@ export const useStore = create<UIState>((set, get) => ({
   // already there and waits; App resolves the answer into either an immediate
   // run (nothing to overwrite) or a confirmation dialog.
   startGeneration: (target) => {
-    // A second press while the first check is in flight would post a second
-    // CHECK_EXISTING, and the first reply already consumes pendingTarget — so the
-    // second reply would arrive with nothing to do and the run would look lost.
-    // The same applies once the confirmation is up: that press is still pending
-    // an answer from the user, it just isn't waiting on the sandbox any more.
     if (isGenerateBusy(get())) return;
-    // The active destination names its own target, so the caller normally passes
-    // nothing. Reading it from the table rather than deriving it here is what
-    // keeps Shape — one destination over two token scales — expressible at all.
     const resolved = target ?? destination(get().destination).target;
-    // Motion, Audit and Export have no target. The rail draws no Build for them,
-    // so this is a backstop rather than a path: returning is the safe answer
-    // because the alternative is posting an unrecognised target, which the
-    // sandbox falls through into a full five-page rebuild.
     if (resolved === undefined) return;
-    set({ pendingTarget: resolved, lastError: null, checkingExisting: true });
+    set({ pendingTarget: resolved, lastError: null });
+
+    // Single-target builds (like Components) build directly on their own page without dialog prompts
+    if (resolved !== 'all') {
+      get().confirmGeneration();
+      return;
+    }
+
+    set({ checkingExisting: true });
     startCheckWatchdog();
     postToPlugin({ type: 'CHECK_EXISTING' });
   },
