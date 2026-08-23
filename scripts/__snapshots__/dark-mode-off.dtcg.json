@@ -1265,19 +1265,19 @@
     "$type": "fontFamily",
     "heading": {
       "$value": [
-        "Inter",
+        "Geist",
         "sans-serif"
       ]
     },
     "body": {
       "$value": [
-        "Inter",
+        "Geist",
         "sans-serif"
       ]
     },
     "mono": {
       "$value": [
-        "Roboto Mono",
+        "Geist Mono",
         "monospace"
       ]
     }
@@ -1289,7 +1289,7 @@
       "h1": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1307,7 +1307,7 @@
       "h2": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1325,7 +1325,7 @@
       "h3": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1343,7 +1343,7 @@
       "h4": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1361,7 +1361,7 @@
       "h5": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1379,7 +1379,7 @@
       "h6": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1399,7 +1399,7 @@
       "large": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1417,7 +1417,7 @@
       "large-semi-bold": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1435,7 +1435,7 @@
       "large-link": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1454,7 +1454,7 @@
       "medium": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1472,7 +1472,7 @@
       "medium-semi-bold": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1490,7 +1490,7 @@
       "medium-link": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1509,7 +1509,7 @@
       "small": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1527,7 +1527,7 @@
       "small-semi-bold": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1545,7 +1545,7 @@
       "small-link": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1564,7 +1564,7 @@
       "x-small": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1582,7 +1582,7 @@
       "x-small-semi-bold": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {
@@ -1600,7 +1600,7 @@
       "x-small-link": {
         "$value": {
           "fontFamily": [
-            "Inter",
+            "Geist",
             "sans-serif"
           ],
           "fontSize": {

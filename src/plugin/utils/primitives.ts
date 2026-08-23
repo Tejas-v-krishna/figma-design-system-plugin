@@ -22,7 +22,54 @@ export function makeComponent(name: string): ComponentNode {
   const c = figma.createComponent();
   c.name = name;
   c.fills = [];
+  c.primaryAxisSizingMode = 'AUTO';
+  c.counterAxisSizingMode = 'AUTO';
   return c;
+}
+
+export const ICON_PATHS: Record<string, string> = {
+  search: 'M21 21l-4.35-4.35M19 11a8 8 0 11-16 0 8 8 0 0116 0z',
+  chevronDown: 'M6 9l6 6 6-6',
+  chevronRight: 'M9 18l6-6-6-6',
+  chevronLeft: 'M15 18l-6-6 6-6',
+  chevronUp: 'M18 15l-6-6-6 6',
+  check: 'M20 6L9 17l-5-5',
+  x: 'M18 6L6 18M6 6l12 12',
+  alertCircle: 'M12 8v4m0 4h.01M22 12A10 10 0 112 12a10 10 0 0120 0z',
+  alertTriangle: 'M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4m0 4h.01',
+  info: 'M12 16v-4m0-4h.01M22 12A10 10 0 112 12a10 10 0 0120 0z',
+  calendar: 'M19 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zM16 2v4M8 2v4M3 10h18',
+  clock: 'M12 6v6l4 2M22 12A10 10 0 112 12a10 10 0 0120 0z',
+  upload: 'M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12',
+  user: 'M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z',
+  star: 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
+  image: 'M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zM8.5 10a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM21 15l-5-5L5 21',
+  mail: 'M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6',
+  lock: 'M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2zM7 11V7a5 5 0 0110 0v4',
+  trash: 'M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2',
+  plus: 'M12 5v14M5 12h14',
+  minus: 'M5 12h14',
+  eye: 'M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8zM12 9a3 3 0 100 6 3 3 0 000-6z',
+  externalLink: 'M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3',
+};
+
+export function createVectorIcon(
+  name: string,
+  size = 18,
+  colorHex = '#64748B',
+  strokeWidth = 2
+): VectorNode {
+  const v = figma.createVector();
+  v.name = `icon-${name}`;
+  const pathData = ICON_PATHS[name] ?? ICON_PATHS.info ?? 'M0 0h24v24H0z';
+  v.vectorPaths = [{ windingRule: 'NONZERO', data: pathData }];
+  v.strokes = [{ type: 'SOLID', color: hexToRgb(colorHex) }];
+  v.strokeWeight = strokeWidth;
+  v.strokeCap = 'ROUND';
+  v.strokeJoin = 'ROUND';
+  v.fills = [];
+  v.resize(size, size);
+  return v;
 }
 
 /**
@@ -211,7 +258,7 @@ export function text(opts: TextOptions): TextNode {
   if (opts.lineHeightRatio) {
     t.lineHeight = { value: (opts.fontSize ?? 14) * opts.lineHeightRatio, unit: 'PIXELS' };
   }
-  t.letterSpacing = { value: opts.letterSpacing ?? -5, unit: 'PERCENT' };
+  t.letterSpacing = { value: opts.letterSpacing ?? 0, unit: 'PERCENT' };
   // The sync `textStyleId` setter is read-only when the manifest declares
   // documentAccess: "dynamic-page" — assigning it throws "Cannot write to
   // internal and read-only node property". It was assigned here, so every text

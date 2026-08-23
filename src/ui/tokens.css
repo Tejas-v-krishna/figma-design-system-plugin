@@ -1,0 +1,81 @@
+﻿@import '@fontsource-variable/geist/wght.css';
+@import '@fontsource-variable/geist-mono/wght.css';
+
+:root {
+  /* Surfaces — steps, not strokes */
+  --surface: #FFFFFF;
+  --surface-rail: #F7F7F6;
+  --surface-sunk: #F4F4F2;
+  --ink: #16181C;
+  --on-ink: #FFFFFF;
+  --hairline: #E8E8E5;
+
+  /* Text tiers — all >4.5:1 on all surfaces */
+  --text: #16181C;
+  --text-dim: #5C6169;
+  --text-faint: #6B7078;
+
+  /* Radii */
+  --r-card: 14px;
+  --r-control: 10px;
+  --r-pill: 999px;
+  --r-chip: 8px;
+  --radius-user: 8px;
+
+  /* Type scale */
+  --font-ui: 'Geist Variable', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-specimen: var(--font-ui);
+
+  --fs-display: 24px;
+  --lh-display: 1.15;
+  --ls-display: -0.02em;
+
+  --fs-title: 15px;
+  --lh-title: 1.30;
+  --ls-title: -0.01em;
+
+  --fs-label: 12.5px;
+  --lh-label: 1.40;
+
+  --fs-body: 13px;
+  --lh-body: 1.45;
+
+  --fs-meta: 11.5px;
+  --lh-meta: 1.40;
+
+  --fs-data: 11.5px;
+  --fs-eyebrow: 11px;
+  --ls-eyebrow: 0.1em;
+
+  /* Brand placeholders — updated live by useBrandTheme */
+  --brand: #2563EB;
+  --brand-chrome: #2563EB;
+  --brand-ink: #FFFFFF;
+  --brand-wash: rgba(37, 99, 235, 0.1);
+
+  /* Signal colours */
+  --signal-ok: #0D9488;
+  --signal-ok-wash: #F0FDFA;
+  --signal-warn: #D97706;
+  --signal-warn-wash: #FFFBEB;
+  --signal-bad: #E11D48;
+  --signal-bad-wash: #FFF1F2;
+
+  /* Geometry & animation */
+  --rail-w: 184px;
+  --sheet-w: 536px;
+  --dur: 0.12s;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --shadow-raise: 0 1px 2px rgba(22, 24, 28, 0.05);
+
+  /* Legacy aliases for non-breaking cascade */
+  --paper: var(--surface);
+  --paper-sunk: var(--surface-sunk);
+  --on-paper: var(--text);
+  --on-paper-dim: var(--text-dim);
+  --on-paper-faint: var(--text-faint);
+  --wire: var(--hairline);
+  --rule: var(--hairline);
+  --radius-chip: var(--r-chip);
+}

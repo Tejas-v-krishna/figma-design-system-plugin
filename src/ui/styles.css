@@ -415,29 +415,38 @@ h1, h2, h3, h4, h5, h6,
 
 .dsk-search-input {
   width: 100%;
-  background: #242424;
-  border: 1px solid #333;
-  border-radius: 8px;
+  background: var(--surface-sunk);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-control);
   padding: 9px 12px 9px 36px;
-  color: #fff;
-  font-size: 13px;
+  color: var(--text);
+  font-size: var(--fs-body);
 }
-.dsk-search-input:focus { border-color: var(--accent); outline: none; }
+.dsk-search-input:focus {
+  border-color: var(--brand);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px var(--brand-wash);
+  outline: none;
+}
 
 .dsk-secondary-btn {
-  background: #282828;
-  border: 1px solid #383838;
-  color: #eee;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  color: var(--text);
   padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-label);
   font-weight: 500;
   display: flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
 }
-.dsk-secondary-btn:hover { background: #303030; }
+.dsk-secondary-btn:hover {
+  background: var(--surface-sunk);
+  border-color: var(--text-faint);
+}
 
 .dsk-components-desc {
   color: var(--text-dim);
@@ -446,10 +455,6 @@ h1, h2, h3, h4, h5, h6,
   line-height: 1.4;
 }
 
-/* Was `color: #fff` — white text on a light panel, 1.11:1, so the count of
-   matching components was invisible. Another line left behind when the theme
-   moved from a dark surface to a light one. It reads as a heading for the grid
-   below it, so it takes the full-strength text colour rather than --text-dim. */
 .dsk-components-count {
   font-weight: 600;
   color: var(--text);
@@ -464,25 +469,32 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .dsk-component-card {
-  background: #242424;
-  border: 1px solid #333;
-  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
   padding: 10px;
   cursor: pointer;
-  transition: border-color 0.15s, transform 0.1s;
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
-.dsk-component-card:hover { border-color: #555; }
-.dsk-component-card.selected { border-color: var(--accent); background: #202b36; }
+.dsk-component-card:hover {
+  border-color: var(--text-dim);
+  box-shadow: var(--shadow-raise);
+}
+.dsk-component-card.selected {
+  border-color: var(--brand);
+  background: var(--brand-wash);
+}
 
 .dsk-card-preview {
-  background: #ffffff;
-  border-radius: 6px;
+  background: var(--surface-sunk);
+  border-radius: var(--r-control);
   height: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   margin-bottom: 8px;
+  overflow: hidden;
 }
 
 .dsk-card-preview-inner {
@@ -491,15 +503,11 @@ h1, h2, h3, h4, h5, h6,
   font-weight: 700;
 }
 
-/* --accent is near-black on the light theme, so on the blue-tinted dark card a
-   selected component's tick measured 1.26:1 — the one mark that says "this is
-   in the run" was invisible. --brand-chrome is the light-on-dark form of the
-   brand colour and clears 4.4:1 here. */
 .dsk-card-check {
   position: absolute;
   top: 6px;
   right: 6px;
-  color: var(--brand-chrome);
+  color: var(--brand);
 }
 
 .dsk-card-info {
@@ -508,19 +516,14 @@ h1, h2, h3, h4, h5, h6,
   gap: 2px;
 }
 
-/* The component card is a dark island on a light panel, so its text takes the
-   on-ink pair rather than the page text colours. The variant count was #888,
-   which measured 4.38:1 at 11px — close enough to look fine and still under the
-   4.5:1 that size needs, on the one label that tells you how much the run will
-   actually build. */
 .dsk-card-title {
   font-weight: 600;
-  color: var(--on-ink);
+  color: var(--text);
   font-size: 13px;
 }
 
 .dsk-card-variants {
-  color: var(--on-ink-dim);
+  color: var(--text-dim);
   font-size: 11px;
 }
 

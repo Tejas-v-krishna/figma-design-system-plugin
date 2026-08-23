@@ -39,13 +39,14 @@ function findFamily(name: string): string | undefined {
 // Candidate style names per weight bucket, best match first. Covers both the
 // spaced ("Semi Bold") and unspaced ("SemiBold") conventions.
 function nearestStyle(styles: string[], weight: number): string {
-  const effectiveWeight = Math.min(weight, 600);
   const order =
-    effectiveWeight >= 600
-      ? ['SemiBold', 'Semi Bold', 'Medium', 'Regular']
-      : effectiveWeight >= 500
+    weight >= 700
+      ? ['Bold', 'SemiBold', 'Semi Bold', 'Heavy', 'Black', 'Medium', 'Regular']
+      : weight >= 600
+      ? ['SemiBold', 'Semi Bold', 'Bold', 'Medium', 'Regular']
+      : weight >= 500
       ? ['Medium', 'Regular', 'SemiBold', 'Semi Bold']
-      : ['Regular', 'Medium', 'Light'];
+      : ['Regular', 'Light', 'Medium'];
   for (const s of order) {
     if (styles.includes(s)) return s;
   }
@@ -67,10 +68,10 @@ function firstInstalled(names: string[]): string | undefined {
 
 /** Resolve a desired font family + numeric weight to an installed { family, style }. */
 export function resolveFont(family: string, weight: number): FontName {
-  const targetWeight = Math.min(weight, 600);
+  const targetWeight = weight;
 
   if (!byFamily || byFamily.size === 0) {
-    const styleName = targetWeight >= 600 ? 'Semi Bold' : targetWeight >= 500 ? 'Medium' : 'Regular';
+    const styleName = targetWeight >= 700 ? 'Bold' : targetWeight >= 600 ? 'Semi Bold' : targetWeight >= 500 ? 'Medium' : 'Regular';
     return { family: family || 'Inter', style: styleName };
   }
 

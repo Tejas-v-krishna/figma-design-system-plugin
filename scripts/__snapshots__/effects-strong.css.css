@@ -89,9 +89,9 @@
   --color-neutral-900: #14171c;
   --color-neutral-950: #0a0c0e;
   /* Typography */
-  --font-heading: Inter, sans-serif;
-  --font-body: Inter, sans-serif;
-  --font-mono: Roboto Mono, monospace;
+  --font-heading: Geist, sans-serif;
+  --font-body: Geist, sans-serif;
+  --font-mono: Geist Mono, monospace;
   /* Spacing */
   --space-25: 1px;
   --space-50: 2px;

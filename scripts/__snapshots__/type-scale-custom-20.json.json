@@ -285,7 +285,7 @@
     {
       "name": "Headings / H1",
       "group": "headings",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 75,
       "fontWeight": 600,
       "lineHeight": 92,
@@ -295,7 +295,7 @@
     {
       "name": "Headings / H2",
       "group": "headings",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 60,
       "fontWeight": 600,
       "lineHeight": 72,
@@ -305,7 +305,7 @@
     {
       "name": "Headings / H3",
       "group": "headings",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 50,
       "fontWeight": 600,
       "lineHeight": 60,
@@ -315,7 +315,7 @@
     {
       "name": "Headings / H4",
       "group": "headings",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 40,
       "fontWeight": 600,
       "lineHeight": 48,
@@ -325,7 +325,7 @@
     {
       "name": "Headings / H5",
       "group": "headings",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 30,
       "fontWeight": 600,
       "lineHeight": 36,
@@ -335,7 +335,7 @@
     {
       "name": "Headings / H6",
       "group": "headings",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 25,
       "fontWeight": 600,
       "lineHeight": 32,
@@ -345,7 +345,7 @@
     {
       "name": "Body / Large",
       "group": "body",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 25,
       "fontWeight": 400,
       "lineHeight": 32,
@@ -355,7 +355,7 @@
     {
       "name": "Body / Large / Semi Bold",
       "group": "body",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 25,
       "fontWeight": 600,
       "lineHeight": 32,
@@ -365,7 +365,7 @@
     {
       "name": "Body / Large / Link",
       "group": "body",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 25,
       "fontWeight": 400,
       "lineHeight": 32,
@@ -375,7 +375,7 @@
     {
       "name": "Body / Medium",
       "group": "body",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 20,
       "fontWeight": 400,
       "lineHeight": 24,
@@ -385,7 +385,7 @@
     {
       "name": "Body / Medium / Semi Bold",
       "group": "body",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 20,
       "fontWeight": 600,
       "lineHeight": 24,
@@ -395,7 +395,7 @@
     {
       "name": "Body / Medium / Link",
       "group": "body",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 20,
       "fontWeight": 400,
       "lineHeight": 24,
@@ -405,7 +405,7 @@
     {
       "name": "Body / Small",
       "group": "body",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 18,
       "fontWeight": 400,
       "lineHeight": 20,
@@ -415,7 +415,7 @@
     {
       "name": "Body / Small / Semi Bold",
       "group": "body",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 18,
       "fontWeight": 600,
       "lineHeight": 20,
@@ -425,7 +425,7 @@
     {
       "name": "Body / Small / Link",
       "group": "body",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 18,
       "fontWeight": 400,
       "lineHeight": 20,
@@ -435,7 +435,7 @@
     {
       "name": "Body / X-Small",
       "group": "body",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 15,
       "fontWeight": 400,
       "lineHeight": 20,
@@ -445,7 +445,7 @@
     {
       "name": "Body / X-Small / Semi Bold",
       "group": "body",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 15,
       "fontWeight": 600,
       "lineHeight": 20,
@@ -455,7 +455,7 @@
     {
       "name": "Body / X-Small / Link",
       "group": "body",
-      "fontFamily": "Inter",
+      "fontFamily": "Geist",
       "fontSize": 15,
       "fontWeight": 400,
       "lineHeight": 20,
