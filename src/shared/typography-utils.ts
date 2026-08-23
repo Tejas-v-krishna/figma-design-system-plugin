@@ -215,6 +215,7 @@ export function generateShadowTokens(intensity: EffectsIntensity = 'medium'): Sh
       blur,
       spread,
       color,
+      alpha,
     };
   });
 }

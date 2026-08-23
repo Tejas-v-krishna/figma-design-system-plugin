@@ -70,6 +70,15 @@ export interface ShadowToken {
   blur: number;
   spread: number;
   color: string;
+  /**
+   * The shadow colour's opacity, 0–1.
+   *
+   * Carried separately because `color` is a finished `rgba(...)` string, and the
+   * DTCG exporter needs the number: the spec models a shadow's colour as
+   * `{ colorSpace, components, alpha }`, so the only alternative was regexing
+   * the alpha back out of a string this codebase had just finished building.
+   */
+  alpha: number;
 }
 
 export interface BorderRadiusToken {
