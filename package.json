@@ -23,7 +23,9 @@
     "typecheck": "tsc --noEmit",
     "lint:fix": "eslint . --fix",
     "check:config": "tsx scripts/check-config-schema.ts",
-    "check:dtcg": "tsx scripts/check-dtcg-parity.ts"
+    "check:dtcg": "tsx scripts/check-dtcg-parity.ts",
+    "check:snapshot": "tsx scripts/check-token-snapshot.ts",
+    "check": "npm run typecheck && npm run lint && npm run check:config && npm run check:dtcg && npm run check:snapshot"
   },
   "dependencies": {
     "culori": "^4.0.2",

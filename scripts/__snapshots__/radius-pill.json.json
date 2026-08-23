@@ -1,0 +1,517 @@
+{
+  "colors": {
+    "primary": {
+      "name": "Primary",
+      "hex": "#2563EB",
+      "hsl": {
+        "h": 221,
+        "s": 83,
+        "l": 53
+      },
+      "shades": {
+        "50": "#e9effd",
+        "100": "#d3e0fb",
+        "200": "#a8c1f7",
+        "300": "#7ca1f3",
+        "400": "#5182ef",
+        "500": "#2563EB",
+        "600": "#1e4fbc",
+        "700": "#163b8d",
+        "800": "#0f285e",
+        "900": "#07142f",
+        "950": "#040a18"
+      }
+    },
+    "secondary": {
+      "name": "Secondary",
+      "hex": "#F97316",
+      "hsl": {
+        "h": 25,
+        "s": 95,
+        "l": 53
+      },
+      "shades": {
+        "50": "#fef1e8",
+        "100": "#fee3d0",
+        "200": "#fdc7a2",
+        "300": "#fbab73",
+        "400": "#fa8f45",
+        "500": "#F97316",
+        "600": "#c75c12",
+        "700": "#95450d",
+        "800": "#642e09",
+        "900": "#321704",
+        "950": "#190c02"
+      }
+    },
+    "accent": {
+      "name": "Accent",
+      "hex": "#8B5CF6",
+      "hsl": {
+        "h": 258,
+        "s": 90,
+        "l": 66
+      },
+      "shades": {
+        "50": "#f3effe",
+        "100": "#e8defd",
+        "200": "#d1befb",
+        "300": "#b99dfa",
+        "400": "#a27df8",
+        "500": "#8B5CF6",
+        "600": "#6f4ac5",
+        "700": "#533794",
+        "800": "#382562",
+        "900": "#1c1231",
+        "950": "#0e0919"
+      }
+    },
+    "success": {
+      "name": "Success",
+      "hex": "#10B981",
+      "hsl": {
+        "h": 160,
+        "s": 84,
+        "l": 39
+      },
+      "shades": {
+        "50": "#e7f8f2",
+        "100": "#cff1e6",
+        "200": "#9fe3cd",
+        "300": "#70d5b3",
+        "400": "#40c79a",
+        "500": "#10B981",
+        "600": "#0d9467",
+        "700": "#0a6f4d",
+        "800": "#064a34",
+        "900": "#03251a",
+        "950": "#02130d"
+      }
+    },
+    "error": {
+      "name": "Error",
+      "hex": "#EF4444",
+      "hsl": {
+        "h": 0,
+        "s": 84,
+        "l": 60
+      },
+      "shades": {
+        "50": "#fdecec",
+        "100": "#fcdada",
+        "200": "#f9b4b4",
+        "300": "#f58f8f",
+        "400": "#f26969",
+        "500": "#EF4444",
+        "600": "#bf3636",
+        "700": "#8f2929",
+        "800": "#601b1b",
+        "900": "#300e0e",
+        "950": "#180707"
+      }
+    },
+    "warning": {
+      "name": "Warning",
+      "hex": "#F59E0B",
+      "hsl": {
+        "h": 38,
+        "s": 92,
+        "l": 50
+      },
+      "shades": {
+        "50": "#fef5e7",
+        "100": "#fdecce",
+        "200": "#fbd89d",
+        "300": "#f9c56d",
+        "400": "#f7b13c",
+        "500": "#F59E0B",
+        "600": "#c47e09",
+        "700": "#935f07",
+        "800": "#623f04",
+        "900": "#312002",
+        "950": "#191001"
+      }
+    },
+    "information": {
+      "name": "Information",
+      "hex": "#ebac24",
+      "hsl": {
+        "h": 41,
+        "s": 83,
+        "l": 53
+      },
+      "shades": {
+        "50": "#fdf7e9",
+        "100": "#fbeed3",
+        "200": "#f7dea7",
+        "300": "#f3cd7c",
+        "400": "#efbd50",
+        "500": "#ebac24",
+        "600": "#bc8a1d",
+        "700": "#8d6716",
+        "800": "#5e450e",
+        "900": "#2f2207",
+        "950": "#181104"
+      }
+    },
+    "neutral": {
+      "name": "Neutral",
+      "hex": "#64748B",
+      "hsl": {
+        "h": 215,
+        "s": 16,
+        "l": 47
+      },
+      "shades": {
+        "50": "#f0f1f3",
+        "100": "#e0e3e8",
+        "200": "#c1c7d1",
+        "300": "#a2acb9",
+        "400": "#8390a2",
+        "500": "#64748B",
+        "600": "#505d6f",
+        "700": "#3c4653",
+        "800": "#282e38",
+        "900": "#14171c",
+        "950": "#0a0c0e"
+      }
+    }
+  },
+  "typography": [
+    {
+      "name": "Headings / H1",
+      "group": "headings",
+      "fontFamily": "Inter",
+      "fontSize": 60,
+      "fontWeight": 600,
+      "lineHeight": 72,
+      "letterSpacing": 0,
+      "underline": false
+    },
+    {
+      "name": "Headings / H2",
+      "group": "headings",
+      "fontFamily": "Inter",
+      "fontSize": 48,
+      "fontWeight": 600,
+      "lineHeight": 56,
+      "letterSpacing": 0,
+      "underline": false
+    },
+    {
+      "name": "Headings / H3",
+      "group": "headings",
+      "fontFamily": "Inter",
+      "fontSize": 40,
+      "fontWeight": 600,
+      "lineHeight": 48,
+      "letterSpacing": 0,
+      "underline": false
+    },
+    {
+      "name": "Headings / H4",
+      "group": "headings",
+      "fontFamily": "Inter",
+      "fontSize": 32,
+      "fontWeight": 600,
+      "lineHeight": 40,
+      "letterSpacing": 0,
+      "underline": false
+    },
+    {
+      "name": "Headings / H5",
+      "group": "headings",
+      "fontFamily": "Inter",
+      "fontSize": 24,
+      "fontWeight": 600,
+      "lineHeight": 28,
+      "letterSpacing": 0,
+      "underline": false
+    },
+    {
+      "name": "Headings / H6",
+      "group": "headings",
+      "fontFamily": "Inter",
+      "fontSize": 20,
+      "fontWeight": 600,
+      "lineHeight": 24,
+      "letterSpacing": 0,
+      "underline": false
+    },
+    {
+      "name": "Body / Large",
+      "group": "body",
+      "fontFamily": "Inter",
+      "fontSize": 20,
+      "fontWeight": 400,
+      "lineHeight": 24,
+      "letterSpacing": 0,
+      "underline": false
+    },
+    {
+      "name": "Body / Large / Semi Bold",
+      "group": "body",
+      "fontFamily": "Inter",
+      "fontSize": 20,
+      "fontWeight": 600,
+      "lineHeight": 24,
+      "letterSpacing": 0,
+      "underline": false
+    },
+    {
+      "name": "Body / Large / Link",
+      "group": "body",
+      "fontFamily": "Inter",
+      "fontSize": 20,
+      "fontWeight": 400,
+      "lineHeight": 24,
+      "letterSpacing": 0,
+      "underline": true
+    },
+    {
+      "name": "Body / Medium",
+      "group": "body",
+      "fontFamily": "Inter",
+      "fontSize": 16,
+      "fontWeight": 400,
+      "lineHeight": 20,
+      "letterSpacing": 0,
+      "underline": false
+    },
+    {
+      "name": "Body / Medium / Semi Bold",
+      "group": "body",
+      "fontFamily": "Inter",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "lineHeight": 20,
+      "letterSpacing": 0,
+      "underline": false
+    },
+    {
+      "name": "Body / Medium / Link",
+      "group": "body",
+      "fontFamily": "Inter",
+      "fontSize": 16,
+      "fontWeight": 400,
+      "lineHeight": 20,
+      "letterSpacing": 0,
+      "underline": true
+    },
+    {
+      "name": "Body / Small",
+      "group": "body",
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": 400,
+      "lineHeight": 16,
+      "letterSpacing": 0,
+      "underline": false
+    },
+    {
+      "name": "Body / Small / Semi Bold",
+      "group": "body",
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": 600,
+      "lineHeight": 16,
+      "letterSpacing": 0,
+      "underline": false
+    },
+    {
+      "name": "Body / Small / Link",
+      "group": "body",
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": 400,
+      "lineHeight": 16,
+      "letterSpacing": 0,
+      "underline": true
+    },
+    {
+      "name": "Body / X-Small",
+      "group": "body",
+      "fontFamily": "Inter",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "lineHeight": 16,
+      "letterSpacing": 0,
+      "underline": false
+    },
+    {
+      "name": "Body / X-Small / Semi Bold",
+      "group": "body",
+      "fontFamily": "Inter",
+      "fontSize": 12,
+      "fontWeight": 600,
+      "lineHeight": 16,
+      "letterSpacing": 0,
+      "underline": false
+    },
+    {
+      "name": "Body / X-Small / Link",
+      "group": "body",
+      "fontFamily": "Inter",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "lineHeight": 16,
+      "letterSpacing": 0,
+      "underline": true
+    }
+  ],
+  "spacing": [
+    {
+      "name": "25",
+      "value": 1,
+      "rem": "0.0625rem"
+    },
+    {
+      "name": "50",
+      "value": 2,
+      "rem": "0.125rem"
+    },
+    {
+      "name": "100",
+      "value": 4,
+      "rem": "0.25rem"
+    },
+    {
+      "name": "200",
+      "value": 8,
+      "rem": "0.5rem"
+    },
+    {
+      "name": "300",
+      "value": 12,
+      "rem": "0.75rem"
+    },
+    {
+      "name": "400",
+      "value": 16,
+      "rem": "1rem"
+    },
+    {
+      "name": "500",
+      "value": 20,
+      "rem": "1.25rem"
+    },
+    {
+      "name": "600",
+      "value": 24,
+      "rem": "1.5rem"
+    },
+    {
+      "name": "700",
+      "value": 28,
+      "rem": "1.75rem"
+    },
+    {
+      "name": "800",
+      "value": 32,
+      "rem": "2rem"
+    },
+    {
+      "name": "1100",
+      "value": 64,
+      "rem": "4rem"
+    }
+  ],
+  "shadows": [
+    {
+      "name": "E0",
+      "value": "0px 1px 2px 0px rgba(0, 0, 0, 0.05)",
+      "x": 0,
+      "y": 1,
+      "blur": 2,
+      "spread": 0,
+      "color": "rgba(0, 0, 0, 0.05)"
+    },
+    {
+      "name": "E1",
+      "value": "0px 2px 4px 0px rgba(0, 0, 0, 0.1)",
+      "x": 0,
+      "y": 2,
+      "blur": 4,
+      "spread": 0,
+      "color": "rgba(0, 0, 0, 0.1)"
+    },
+    {
+      "name": "E2",
+      "value": "0px 4px 8px -1px rgba(0, 0, 0, 0.12)",
+      "x": 0,
+      "y": 4,
+      "blur": 8,
+      "spread": -1,
+      "color": "rgba(0, 0, 0, 0.12)"
+    },
+    {
+      "name": "E3",
+      "value": "0px 10px 20px -3px rgba(0, 0, 0, 0.15)",
+      "x": 0,
+      "y": 10,
+      "blur": 20,
+      "spread": -3,
+      "color": "rgba(0, 0, 0, 0.15)"
+    }
+  ],
+  "borderRadius": [
+    {
+      "name": "none",
+      "value": "0px",
+      "px": 0
+    },
+    {
+      "name": "xs",
+      "value": "9999px",
+      "px": 9999
+    },
+    {
+      "name": "sm",
+      "value": "9999px",
+      "px": 9999
+    },
+    {
+      "name": "md",
+      "value": "9999px",
+      "px": 9999
+    },
+    {
+      "name": "lg",
+      "value": "9999px",
+      "px": 9999
+    },
+    {
+      "name": "xl",
+      "value": "9999px",
+      "px": 9999
+    },
+    {
+      "name": "2xl",
+      "value": "9999px",
+      "px": 9999
+    },
+    {
+      "name": "full",
+      "value": "9999px",
+      "px": 9999
+    }
+  ],
+  "strokes": [
+    {
+      "name": "0",
+      "value": 1
+    },
+    {
+      "name": "1",
+      "value": 2
+    },
+    {
+      "name": "2",
+      "value": 4
+    },
+    {
+      "name": "3",
+      "value": 6
+    }
+  ]
+}
