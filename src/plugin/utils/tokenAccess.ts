@@ -57,16 +57,46 @@ export function firstTextOfGroup(tokens: DesignTokens, group: 'headings' | 'body
   return tokens.typography.find((t) => t.group === group);
 }
 
+/**
+ * These three used to return their fallback in silence. That is how every
+ * `radiusPx(tokens, 'md')` call site in the component templates went years
+ * asking for a step name the radius scale never contained — the scale was
+ * `none,1..7` — and got the hardcoded 8 back instead. Nothing in the plugin,
+ * the build or the type checker could see it: the lookup is a string against
+ * a name field, and the fallback is a plausible-looking number.
+ *
+ * They still fall back, because a missing step is not worth aborting a
+ * generation run over, but now they say so. Same shape as findColor above.
+ */
+function missing(kind: string, name: string, fallback: string): void {
+  console.warn(
+    `[design-system-kit] no ${kind} token named "${name}" — using ${fallback}. ` +
+      `This is a bug: the requested name is not in the scale.`,
+  );
+}
+
 export function radiusPx(tokens: DesignTokens, name: string): number {
   const r = tokens.borderRadius.find((b) => b.name === name);
-  return r ? r.px : 8;
+  if (!r) {
+    missing('border-radius', name, '8px');
+    return 8;
+  }
+  return r.px;
 }
 
 export function spacing(tokens: DesignTokens, name: string): number {
   const s = tokens.spacing.find((sp) => sp.name === name);
-  return s ? s.value : 16;
+  if (!s) {
+    missing('spacing', name, '16px');
+    return 16;
+  }
+  return s.value;
 }
 
 export function shadow(tokens: DesignTokens, name: string): ShadowToken | undefined {
-  return tokens.shadows.find((s) => s.name === name);
+  const s = tokens.shadows.find((sh) => sh.name === name);
+  // Callers pass the result straight to setEffect, which no-ops on undefined —
+  // so an unknown name meant a component quietly rendered with no shadow.
+  if (!s) missing('shadow', name, 'no shadow');
+  return s;
 }
