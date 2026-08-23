@@ -9,7 +9,6 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
     variants: [
       { name: 'Primary', properties: { variant: 'primary' } },
       { name: 'Secondary', properties: { variant: 'secondary' } },
-      { name: 'Outline', properties: { variant: 'outline' } },
       { name: 'Tonal', properties: { variant: 'tonal' } },
       { name: 'Ghost', properties: { variant: 'ghost' } },
       { name: 'Destructive', properties: { variant: 'destructive' } },
@@ -35,8 +34,9 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
     variants: [
       { name: 'Primary', properties: { variant: 'primary' } },
       { name: 'Secondary', properties: { variant: 'secondary' } },
-      { name: 'Outline', properties: { variant: 'outline' } },
+      { name: 'Tonal', properties: { variant: 'tonal' } },
       { name: 'Ghost', properties: { variant: 'ghost' } },
+      { name: 'Destructive', properties: { variant: 'destructive' } },
     ],
     states: [
       { name: 'Default', properties: { state: 'default' } },
@@ -93,7 +93,8 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
     variants: [
       { name: 'Primary', properties: { variant: 'primary' } },
       { name: 'Secondary', properties: { variant: 'secondary' } },
-      { name: 'Outline', properties: { variant: 'outline' } },
+      { name: 'Tonal', properties: { variant: 'tonal' } },
+      { name: 'Destructive', properties: { variant: 'destructive' } },
     ],
     states: [
       { name: 'Default', properties: { state: 'default' } },
