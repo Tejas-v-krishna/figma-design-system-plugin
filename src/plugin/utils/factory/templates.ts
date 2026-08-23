@@ -2884,7 +2884,9 @@ const SplitButton: Template = (root, ctx) => {
   const isDisabled = sKey === 'disabled';
 
   const isSecondary = vKey.includes('secondary');
-  const isOutline = vKey.includes('outline') || vKey.includes('obsidian');
+  const isTonal = vKey.includes('tonal');
+  const isDestructive = vKey.includes('destructive') || vKey.includes('danger');
+  const isOutline = vKey.includes('outline');
 
   const szHeight = Number(ctx.sizeProps.height ?? (ctx.sizeName === 'sm' ? 32 : ctx.sizeName === 'lg' ? 48 : 40));
   const padY = szHeight <= 32 ? 4 : szHeight >= 48 ? 10 : 8;
@@ -2901,34 +2903,129 @@ const SplitButton: Template = (root, ctx) => {
   root.counterAxisSizingMode = 'AUTO';
   root.counterAxisAlignItems = 'CENTER';
   root.cornerRadius = radius;
+  root.strokes = [];
+  root.effects = [];
 
   let textFill = '#FFFFFF';
   let sepColor = '#FFFFFF';
 
-  if (isOutline) {
-    if (isActive) setFill(root, '#E4E4E7');
-    else if (isHover) setFill(root, '#F4F4F5');
-    else root.fills = [];
-    setStroke(root, isDisabled ? '#E4E4E7' : '#18181B', 1.5);
-    textFill = isDisabled ? '#A1A1AA' : '#18181B';
-    sepColor = isDisabled ? '#E4E4E7' : '#18181B';
+  if (isDestructive) {
+    if (isDisabled) {
+      setFill(root, '#FCA5A5');
+      textFill = '#FFFFFF';
+      sepColor = '#FCA5A5';
+    } else if (isActive) {
+      setFill(root, '#991B1B');
+      textFill = '#FFFFFF';
+      sepColor = '#B91C1C';
+    } else if (isHover) {
+      setFill(root, '#B91C1C');
+      textFill = '#FFFFFF';
+      sepColor = '#DC2626';
+    } else {
+      setFill(root, '#DC2626');
+      textFill = '#FFFFFF';
+      sepColor = '#EF4444';
+    }
+  } else if (isTonal) {
+    if (isDisabled) {
+      setFill(root, '#FAFAFA');
+      textFill = '#A1A1AA';
+      sepColor = '#E4E4E7';
+    } else if (isActive) {
+      setFill(root, '#D4D4D8');
+      textFill = '#18181B';
+      sepColor = '#CBD5E1';
+    } else if (isHover) {
+      setFill(root, '#E4E4E7');
+      textFill = '#18181B';
+      sepColor = '#D4D4D8';
+    } else {
+      setFill(root, '#F4F4F5');
+      textFill = '#18181B';
+      sepColor = '#E4E4E7';
+    }
   } else if (isSecondary) {
-    if (isActive) setFill(root, colorShade(ctx.tokens, 'neutral', 100));
-    else if (isHover) setFill(root, colorShade(ctx.tokens, 'neutral', 50));
-    else setFill(root, '#FFFFFF');
-    setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
-    textFill = colorShade(ctx.tokens, 'neutral', 800);
-    sepColor = colorShade(ctx.tokens, 'neutral', 200);
+    if (isDisabled) {
+      setFill(root, '#FAFAFA');
+      setStroke(root, '#E4E4E7', 1);
+      textFill = '#A1A1AA';
+      sepColor = '#E4E4E7';
+    } else if (isActive) {
+      setFill(root, '#E4E4E7');
+      setStroke(root, '#D4D4D8', 1);
+      textFill = '#18181B';
+      sepColor = '#D4D4D8';
+    } else if (isHover) {
+      setFill(root, '#F4F4F5');
+      setStroke(root, '#D4D4D8', 1);
+      textFill = '#18181B';
+      sepColor = '#D4D4D8';
+    } else {
+      setFill(root, '#FFFFFF');
+      setStroke(root, '#E4E4E7', 1);
+      textFill = '#18181B';
+      sepColor = '#E4E4E7';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.05 },
+        offset: { x: 0, y: 1 },
+        radius: 2,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    }
+  } else if (isOutline) {
+    if (isDisabled) {
+      root.fills = [];
+      setStroke(root, '#E4E4E7', 1.5);
+      textFill = '#A1A1AA';
+      sepColor = '#E4E4E7';
+    } else if (isActive) {
+      setFill(root, '#E4E4E7');
+      setStroke(root, '#18181B', 1.5);
+      textFill = '#18181B';
+      sepColor = '#18181B';
+    } else if (isHover) {
+      setFill(root, '#F4F4F5');
+      setStroke(root, '#18181B', 1.5);
+      textFill = '#18181B';
+      sepColor = '#18181B';
+    } else {
+      root.fills = [];
+      setStroke(root, '#18181B', 1.5);
+      textFill = '#18181B';
+      sepColor = '#18181B';
+    }
   } else {
-    if (isActive) setFill(root, '#09090B');
-    else if (isHover) setFill(root, '#27272A');
-    else setFill(root, '#18181B');
-    textFill = '#FFFFFF';
-    sepColor = '#3F3F46';
-  }
-
-  if (isDisabled && !isOutline) {
-    root.opacity = 0.5;
+    // Primary Solid Obsidian
+    if (isDisabled) {
+      setFill(root, '#71717A');
+      textFill = '#FFFFFF';
+      sepColor = '#8E8E93';
+    } else if (isActive) {
+      setFill(root, '#09090B');
+      textFill = '#FFFFFF';
+      sepColor = '#27272A';
+    } else if (isHover) {
+      setFill(root, '#27272A');
+      textFill = '#FFFFFF';
+      sepColor = '#52525B';
+    } else {
+      setFill(root, '#18181B');
+      textFill = '#FFFFFF';
+      sepColor = '#3F3F46';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.16 },
+        offset: { x: 0, y: 2 },
+        radius: 4,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    }
   }
 
   const mainBtn = makeFrame('mainBtn');
