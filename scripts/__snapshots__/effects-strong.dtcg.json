@@ -468,21 +468,25 @@
     }
   },
   "shadow": {
-    "E0": {
+    "xs": {
       "$type": "shadow",
-      "$value": "0px 1px 2px 0px rgba(0, 0, 0, 0.05)"
+      "$value": "0px 2px 3px 0px rgba(0, 0, 0, 0.065)"
     },
-    "E1": {
+    "sm": {
       "$type": "shadow",
-      "$value": "0px 2px 4px 0px rgba(0, 0, 0, 0.1)"
+      "$value": "0px 3px 6px 0px rgba(0, 0, 0, 0.13)"
     },
-    "E2": {
+    "md": {
       "$type": "shadow",
-      "$value": "0px 4px 8px -1px rgba(0, 0, 0, 0.12)"
+      "$value": "0px 6px 12px -1px rgba(0, 0, 0, 0.156)"
     },
-    "E3": {
+    "lg": {
       "$type": "shadow",
-      "$value": "0px 10px 20px -3px rgba(0, 0, 0, 0.15)"
+      "$value": "0px 15px 30px -4px rgba(0, 0, 0, 0.195)"
+    },
+    "xl": {
+      "$type": "shadow",
+      "$value": "0px 30px 60px -12px rgba(0, 0, 0, 0.234)"
     }
   }
 }

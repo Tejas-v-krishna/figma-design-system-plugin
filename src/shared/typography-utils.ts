@@ -6,6 +6,7 @@ import {
   BorderRadiusToken,
   StrokeToken,
   TypographyGroup,
+  EffectsIntensity,
 } from './types';
 
 export interface TypographyScaleEntry {
@@ -90,11 +91,27 @@ export const SPACING_SCALE = [
   { name: '1100', value: 64 },
 ];
 
+/**
+ * Semantic step names, matching the radius scale below and the names the
+ * component templates ask for. Was `E0`–`E3`, which no call site used: all
+ * seven asked shadow() for xs/md/lg/xl, got undefined, and setEffect no-ops on
+ * undefined — so not one generated component has ever carried a shadow. Six of
+ * those sites wrote `shadow(ctx.tokens, 'md')!`, and the non-null assertion is
+ * what kept the type checker quiet about it.
+ *
+ * `xl` is new; the old scale stopped at four steps while the templates wanted a
+ * fifth for modals and dialogs.
+ *
+ * Alpha is a number rather than baked into a colour string so intensity can
+ * scale it. The first four steps' geometry and alpha are unchanged, so `medium`
+ * still emits exactly what E0–E3 did.
+ */
 export const SHADOW_SCALE = [
-  { name: 'E0', x: 0, y: 1, blur: 2, spread: 0, color: 'rgba(0, 0, 0, 0.05)', inset: false },
-  { name: 'E1', x: 0, y: 2, blur: 4, spread: 0, color: 'rgba(0, 0, 0, 0.1)', inset: false },
-  { name: 'E2', x: 0, y: 4, blur: 8, spread: -1, color: 'rgba(0, 0, 0, 0.12)', inset: false },
-  { name: 'E3', x: 0, y: 10, blur: 20, spread: -3, color: 'rgba(0, 0, 0, 0.15)', inset: false },
+  { name: 'xs', x: 0, y: 1, blur: 2, spread: 0, alpha: 0.05, inset: false },
+  { name: 'sm', x: 0, y: 2, blur: 4, spread: 0, alpha: 0.1, inset: false },
+  { name: 'md', x: 0, y: 4, blur: 8, spread: -1, alpha: 0.12, inset: false },
+  { name: 'lg', x: 0, y: 10, blur: 20, spread: -3, alpha: 0.15, inset: false },
+  { name: 'xl', x: 0, y: 20, blur: 40, spread: -8, alpha: 0.18, inset: false },
 ];
 
 /**
@@ -138,16 +155,54 @@ export function generateSpacingTokens(baseUnit: number = 4): SpacingToken[] {
   }));
 }
 
-export function generateShadowTokens(): ShadowToken[] {
-  return SHADOW_SCALE.map((s) => ({
-    name: s.name,
-    value: `${s.inset ? 'inset ' : ''}${s.x}px ${s.y}px ${s.blur}px ${s.spread}px ${s.color}`,
-    x: s.x,
-    y: s.y,
-    blur: s.blur,
-    spread: s.spread,
-    color: s.color,
-  }));
+/**
+ * How each intensity bends the ramp: geometry (y, blur, spread) and alpha.
+ *
+ * Intensity used to *remove* steps — subtle kept the first two names, medium
+ * the first four, strong all of them. Two things were wrong with that. It made
+ * intensity a length control rather than a strength control, so `medium` and
+ * `strong` both meant "all four steps" and produced byte-identical output. And
+ * it deleted names out from under the component templates, which ask for a step
+ * by name: at `subtle`, every template requesting `md` or `lg` silently lost
+ * its shadow.
+ *
+ * Scaling instead means every name resolves at every intensity, and the knob
+ * does what it says. `medium` is identity, so the default output is unchanged.
+ */
+const SHADOW_INTENSITY: Record<EffectsIntensity, { geometry: number; alpha: number } | null> = {
+  // Not an empty ramp of zeroed shadows: "none" means the design system has no
+  // elevation tokens, so there is nothing to export or apply.
+  none: null,
+  subtle: { geometry: 0.6, alpha: 0.7 },
+  medium: { geometry: 1, alpha: 1 },
+  strong: { geometry: 1.5, alpha: 1.3 },
+};
+
+export function generateShadowTokens(intensity: EffectsIntensity = 'medium'): ShadowToken[] {
+  const mul = SHADOW_INTENSITY[intensity];
+  if (!mul) return [];
+  return SHADOW_SCALE.map((s) => {
+    // Offsets round to whole pixels because that is what Figma's effect panel
+    // shows and what a hand-written CSS shadow looks like. Alpha keeps three
+    // decimals: 0.05 x 0.7 is 0.035, and rounding that to two would drop the
+    // subtlest step to 0.04, a 14% jump.
+    const y = Math.round(s.y * mul.geometry);
+    const blur = Math.round(s.blur * mul.geometry);
+    const spread = Math.round(s.spread * mul.geometry);
+    // Capped below 1 so `strong` on a future high-alpha step stays a shadow
+    // rather than a solid black slab.
+    const alpha = Math.round(Math.min(s.alpha * mul.alpha, 0.9) * 1000) / 1000;
+    const color = `rgba(0, 0, 0, ${alpha})`;
+    return {
+      name: s.name,
+      value: `${s.inset ? 'inset ' : ''}${s.x}px ${y}px ${blur}px ${spread}px ${color}`,
+      x: s.x,
+      y,
+      blur,
+      spread,
+      color,
+    };
+  });
 }
 
 export function generateBorderRadiusTokens(): BorderRadiusToken[] {

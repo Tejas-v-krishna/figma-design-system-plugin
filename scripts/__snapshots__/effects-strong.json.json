@@ -418,40 +418,49 @@
   ],
   "shadows": [
     {
-      "name": "E0",
-      "value": "0px 1px 2px 0px rgba(0, 0, 0, 0.05)",
-      "x": 0,
-      "y": 1,
-      "blur": 2,
-      "spread": 0,
-      "color": "rgba(0, 0, 0, 0.05)"
-    },
-    {
-      "name": "E1",
-      "value": "0px 2px 4px 0px rgba(0, 0, 0, 0.1)",
+      "name": "xs",
+      "value": "0px 2px 3px 0px rgba(0, 0, 0, 0.065)",
       "x": 0,
       "y": 2,
-      "blur": 4,
+      "blur": 3,
       "spread": 0,
-      "color": "rgba(0, 0, 0, 0.1)"
+      "color": "rgba(0, 0, 0, 0.065)"
     },
     {
-      "name": "E2",
-      "value": "0px 4px 8px -1px rgba(0, 0, 0, 0.12)",
+      "name": "sm",
+      "value": "0px 3px 6px 0px rgba(0, 0, 0, 0.13)",
       "x": 0,
-      "y": 4,
-      "blur": 8,
+      "y": 3,
+      "blur": 6,
+      "spread": 0,
+      "color": "rgba(0, 0, 0, 0.13)"
+    },
+    {
+      "name": "md",
+      "value": "0px 6px 12px -1px rgba(0, 0, 0, 0.156)",
+      "x": 0,
+      "y": 6,
+      "blur": 12,
       "spread": -1,
-      "color": "rgba(0, 0, 0, 0.12)"
+      "color": "rgba(0, 0, 0, 0.156)"
     },
     {
-      "name": "E3",
-      "value": "0px 10px 20px -3px rgba(0, 0, 0, 0.15)",
+      "name": "lg",
+      "value": "0px 15px 30px -4px rgba(0, 0, 0, 0.195)",
       "x": 0,
-      "y": 10,
-      "blur": 20,
-      "spread": -3,
-      "color": "rgba(0, 0, 0, 0.15)"
+      "y": 15,
+      "blur": 30,
+      "spread": -4,
+      "color": "rgba(0, 0, 0, 0.195)"
+    },
+    {
+      "name": "xl",
+      "value": "0px 30px 60px -12px rgba(0, 0, 0, 0.234)",
+      "x": 0,
+      "y": 30,
+      "blur": 60,
+      "spread": -12,
+      "color": "rgba(0, 0, 0, 0.234)"
     }
   ],
   "borderRadius": [

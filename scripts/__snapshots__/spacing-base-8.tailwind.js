@@ -138,10 +138,11 @@ module.exports = {
         "3": "6px"
       },
       "boxShadow": {
-        "E0": "0px 1px 2px 0px rgba(0, 0, 0, 0.05)",
-        "E1": "0px 2px 4px 0px rgba(0, 0, 0, 0.1)",
-        "E2": "0px 4px 8px -1px rgba(0, 0, 0, 0.12)",
-        "E3": "0px 10px 20px -3px rgba(0, 0, 0, 0.15)"
+        "xs": "0px 1px 2px 0px rgba(0, 0, 0, 0.05)",
+        "sm": "0px 2px 4px 0px rgba(0, 0, 0, 0.1)",
+        "md": "0px 4px 8px -1px rgba(0, 0, 0, 0.12)",
+        "lg": "0px 10px 20px -3px rgba(0, 0, 0, 0.15)",
+        "xl": "0px 20px 40px -8px rgba(0, 0, 0, 0.18)"
       }
     }
   }

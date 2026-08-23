@@ -97,6 +97,10 @@ export function shadow(tokens: DesignTokens, name: string): ShadowToken | undefi
   const s = tokens.shadows.find((sh) => sh.name === name);
   // Callers pass the result straight to setEffect, which no-ops on undefined —
   // so an unknown name meant a component quietly rendered with no shadow.
-  if (!s) missing('shadow', name, 'no shadow');
+  //
+  // An empty ramp is not that: `effectsIntensity: 'none'` means the system has
+  // no elevation tokens on purpose, and warning seven times per run about a
+  // setting the user chose is noise, not a diagnostic.
+  if (!s && tokens.shadows.length > 0) missing('shadow', name, 'no shadow');
   return s;
 }

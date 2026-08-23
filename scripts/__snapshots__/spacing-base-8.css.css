@@ -119,8 +119,9 @@
   --stroke-2: 4px;
   --stroke-3: 6px;
   /* Elevation */
-  --shadow-E0: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
-  --shadow-E1: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-  --shadow-E2: 0px 4px 8px -1px rgba(0, 0, 0, 0.12);
-  --shadow-E3: 0px 10px 20px -3px rgba(0, 0, 0, 0.15);
+  --shadow-xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0px 4px 8px -1px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0px 10px 20px -3px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0px 20px 40px -8px rgba(0, 0, 0, 0.18);
 }
