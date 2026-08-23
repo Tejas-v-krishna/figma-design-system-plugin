@@ -22,7 +22,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "lint:fix": "eslint . --fix",
-    "check:config": "vite-node scripts/check-config-schema.ts"
+    "check:config": "vite-node scripts/check-config-schema.ts",
+    "check:dtcg": "vite-node scripts/check-dtcg-parity.ts"
   },
   "dependencies": {
     "culori": "^4.0.2",
