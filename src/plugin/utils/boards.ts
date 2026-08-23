@@ -13,7 +13,7 @@ export interface BoardContext {
   varMap: VariableMap;
 }
 
-export const CW = 904;
+export const CW = 960;
 export const PAD = 56;
 
 const C_DARK = '#0F172A';
