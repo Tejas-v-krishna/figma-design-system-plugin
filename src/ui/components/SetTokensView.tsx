@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useStore, TokenCategory } from '../store';
+import { useStore, isGenerateBusy, TokenCategory } from '../store';
 import { generateColorShades, generateGradientsForColor, hexToHsl, hexToRgb, interpolateOklchStops } from '../../shared/color-utils';
 import { getColorName, getNearestColorName } from '../../shared/color-naming';
-import { ChevronUp, Sun, Sparkles, Layers, Palette } from 'lucide-react';
+import { ChevronUp, Sun, Sparkles, Layers, Palette, Loader2 } from 'lucide-react';
 import { ColorPickerModal } from './ColorPickerModal';
 
 export const SetTokensView: React.FC = () => {
@@ -30,6 +30,8 @@ export const SetTokensView: React.FC = () => {
   const updateConfig = useStore((s) => s.updateConfig);
   const updateFont = useStore((s) => s.updateFont);
   const startGeneration = useStore((s) => s.startGeneration);
+  const checkingExisting = useStore((s) => s.checkingExisting);
+  const generateBusy = useStore(isGenerateBusy);
 
   const [colorNames, setColorNames] = useState<Record<string, string>>(
     () => config.colorNames ?? {}
@@ -575,10 +577,30 @@ export const SetTokensView: React.FC = () => {
 
       <footer className="dsk-bottom-bar">
         <div className="dsk-split-action">
-          <button className="dsk-primary-btn" onClick={() => startGeneration(tokenCategory)}>
-            Create {tokenCategory} variables in <span className="figma-icon">❖</span>
+          {/* The press does not start the run — it asks the sandbox what is
+              already in the file, and on a large file that answer takes seconds.
+              See BuildComponentsView for the same pair. */}
+          <button
+            className="dsk-primary-btn"
+            onClick={() => startGeneration(tokenCategory)}
+            disabled={generateBusy}
+          >
+            {checkingExisting ? (
+              <>
+                <Loader2 size={15} className="dsk-spin" />
+                Checking this file…
+              </>
+            ) : (
+              <>
+                Create {tokenCategory} variables in <span className="figma-icon">❖</span>
+              </>
+            )}
           </button>
-          <button className="dsk-split-caret" onClick={() => startGeneration(tokenCategory)}>
+          <button
+            className="dsk-split-caret"
+            onClick={() => startGeneration(tokenCategory)}
+            disabled={generateBusy}
+          >
             <ChevronUp size={16} />
           </button>
         </div>
