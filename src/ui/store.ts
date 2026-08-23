@@ -163,6 +163,13 @@ interface UIState {
   startGeneration: (target?: string) => void;
   /** Non-null while an overwrite confirmation is on screen. */
   existingSummary: ExistingSummary | null;
+  /**
+   * True between pressing Generate and the sandbox answering the overwrite
+   * check. That check runs loadAllPagesAsync plus three style queries, which on
+   * a large file is well over the 500ms where an action needs to say it is
+   * working — and until it answers, nothing at all had happened on screen.
+   */
+  checkingExisting: boolean;
   /** The target the user asked for, held across the overwrite round trip. */
   pendingTarget: string | null;
   confirmGeneration: () => void;
@@ -171,6 +178,18 @@ interface UIState {
   requestExport: (format: ExportFormat) => void;
   requestScan: () => void;
 }
+
+/**
+ * True while a Generate press is still waiting on something — the sandbox's
+ * overwrite check, or the confirmation dialog that check raised.
+ *
+ * Both footers and the success overlay read this rather than checking one flag
+ * each, because a button that started the wait must not look pressable for
+ * either half of it. The confirmation's backdrop happens to swallow the click,
+ * but "blocked by an invisible layer" is not the same as "shown as unavailable".
+ */
+export const isGenerateBusy = (s: UIState): boolean =>
+  s.checkingExisting || s.existingSummary !== null;
 
 export const useStore = create<UIState>((set, get) => ({
   view: 'set-tokens',
@@ -233,6 +252,7 @@ export const useStore = create<UIState>((set, get) => ({
   scanMessage: '',
 
   existingSummary: null,
+  checkingExisting: false,
   pendingTarget: null,
 
   setView: (v) => set({ view: v, lastError: null }),
@@ -429,14 +449,22 @@ export const useStore = create<UIState>((set, get) => ({
   // already there and waits; App resolves the answer into either an immediate
   // run (nothing to overwrite) or a confirmation dialog.
   startGeneration: (target) => {
+    // A second press while the first check is in flight would post a second
+    // CHECK_EXISTING, and the first reply already consumes pendingTarget — so the
+    // second reply would arrive with nothing to do and the run would look lost.
+    // The same applies once the confirmation is up: that press is still pending
+    // an answer from the user, it just isn't waiting on the sandbox any more.
+    if (isGenerateBusy(get())) return;
     const resolved = target ?? (get().view === 'build-components' ? 'components' : get().tokenCategory);
-    set({ pendingTarget: resolved, lastError: null });
+    set({ pendingTarget: resolved, lastError: null, checkingExisting: true });
+    startCheckWatchdog();
     postToPlugin({ type: 'CHECK_EXISTING' });
   },
 
   /** Run for real. Called once the user has confirmed, or when there was nothing to confirm. */
   confirmGeneration: () => {
     const target = get().pendingTarget;
+    clearCheckWatchdog();
     set({
       overlay: 'generating',
       progress: 0,
@@ -445,6 +473,7 @@ export const useStore = create<UIState>((set, get) => ({
       lastError: null,
       existingSummary: null,
       pendingTarget: null,
+      checkingExisting: false,
     });
     postToPlugin({
       type: 'GENERATE_DESIGN_SYSTEM',
@@ -452,7 +481,10 @@ export const useStore = create<UIState>((set, get) => ({
     });
   },
 
-  cancelGeneration: () => set({ existingSummary: null, pendingTarget: null }),
+  cancelGeneration: () => {
+    clearCheckWatchdog();
+    set({ existingSummary: null, pendingTarget: null, checkingExisting: false });
+  },
 
   /**
    * The sandbox answered the overwrite check.
@@ -463,11 +495,15 @@ export const useStore = create<UIState>((set, get) => ({
    */
   existingChecked: (summary) => {
     if (get().pendingTarget === null) return;
+    clearCheckWatchdog();
     if (!summary.hasAny) {
+      // confirmGeneration clears checkingExisting on its way into 'generating',
+      // so the button hands its busy state straight over to the progress overlay
+      // instead of flickering back to idle in between.
       get().confirmGeneration();
       return;
     }
-    set({ existingSummary: summary });
+    set({ existingSummary: summary, checkingExisting: false });
   },
   requestExport: (format) => {
     set({ exportBusy: true, exportResult: null, exportError: null });
@@ -481,5 +517,43 @@ export const useStore = create<UIState>((set, get) => ({
     postToPlugin({ type: 'SCAN_USAGE' });
   },
 }));
+
+/**
+ * Failsafe for the overwrite check.
+ *
+ * The sandbox answers CHECK_EXISTING on both its success and its failure path,
+ * so under normal conditions this timer is always cleared before it fires. It is
+ * here for the case where no answer arrives at all — the sandbox being torn down
+ * mid-check, or the message channel dropping — because without it the Generate
+ * button would stay in its busy state for the rest of the session with no way
+ * back and nothing on screen explaining why.
+ *
+ * The window is deliberately generous: loadAllPagesAsync on a large file is
+ * genuinely slow, and a watchdog that fires while real work is still running
+ * would be a worse bug than the one it guards against.
+ */
+const CHECK_TIMEOUT_MS = 30000;
+let checkWatchdog: ReturnType<typeof setTimeout> | null = null;
+
+function startCheckWatchdog(): void {
+  clearCheckWatchdog();
+  checkWatchdog = setTimeout(() => {
+    checkWatchdog = null;
+    if (!useStore.getState().checkingExisting) return;
+    useStore.setState({
+      checkingExisting: false,
+      pendingTarget: null,
+      lastError:
+        'Figma did not respond while checking what is already in this file. Nothing was changed — try again, and if it keeps happening close and reopen the plugin.',
+    });
+  }, CHECK_TIMEOUT_MS);
+}
+
+function clearCheckWatchdog(): void {
+  if (checkWatchdog !== null) {
+    clearTimeout(checkWatchdog);
+    checkWatchdog = null;
+  }
+}
 
 export { BRAND_PRESETS };
