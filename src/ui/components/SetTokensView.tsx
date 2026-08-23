@@ -1,24 +1,65 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useStore, isGenerateBusy, TokenCategory } from '../store';
 import { generateColorShades, generateGradientsForColor, hexToHsl, hexToRgb, interpolateOklchStops } from '../../shared/color-utils';
+import {
+  generateBorderRadiusTokens,
+  generateShadowTokens,
+  generateStrokeTokens,
+} from '../../shared/typography-utils';
+import type { EffectsIntensity, RadiusPreset } from '../../shared/types';
 import { getColorName, getNearestColorName } from '../../shared/color-naming';
-import { ChevronUp, Sun, Sparkles, Layers, Palette, Loader2 } from 'lucide-react';
+import { ChevronUp, Sparkles, Layers, Palette, Loader2 } from 'lucide-react';
 import { ColorPickerModal } from './ColorPickerModal';
+
+const RADIUS_PRESETS: { value: RadiusPreset; label: string; hint: string }[] = [
+  { value: 'sharp', label: 'Sharp', hint: 'Every step flat except full.' },
+  { value: 'rounded', label: 'Rounded', hint: 'The full 2–24px geometric ramp.' },
+  { value: 'pill', label: 'Pill', hint: 'Every step fully round except none.' },
+];
+
+const EFFECT_INTENSITIES: { value: EffectsIntensity; label: string; hint: string }[] = [
+  { value: 'none', label: 'None', hint: 'No elevation tokens at all.' },
+  { value: 'subtle', label: 'Subtle', hint: 'Tighter geometry, 70% opacity.' },
+  { value: 'medium', label: 'Medium', hint: 'The reference ramp.' },
+  { value: 'strong', label: 'Strong', hint: 'Longer throw, 130% opacity.' },
+];
+
+/**
+ * A small light-palette switch, rather than the shared SegmentedControl in
+ * controls.tsx. That one is styled off --panel-2/--text-dim/--grad, which are
+ * the dark instrument-chrome variables; dropping it into a token panel built on
+ * the light specimen sheet puts a dark pill in the middle of white paper.
+ */
+function PresetSwitch<T extends string>({ value, options, onChange }: {
+  value: T;
+  options: { value: T; label: string; hint: string }[];
+  onChange: (v: T) => void;
+}) {
+  const active = options.find((o) => o.value === value);
+  return (
+    <div className="dsk-preset-switch-wrap">
+      <div className="dsk-preset-switch" role="radiogroup">
+        {options.map((o) => (
+          <button
+            key={o.value}
+            type="button"
+            role="radio"
+            aria-checked={value === o.value}
+            className={`dsk-preset-btn ${value === o.value ? 'active' : ''}`}
+            onClick={() => onChange(o.value)}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+      {active && <p className="dsk-preset-hint">{active.hint}</p>}
+    </div>
+  );
+}
 
 export const SetTokensView: React.FC = () => {
   const tokenCategory = useStore((s) => s.tokenCategory);
   const setTokenCategory = useStore((s) => s.setTokenCategory);
-
-  const radiusList = useStore((s) => s.radiusList);
-  const updateRadiusItem = useStore((s) => s.updateRadiusItem);
-  const addRadiusItem = useStore((s) => s.addRadiusItem);
-
-  const strokeList = useStore((s) => s.strokeList);
-  const updateStrokeItem = useStore((s) => s.updateStrokeItem);
-  const addStrokeItem = useStore((s) => s.addStrokeItem);
-
-  const effectsList = useStore((s) => s.effectsList);
-  const updateEffectItem = useStore((s) => s.updateEffectItem);
 
   const addCustomColorGroup = useStore((s) => s.addCustomColorGroup);
 
@@ -106,99 +147,133 @@ export const SetTokensView: React.FC = () => {
 
   const renderContent = () => {
     switch (tokenCategory) {
-      case 'radius':
+      case 'radius': {
+        // The same call buildTokens makes, so what this panel lists is what a
+        // build emits. It used to read a hand-written list in the UI store that
+        // nothing downstream consulted: editing a number here changed a row on
+        // screen and nothing else, and the names it showed (none, 1…7) were not
+        // even the names the exporter wrote.
+        const radii = generateBorderRadiusTokens(config.radiusPreset);
         return (
           <div className="dsk-token-panel">
             <div className="dsk-token-header">
               <h2>Radius</h2>
-              <button className="dsk-link-btn" onClick={addRadiusItem}>
-                + New radius
-              </button>
+              <span className="dsk-token-count">{radii.length} steps</span>
             </div>
+
+            <PresetSwitch
+              value={config.radiusPreset}
+              options={RADIUS_PRESETS}
+              onChange={(radiusPreset) => updateConfig({ radiusPreset })}
+            />
+
             <div className="dsk-token-group-bar">
-              <span>All Radius</span>
-              <button className="dsk-icon-add" onClick={addRadiusItem}>+</button>
+              <span>Corner scale</span>
+              <span className="dsk-token-group-meta">--radius-*</span>
             </div>
             <div className="dsk-token-rows">
-              {radiusList.map((item) => (
-                <div className="dsk-token-row" key={item.id}>
-                  <span className="dsk-token-name">{item.label}</span>
-                  <div className="dsk-token-input-wrapper">
-                    <input
-                      type="number"
-                      className="dsk-token-input"
-                      value={item.value}
-                      onChange={(e) => updateRadiusItem(item.id, Number(e.target.value))}
-                    />
-                  </div>
+              {radii.map((r) => (
+                <div className="dsk-token-row" key={r.name}>
+                  <span
+                    className="dsk-radius-swatch"
+                    // Clamped to half the swatch: `full` is 9999px, and asking
+                    // for a 9999px corner on a 32px box is the same shape as
+                    // asking for 16px. Passed as a custom property because the
+                    // rule rounds one corner, not all four.
+                    style={{ ['--dsk-corner' as string]: `${Math.min(r.px, 16)}px` }}
+                    aria-hidden="true"
+                  />
+                  <span className="dsk-token-name">{r.name}</span>
+                  <code className="dsk-token-value">{r.value}</code>
                 </div>
               ))}
             </div>
           </div>
         );
+      }
 
-      case 'stroke':
+      case 'stroke': {
+        const strokes = generateStrokeTokens();
         return (
           <div className="dsk-token-panel">
             <div className="dsk-token-header">
               <h2>Stroke</h2>
-              <button className="dsk-link-btn" onClick={addStrokeItem}>
-                + New stroke
-              </button>
+              <span className="dsk-token-count">{strokes.length} steps</span>
             </div>
+
+            <p className="dsk-token-note">
+              Border widths are a fixed four-step scale — there is no preset to
+              choose, so this panel reports rather than edits.
+            </p>
+
             <div className="dsk-token-group-bar">
-              <span>All Stroke</span>
-              <button className="dsk-icon-add" onClick={addStrokeItem}>+</button>
+              <span>Width scale</span>
+              <span className="dsk-token-group-meta">--stroke-*</span>
             </div>
             <div className="dsk-token-rows">
-              {strokeList.map((item) => (
-                <div className="dsk-token-row" key={item.id}>
-                  <span className="dsk-token-name">{item.label}</span>
-                  <div className="dsk-token-input-wrapper">
-                    <input
-                      type="number"
-                      className="dsk-token-input"
-                      value={item.value}
-                      onChange={(e) => updateStrokeItem(item.id, Number(e.target.value))}
-                    />
-                  </div>
+              {strokes.map((s) => (
+                <div className="dsk-token-row" key={s.name}>
+                  <span className="dsk-stroke-swatch" aria-hidden="true">
+                    <span style={{ height: s.value }} />
+                  </span>
+                  <span className="dsk-token-name">{s.name}</span>
+                  <code className="dsk-token-value">{s.value}px</code>
                 </div>
               ))}
             </div>
           </div>
         );
+      }
 
-      case 'effects':
+      case 'effects': {
+        const shadows = generateShadowTokens(config.effectsIntensity);
         return (
           <div className="dsk-token-panel">
             <div className="dsk-token-header">
               <h2>Effects</h2>
-              <button className="dsk-link-btn">
-                + New effects
-              </button>
+              <span className="dsk-token-count">
+                {shadows.length ? `${shadows.length} steps` : 'no elevation'}
+              </span>
             </div>
-            <div className="dsk-token-group-bar">
-              <span>All Effects</span>
-              <button className="dsk-icon-add">+</button>
-            </div>
-            <div className="dsk-token-rows">
-              {effectsList.map((item) => (
-                <div className="dsk-token-row" key={item.id}>
-                  <span className="dsk-token-name">{item.label}</span>
-                  <div className="dsk-effect-pill">
-                    <Sun size={13} className="dsk-effect-icon" />
-                    <input
-                      type="text"
-                      className="dsk-effect-input"
-                      value={item.value}
-                      onChange={(e) => updateEffectItem(item.id, e.target.value)}
-                    />
-                  </div>
+
+            <PresetSwitch
+              value={config.effectsIntensity}
+              options={EFFECT_INTENSITIES}
+              onChange={(effectsIntensity) => updateConfig({ effectsIntensity })}
+            />
+
+            {shadows.length === 0 ? (
+              <div className="dsk-token-empty">
+                <p>This system ships no elevation tokens.</p>
+                <p className="dsk-token-empty-sub">
+                  Nothing is exported and generated components stay flat. Pick
+                  another intensity to bring the ramp back.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="dsk-token-group-bar">
+                  <span>Elevation ramp</span>
+                  <span className="dsk-token-group-meta">--shadow-*</span>
                 </div>
-              ))}
-            </div>
+                <div className="dsk-token-rows">
+                  {shadows.map((s) => (
+                    <div className="dsk-token-row dsk-token-row-tall" key={s.name}>
+                      {/* The real token string, so the row shows the shadow the
+                          exporter writes rather than a stand-in of it. */}
+                      <span className="dsk-shadow-plinth" aria-hidden="true">
+                        <span className="dsk-shadow-swatch" style={{ boxShadow: s.value }} />
+                      </span>
+                      <span className="dsk-token-name">{s.name}</span>
+                      <code className="dsk-token-value dsk-token-value-wide">{s.value}</code>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         );
+      }
 
       case 'colors': {
         const handleAddColor = () => {

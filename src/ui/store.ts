@@ -56,25 +56,6 @@ function clone<T>(v: T): T {
   return JSON.parse(JSON.stringify(v));
 }
 
-export interface RadiusItem {
-  id: string;
-  label: string;
-  value: number;
-}
-
-export interface StrokeItem {
-  id: string;
-  label: string;
-  value: number;
-}
-
-export interface ShadowItem {
-  id: string;
-  label: string;
-  value: string;
-  type: string;
-}
-
 export interface CustomColorGroup {
   id: string;
   name: string;
@@ -96,10 +77,6 @@ interface UIState {
    */
   warnings: string[];
 
-  // Custom token overrides, editable per row in the token panels
-  radiusList: RadiusItem[];
-  strokeList: StrokeItem[];
-  effectsList: ShadowItem[];
   customColorGroups: CustomColorGroup[];
 
   config: GenerationConfig;
@@ -134,11 +111,6 @@ interface UIState {
   clearWarnings: () => void;
   setScanProgress: (progress: number, message: string) => void;
 
-  updateRadiusItem: (id: string, value: number) => void;
-  addRadiusItem: () => void;
-  updateStrokeItem: (id: string, value: number) => void;
-  addStrokeItem: () => void;
-  updateEffectItem: (id: string, label: string) => void;
   addCustomColorGroup: (name: string, hex: string) => void;
 
   updateConfig: (patch: Partial<GenerationConfig>) => void;
@@ -205,28 +177,6 @@ export const useStore = create<UIState>((set, get) => ({
   lastError: null,
   warnings: [],
 
-  radiusList: [
-    { id: 'none', label: 'none', value: 0 },
-    { id: '1', label: '1', value: 2 },
-    { id: '2', label: '2', value: 4 },
-    { id: '3', label: '3', value: 6 },
-    { id: '4', label: '4', value: 8 },
-    { id: '5', label: '5', value: 10 },
-    { id: '6', label: '6', value: 12 },
-    { id: '7', label: '7', value: 16 },
-  ],
-  strokeList: [
-    { id: '0', label: '0', value: 1 },
-    { id: '1', label: '1', value: 2 },
-    { id: '2', label: '2', value: 4 },
-    { id: '3', label: '3', value: 6 },
-  ],
-  effectsList: [
-    { id: 'E0', label: 'E0', value: 'Drop Shadow', type: 'Drop Shadow' },
-    { id: 'E1', label: 'E1', value: 'Drop Shadow, In...', type: 'Drop Shadow' },
-    { id: 'E2', label: 'E2', value: 'Drop Shadow, In...', type: 'Drop Shadow' },
-    { id: 'E3', label: 'E3', value: 'Drop Shadow, In...', type: 'Drop Shadow' },
-  ],
   customColorGroups: [
     { id: 'red', name: 'Red', hex: '#EF4444' },
     { id: 'yellow', name: 'Yellow', hex: '#F59E0B' },
@@ -302,34 +252,6 @@ export const useStore = create<UIState>((set, get) => ({
   setScanProgress: (progress, message) => set({ scanProgress: progress, scanMessage: message }),
 
 
-  updateRadiusItem: (id, value) =>
-    set((s) => ({
-      radiusList: s.radiusList.map((item) => (item.id === id ? { ...item, value } : item)),
-    })),
-  addRadiusItem: () =>
-    set((s) => {
-      const newId = String(s.radiusList.length);
-      const lastVal = s.radiusList[s.radiusList.length - 1]?.value ?? 0;
-      return {
-        radiusList: [...s.radiusList, { id: newId, label: newId, value: lastVal + 4 }],
-      };
-    }),
-  updateStrokeItem: (id, value) =>
-    set((s) => ({
-      strokeList: s.strokeList.map((item) => (item.id === id ? { ...item, value } : item)),
-    })),
-  addStrokeItem: () =>
-    set((s) => {
-      const newId = String(s.strokeList.length);
-      const lastVal = s.strokeList[s.strokeList.length - 1]?.value ?? 1;
-      return {
-        strokeList: [...s.strokeList, { id: newId, label: newId, value: lastVal + 2 }],
-      };
-    }),
-  updateEffectItem: (id, label) =>
-    set((s) => ({
-      effectsList: s.effectsList.map((item) => (item.id === id ? { ...item, label, value: label } : item)),
-    })),
   addCustomColorGroup: (name, hex) =>
     set((s) => ({
       customColorGroups: [
