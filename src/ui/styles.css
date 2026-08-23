@@ -16,6 +16,17 @@
   --radius: 14px;
   --radius-lg: 22px;
 
+  /* Text and icon colours for the panel's dark islands — the component cards,
+     the code block and its header. Those surfaces stay dark on a light theme, so
+     they cannot use --text/--text-dim, and they cannot use --accent either:
+     --accent is near-black here, which is how the Copy Code button ended up
+     black on black. theme.css declares the same three, but they are repeated
+     here so this stylesheet is legible on its own — a missing variable resolves
+     to `inherit` for `color`, and the failure mode is invisible text. */
+  --on-ink: #f4f4f2;
+  --on-ink-dim: #8b929c;
+  --brand-chrome: #5b8ef7;
+
   /* This iframe cannot load webfonts. vite.config.ts builds its own HTML shell
      with no <link> tags, and manifest.json declares
      networkAccess.allowedDomains: ["none"], so a font request is blocked twice
@@ -351,15 +362,19 @@ h1, h2, h3, h4, h5, h6,
 .dsk-secondary-btn:hover { background: #303030; }
 
 .dsk-components-desc {
-  color: #888;
+  color: var(--text-dim);
   font-size: 13px;
   margin-bottom: 16px;
   line-height: 1.4;
 }
 
+/* Was `color: #fff` — white text on a light panel, 1.11:1, so the count of
+   matching components was invisible. Another line left behind when the theme
+   moved from a dark surface to a light one. It reads as a heading for the grid
+   below it, so it takes the full-strength text colour rather than --text-dim. */
 .dsk-components-count {
   font-weight: 600;
-  color: #fff;
+  color: var(--text);
   font-size: 14px;
   margin-bottom: 16px;
 }
@@ -398,11 +413,15 @@ h1, h2, h3, h4, h5, h6,
   font-weight: 700;
 }
 
+/* --accent is near-black on the light theme, so on the blue-tinted dark card a
+   selected component's tick measured 1.26:1 — the one mark that says "this is
+   in the run" was invisible. --brand-chrome is the light-on-dark form of the
+   brand colour and clears 4.4:1 here. */
 .dsk-card-check {
   position: absolute;
   top: 6px;
   right: 6px;
-  color: var(--accent);
+  color: var(--brand-chrome);
 }
 
 .dsk-card-info {
@@ -411,14 +430,19 @@ h1, h2, h3, h4, h5, h6,
   gap: 2px;
 }
 
+/* The component card is a dark island on a light panel, so its text takes the
+   on-ink pair rather than the page text colours. The variant count was #888,
+   which measured 4.38:1 at 11px — close enough to look fine and still under the
+   4.5:1 that size needs, on the one label that tells you how much the run will
+   actually build. */
 .dsk-card-title {
   font-weight: 600;
-  color: #fff;
+  color: var(--on-ink);
   font-size: 13px;
 }
 
 .dsk-card-variants {
-  color: #888;
+  color: var(--on-ink-dim);
   font-size: 11px;
 }
 
@@ -555,7 +579,9 @@ h1, h2, h3, h4, h5, h6,
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent);
+  /* Dark tile, so the glyph needs the on-ink colour — --accent is near-black on
+     this theme and put a black icon on a near-black square. */
+  color: var(--on-ink);
   margin-bottom: 20px;
 }
 
@@ -565,10 +591,13 @@ h1, h2, h3, h4, h5, h6,
   gap: 10px;
   margin-bottom: 8px;
 }
-.dsk-code-header-badge h2 { font-size: 22px; font-weight: 700; color: #fff; }
+/* Both of these were dark-surface values sitting on the light Export panel:
+   #fff on #f3f3f0 is 1.11:1, so the view's own title was invisible, and #888 at
+   13px is 3.19:1, under the 4.5:1 that size needs. */
+.dsk-code-header-badge h2 { font-size: 22px; font-weight: 700; color: var(--text); }
 
 .dsk-code-desc {
-  color: #888;
+  color: var(--text-dim);
   font-size: 13px;
   line-height: 1.5;
   margin-bottom: 24px;
@@ -619,10 +648,14 @@ h1, h2, h3, h4, h5, h6,
   gap: 4px;
 }
 
+/* Save file / Copy Code sit in the code block's dark header, and --accent is
+   near-black on the light theme — 1.11:1, so the two actions the Export view
+   exists for were black on black. The code block is deliberately dark, so these
+   take the on-ink text colour rather than the page one. */
 .dsk-copy-btn {
   background: transparent;
   border: none;
-  color: var(--accent);
+  color: var(--on-ink);
   font-size: 12px;
   cursor: pointer;
   display: flex;
