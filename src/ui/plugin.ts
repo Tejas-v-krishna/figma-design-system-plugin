@@ -24,6 +24,16 @@ export function postToPlugin(message: unknown): void {
  * has to be handled. `warnings` rides on the two messages that can carry config
  * repairs.
  */
+/** What a generate would overwrite. Mirrors ExistingSummary in the sandbox. */
+export interface ExistingSummary {
+  pages: string[];
+  paintStyles: number;
+  textStyles: number;
+  effectStyles: number;
+  duplicateStyles: number;
+  hasAny: boolean;
+}
+
 export type PluginIncoming =
   | { type: 'GENERATION_START'; payload: { step: GenerationStep | string; progress: number } }
   | { type: 'GENERATION_PROGRESS'; payload: GenerationProgress }
@@ -51,7 +61,8 @@ export type PluginIncoming =
   // missing key.
   | { type: 'COLOR_SELECTED'; payload: { hex?: string; name?: string | null } }
   | { type: 'PERSISTED_CONFIG'; payload: Partial<GenerationConfig>; warnings?: string[] }
-  | { type: 'PLUGIN_ERROR'; payload: { message: string } };
+  | { type: 'PLUGIN_ERROR'; payload: { message: string } }
+  | { type: 'EXISTING_SUMMARY'; payload: ExistingSummary };
 
 export type PluginIncomingType = PluginIncoming['type'];
 
@@ -66,6 +77,7 @@ const INCOMING_TYPES: ReadonlySet<string> = new Set<PluginIncomingType>([
   'COLOR_SELECTED',
   'PERSISTED_CONFIG',
   'PLUGIN_ERROR',
+  'EXISTING_SUMMARY',
 ]);
 
 export function onPluginMessage(handler: (msg: PluginIncoming) => void): () => void {
