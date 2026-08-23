@@ -37,7 +37,7 @@ export function boardShell(name: string): FrameNode {
   board.paddingRight = PAD;
   board.fills = [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }];
   board.cornerRadius = 20;
-  board.clipsContent = false;
+  board.clipsContent = true;  // prevent component overflow from bleeding into adjacent boards
   board.effects = [
     {
       type: 'DROP_SHADOW',

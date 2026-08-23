@@ -27,6 +27,7 @@ export async function buildDesignSystemBentoBoard(
   board.itemSpacing = 36;
   pad(board, 48, 48);
   board.cornerRadius = 24;
+  board.clipsContent = true;
   setFill(board, '#F8F7F4'); // Warm premier canvas background from Image 5
 
   // 1. Editorial Header
@@ -93,6 +94,7 @@ export async function buildDesignSystemBentoBoard(
     card.itemSpacing = 16;
     pad(card, 24, 24);
     card.cornerRadius = 20;
+    card.clipsContent = true;  // prevent overflow from bleeding onto adjacent boards
     setFill(card, '#FFFFFF');
     setStroke(card, '#F1F0EC', 1);
     card.effects = [
@@ -123,6 +125,7 @@ export async function buildDesignSystemBentoBoard(
     body.itemSpacing = 12;
     body.resize(colWidth - 48, 40);
     body.fills = [];
+    body.clipsContent = false;  // body can still overflow within the card
     card.appendChild(body);
 
     return { card, body };
