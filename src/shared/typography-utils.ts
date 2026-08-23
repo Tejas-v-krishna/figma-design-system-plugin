@@ -97,15 +97,30 @@ export const SHADOW_SCALE = [
   { name: 'E3', x: 0, y: 10, blur: 20, spread: -3, color: 'rgba(0, 0, 0, 0.15)', inset: false },
 ];
 
+/**
+ * Semantic step names, not ordinals.
+ *
+ * This scale used to be named `none,1,2,3,4,5,6,7`, while all 39 call sites in
+ * the component templates asked for `sm`/`md`/`lg`/`xl`. None of those names
+ * existed, so radiusPx returned its hardcoded 8px fallback every time and the
+ * radius scale never reached a single generated component. Names now match
+ * what the templates — and every other design system a user has seen — use.
+ *
+ * `md` is 8px so the components that were silently getting the 8px fallback
+ * keep the corners they had. The steps are geometric rather than the old
+ * near-linear 2,4,6,8,10,12,16: a radius scale with both 6 and 10 in it offers
+ * a choice nobody can see. `full` replaces the 9999 that templates hardcoded
+ * for the pill preset.
+ */
 export const BORDER_RADIUS_SCALE = [
   { name: 'none', value: '0px', px: 0 },
-  { name: '1', value: '2px', px: 2 },
-  { name: '2', value: '4px', px: 4 },
-  { name: '3', value: '6px', px: 6 },
-  { name: '4', value: '8px', px: 8 },
-  { name: '5', value: '10px', px: 10 },
-  { name: '6', value: '12px', px: 12 },
-  { name: '7', value: '16px', px: 16 },
+  { name: 'xs', value: '2px', px: 2 },
+  { name: 'sm', value: '4px', px: 4 },
+  { name: 'md', value: '8px', px: 8 },
+  { name: 'lg', value: '12px', px: 12 },
+  { name: 'xl', value: '16px', px: 16 },
+  { name: '2xl', value: '24px', px: 24 },
+  { name: 'full', value: '9999px', px: 9999 },
 ];
 
 export const BORDER_STROKE_SCALE = [
