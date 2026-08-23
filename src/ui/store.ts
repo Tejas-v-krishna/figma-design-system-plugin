@@ -9,11 +9,13 @@ import { COMPONENT_DEFINITIONS } from '../shared/component-definitions';
 import { BRAND_PRESETS, BrandPreset } from '../shared/presets';
 import { postToPlugin, ExistingSummary } from './plugin';
 
-// 'brand', 'typography', 'components' and 'export' are aliases for the four real
-// panels, kept because App routes them and older saved state may still hold one.
-// 'review' was in this union with no route and nothing setting it, so
-// setView('review') type-checked and rendered an empty main area.
-export type View = 'set-tokens' | 'build-components' | 'code' | 'brand' | 'typography' | 'components' | 'export' | 'scan';
+// Exactly the four panels the header offers, and nothing else. There used to be
+// four more members — 'brand', 'typography', 'components' and 'export' — that
+// App routed to one of these four anyway, plus a 'review' that routed nowhere
+// and rendered an empty main area. They were kept on the theory that persisted
+// state might still hold one, but `persist` only ever saves `config`, so a view
+// name has never survived a reload.
+export type View = 'set-tokens' | 'build-components' | 'code' | 'scan';
 export type TokenCategory = 'colors' | 'gradients' | 'typography' | 'spacing' | 'radius' | 'stroke' | 'effects' | 'motion';
 export type Overlay = 'none' | 'generating' | 'success';
 export type ExportFormat = 'json' | 'css' | 'tailwind' | 'dtcg';
@@ -398,7 +400,7 @@ export const useStore = create<UIState>((set, get) => ({
     set((s) => ({
       config: { ...s.config, ...patch },
       importOpen: false,
-      view: 'brand',
+      view: 'set-tokens',
       tokenCategory: 'colors',
     }));
     get().persist();

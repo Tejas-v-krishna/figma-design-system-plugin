@@ -63,7 +63,7 @@ export function SuccessOverlay() {
         )}
 
         <div className="success-actions">
-          <Button onClick={leave(() => setView('export'))}>
+          <Button onClick={leave(() => setView('code'))}>
             <Download size={16} /> Export tokens
           </Button>
           <Button variant="secondary" onClick={leave(() => setView('scan'))}>

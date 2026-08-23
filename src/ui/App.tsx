@@ -106,9 +106,9 @@ export default function App() {
         </div>
       )}
       <main className="dsk-main-content">
-        {(view === 'set-tokens' || view === 'brand' || view === 'typography') && <SetTokensView />}
-        {(view === 'build-components' || view === 'components') && <BuildComponentsView />}
-        {(view === 'code' || view === 'export') && <CodeExportView />}
+        {view === 'set-tokens' && <SetTokensView />}
+        {view === 'build-components' && <BuildComponentsView />}
+        {view === 'code' && <CodeExportView />}
         {view === 'scan' && <AuditView />}
       </main>
 

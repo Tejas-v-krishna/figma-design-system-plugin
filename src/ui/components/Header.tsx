@@ -35,19 +35,19 @@ export const Header: React.FC = () => {
 
       <nav className="dsk-header-nav">
         <button
-          className={`dsk-nav-tab ${view === 'set-tokens' || view === 'brand' || view === 'typography' ? 'active' : ''}`}
+          className={`dsk-nav-tab ${view === 'set-tokens' ? 'active' : ''}`}
           onClick={() => setView('set-tokens')}
         >
           Set Tokens
         </button>
         <button
-          className={`dsk-nav-tab ${view === 'build-components' || view === 'components' ? 'active' : ''}`}
+          className={`dsk-nav-tab ${view === 'build-components' ? 'active' : ''}`}
           onClick={() => setView('build-components')}
         >
           Build Components
         </button>
         <button
-          className={`dsk-nav-tab ${view === 'code' || view === 'export' ? 'active' : ''}`}
+          className={`dsk-nav-tab ${view === 'code' ? 'active' : ''}`}
           onClick={() => setView('code')}
         >
           Code
