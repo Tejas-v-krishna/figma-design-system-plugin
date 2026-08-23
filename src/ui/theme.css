@@ -37,11 +37,16 @@
   --brand-ink: #ffffff;
   --brand-wash: rgba(37, 99, 235, 0.1);
 
-  /* ---- Signal ---- */
+  /* ---- Signal. Every value here is picked to clear 4.5:1 against its own wash
+          on this light surface, because these are the colours the plugin uses to
+          tell the user something went wrong. ---- */
   --signal-ok: #1a7f5a;
-  --signal-warn: #9a6510;
+  --signal-warn: #8a5a0d;
+  --signal-warn-wash: #fdf3e3;
+  --signal-warn-line: #e8c98f;
   --signal-bad: #b3261e;
   --signal-bad-wash: #fdecea;
+  --signal-bad-line: #f0b4ae;
 
   /* ---- Geometry. --radius-user is overwritten from the chosen radius
           preset: the panel's own corners demonstrate your token. ---- */
@@ -76,6 +81,7 @@
   --accent-glow: var(--brand-wash);
   --danger: var(--signal-bad);
   --ok: var(--signal-ok);
+  --warn: var(--signal-warn);
   --radius: var(--radius-user);
   --radius-lg: var(--radius-sheet);
 
@@ -83,6 +89,9 @@
      .overlay-card, .modal, .drawer and .progress-fill but never defined, so all
      of those rendered with the property dropped. */
   --danger-soft: var(--signal-bad-wash);
+  --danger-line: var(--signal-bad-line);
+  --warn-soft: var(--signal-warn-wash);
+  --warn-line: var(--signal-warn-line);
   --grad: linear-gradient(180deg, var(--brand) 0%, var(--brand-chrome) 100%);
   --shadow: 0 8px 28px rgba(10, 12, 16, 0.18);
 }
