@@ -504,6 +504,30 @@ h1, h2, h3, h4, h5, h6,
   background: #2c2c2e;
 }
 
+/* A blocked action has to look blocked. Generate is now disabled until at least
+   one component is selected, and without this it kept the full black fill and
+   the lift-on-hover — so the only feedback for pressing it was nothing at all
+   happening, which reads as a broken button rather than a precondition.
+
+   The :disabled:hover pair is not redundant: a disabled button still matches
+   :hover in every browser, so the rules above would otherwise win on
+   specificity the moment the pointer crossed it. The outline is an inset shadow
+   rather than a border so the geometry doesn't shift between states. */
+.dsk-primary-btn:disabled,
+.dsk-primary-btn:disabled:hover,
+.dsk-split-caret:disabled,
+.dsk-split-caret:disabled:hover {
+  background: var(--panel-3);
+  color: var(--text-dim);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+  transform: none;
+  cursor: not-allowed;
+}
+.dsk-split-caret:disabled,
+.dsk-split-caret:disabled:hover {
+  border-left-color: var(--border-strong);
+}
+
 /* ---------- Code Export Screen ---------- */
 .dsk-code-view-container {
   flex: 1;
