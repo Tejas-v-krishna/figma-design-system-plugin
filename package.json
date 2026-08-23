@@ -22,8 +22,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "lint:fix": "eslint . --fix",
-    "check:config": "vite-node scripts/check-config-schema.ts",
-    "check:dtcg": "vite-node scripts/check-dtcg-parity.ts"
+    "check:config": "tsx scripts/check-config-schema.ts",
+    "check:dtcg": "tsx scripts/check-dtcg-parity.ts"
   },
   "dependencies": {
     "culori": "^4.0.2",
@@ -42,6 +42,7 @@
     "eslint": "^9.39.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "globals": "^15.15.0",
+    "tsx": "^4.23.12",
     "typescript": "^5.3.2",
     "typescript-eslint": "^8.67.0",
     "vite": "^5.0.8",
