@@ -437,12 +437,15 @@ export const useStore = create<UIState>((set, get) => ({
   // Export and scan failures also raise lastError so App's banner shows them.
   // Without this the only feedback for a failed export was the button leaving
   // its busy state — exportError was set and never rendered anywhere.
+  //
+  // Neither clears lastError on success: requestExport and requestScan do that
+  // when they start, which is the moment a previous failure stops being true.
   exportComplete: (success, result, message) =>
     set({
       exportBusy: false,
       exportResult: success ? result : null,
       exportError: success ? null : message ?? 'Export failed',
-      lastError: success ? null : message ?? 'Export failed',
+      ...(success ? {} : { lastError: message ?? 'Export failed' }),
     }),
 
   scanComplete: (success, report, message) =>
@@ -450,7 +453,7 @@ export const useStore = create<UIState>((set, get) => ({
       scanBusy: false,
       scanResult: success ? report : null,
       scanError: success ? null : message ?? 'Scan failed',
-      lastError: success ? null : message ?? 'Scan failed',
+      ...(success ? {} : { lastError: message ?? 'Scan failed' }),
     }),
 
   setAvailableFonts: (fonts) => set({ availableFonts: fonts }),
@@ -524,14 +527,26 @@ export const useStore = create<UIState>((set, get) => ({
     set({ existingSummary: summary, checkingExisting: false });
   },
   requestExport: (format) => {
-    set({ exportBusy: true, exportResult: null, exportError: null });
+    // lastError is cleared here, at the start, rather than on the success path
+    // of exportComplete. Pressing the button is what makes a previous failure of
+    // this action moot; a *success* arriving later says nothing about an error
+    // raised by some other action, and clearing it there wiped messages the user
+    // had not read yet.
+    set({ exportBusy: true, exportResult: null, exportError: null, lastError: null });
     // Send the config too: the plugin sandbox loses its token cache on every
     // reopen, and tokens are derivable from config, so this makes export work
     // without forcing a generate first.
     postToPlugin({ type: 'EXPORT_TOKENS', payload: { format, config: get().config } });
   },
   requestScan: () => {
-    set({ scanBusy: true, scanResult: null, scanError: null, scanProgress: 0, scanMessage: 'Starting scan…' });
+    set({
+      scanBusy: true,
+      scanResult: null,
+      scanError: null,
+      lastError: null,
+      scanProgress: 0,
+      scanMessage: 'Starting scan…',
+    });
     postToPlugin({ type: 'SCAN_USAGE' });
   },
 }));
