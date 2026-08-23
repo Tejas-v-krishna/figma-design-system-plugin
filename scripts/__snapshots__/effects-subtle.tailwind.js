@@ -132,10 +132,10 @@ module.exports = {
         "full": "9999px"
       },
       "borderWidth": {
-        "0": "1px",
-        "1": "2px",
-        "2": "4px",
-        "3": "6px"
+        "1": "1px",
+        "2": "2px",
+        "4": "4px",
+        "6": "6px"
       },
       "boxShadow": {
         "xs": "0px 1px 1px 0px rgba(0, 0, 0, 0.035)",

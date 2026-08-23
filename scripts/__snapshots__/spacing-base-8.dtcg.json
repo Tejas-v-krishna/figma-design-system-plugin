@@ -450,19 +450,19 @@
     }
   },
   "strokeWidth": {
-    "0": {
+    "1": {
       "$type": "dimension",
       "$value": "1px"
     },
-    "1": {
+    "2": {
       "$type": "dimension",
       "$value": "2px"
     },
-    "2": {
+    "4": {
       "$type": "dimension",
       "$value": "4px"
     },
-    "3": {
+    "6": {
       "$type": "dimension",
       "$value": "6px"
     }

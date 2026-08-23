@@ -114,10 +114,10 @@
   --radius-2xl: 9999px;
   --radius-full: 9999px;
   /* Stroke */
-  --stroke-0: 1px;
-  --stroke-1: 2px;
-  --stroke-2: 4px;
-  --stroke-3: 6px;
+  --stroke-1: 1px;
+  --stroke-2: 2px;
+  --stroke-4: 4px;
+  --stroke-6: 6px;
   /* Elevation */
   --shadow-xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
   --shadow-sm: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);

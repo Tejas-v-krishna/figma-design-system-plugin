@@ -141,11 +141,24 @@ export const BORDER_RADIUS_SCALE = [
   { name: 'full', value: '9999px', px: 9999 },
 ];
 
+/**
+ * Named for the width each step is, not for its position in the list.
+ *
+ * These were `0,1,2,3` against values `1,2,4,6`, so every name was off by one
+ * from the thing it named: `--stroke-0` was a 1px border and `--stroke-3` was
+ * 6px. A four-entry scale where the label contradicts the value is a scale
+ * people will misuse, and unlike the radius and shadow scales nothing looks
+ * these up by name — they are only ever iterated — so the names existed purely
+ * to be read by a user, and were wrong for that one job.
+ *
+ * Value-named rather than xs/sm/md/lg because a border width has no semantics
+ * beyond its width; this is the convention Tailwind and Polaris both use.
+ */
 export const BORDER_STROKE_SCALE = [
-  { name: '0', value: 1 },
-  { name: '1', value: 2 },
-  { name: '2', value: 4 },
-  { name: '3', value: 6 },
+  { name: '1', value: 1 },
+  { name: '2', value: 2 },
+  { name: '4', value: 4 },
+  { name: '6', value: 6 },
 ];
 
 export function generateSpacingTokens(baseUnit: number = 4): SpacingToken[] {
