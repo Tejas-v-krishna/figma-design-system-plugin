@@ -2956,31 +2956,171 @@ const SplitButton: Template = (root, ctx) => {
 };
 
 const FloatingActionButton: Template = (root, ctx) => {
-  const isExtended = variantKey(ctx).includes('extended');
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const isHover = sKey === 'hover';
+  const isActive = sKey === 'active';
+  const isDisabled = sKey === 'disabled';
+
+  const isExtended = vKey.includes('extended');
+  const isSurface = vKey.includes('surface') || vKey.includes('secondary');
+  const isTonal = vKey.includes('tonal');
+
+  const szKey = String(ctx.sizeName || ctx.sizeProps.name || 'md').toLowerCase();
+  const dim = szKey === 'sm' ? 40 : szKey === 'lg' ? 56 : 48;
+  const iconSz = szKey === 'sm' ? 16 : szKey === 'lg' ? 22 : 18;
+  const fontSize = szKey === 'sm' ? 12 : szKey === 'lg' ? 15 : 14;
+  const padY = szKey === 'sm' ? 8 : szKey === 'lg' ? 14 : 12;
+  const padX = szKey === 'sm' ? 14 : szKey === 'lg' ? 22 : 18;
+
   root.layoutMode = 'HORIZONTAL';
   root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
   root.cornerRadius = 9999;
-  setFill(root, '#18181B');
-  root.effects = [{
-    type: 'DROP_SHADOW',
-    color: { r: 0, g: 0, b: 0, a: 0.16 },
-    offset: { x: 0, y: 4 },
-    radius: 12,
-    spread: 0,
-    visible: true,
-    blendMode: 'NORMAL',
-  }];
+  root.strokes = [];
+  root.effects = [];
+
+  let fgHex = '#FFFFFF';
+
+  if (isSurface) {
+    if (isDisabled) {
+      setFill(root, '#FAFAFA');
+      setStroke(root, '#E4E4E7', 1);
+      fgHex = '#A1A1AA';
+    } else if (isActive) {
+      setFill(root, '#E4E4E7');
+      setStroke(root, '#D4D4D8', 1);
+      fgHex = '#18181B';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.06 },
+        offset: { x: 0, y: 1 },
+        radius: 3,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    } else if (isHover) {
+      setFill(root, '#F4F4F5');
+      setStroke(root, '#D4D4D8', 1);
+      fgHex = '#18181B';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.12 },
+        offset: { x: 0, y: 6 },
+        radius: 14,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    } else {
+      setFill(root, '#FFFFFF');
+      setStroke(root, '#E4E4E7', 1);
+      fgHex = '#18181B';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.08 },
+        offset: { x: 0, y: 3 },
+        radius: 8,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    }
+  } else if (isTonal) {
+    if (isDisabled) {
+      setFill(root, '#FAFAFA');
+      fgHex = '#A1A1AA';
+    } else if (isActive) {
+      setFill(root, '#D4D4D8');
+      fgHex = '#18181B';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.05 },
+        offset: { x: 0, y: 1 },
+        radius: 3,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    } else if (isHover) {
+      setFill(root, '#E4E4E7');
+      fgHex = '#18181B';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.1 },
+        offset: { x: 0, y: 5 },
+        radius: 12,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    } else {
+      setFill(root, '#F4F4F5');
+      fgHex = '#18181B';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.06 },
+        offset: { x: 0, y: 3 },
+        radius: 6,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    }
+  } else {
+    // Solid Obsidian
+    if (isDisabled) {
+      setFill(root, '#E4E4E7');
+      fgHex = '#A1A1AA';
+    } else if (isActive) {
+      setFill(root, '#09090B');
+      fgHex = '#FFFFFF';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.16 },
+        offset: { x: 0, y: 2 },
+        radius: 4,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    } else if (isHover) {
+      setFill(root, '#27272A');
+      fgHex = '#FFFFFF';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.26 },
+        offset: { x: 0, y: 7 },
+        radius: 16,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    } else {
+      setFill(root, '#18181B');
+      fgHex = '#FFFFFF';
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.18 },
+        offset: { x: 0, y: 4 },
+        radius: 10,
+        spread: 0,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    }
+  }
 
   if (isExtended) {
-    pad(root, 12, 20);
+    pad(root, padY, padX);
     root.itemSpacing = 8;
-    root.appendChild(buildIcon(16, '#FFFFFF', 'plus'));
-    root.appendChild(text({ characters: 'Create New', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 14, fill: '#FFFFFF' }));
+    root.appendChild(buildIcon(iconSz, fgHex, 'plus'));
+    root.appendChild(text({ characters: 'Create New', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize, fill: fgHex }));
   } else {
     pad(root, 0, 0);
-    root.resize(48, 48);
-    root.appendChild(buildIcon(20, '#FFFFFF', 'plus'));
+    root.resize(dim, dim);
+    root.appendChild(buildIcon(iconSz, fgHex, 'plus'));
   }
   return root;
 };
