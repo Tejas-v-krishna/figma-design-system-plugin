@@ -462,27 +462,14 @@ export async function generateComponents(
             cell.counterAxisSizingMode = 'AUTO';
             cell.primaryAxisAlignItems = 'CENTER';
             cell.counterAxisAlignItems = 'CENTER';
-            cell.itemSpacing = 8;
-            cell.paddingTop = 0;
-            cell.paddingBottom = 4;
+            cell.itemSpacing = 10;
+            cell.paddingTop = 6;
+            cell.paddingBottom = 6;
             cell.paddingLeft = 4;
             cell.paddingRight = 4;
             cell.fills = [];
-
-            // A fixed-height stage ensures all buttons of varying heights align along the exact same central text baseline
-            const stage = figma.createFrame();
-            stage.name = 'Stage';
-            stage.layoutMode = 'HORIZONTAL';
-            stage.primaryAxisSizingMode = 'AUTO';
-            stage.counterAxisSizingMode = 'FIXED';
-            stage.primaryAxisAlignItems = 'CENTER';
-            stage.counterAxisAlignItems = 'CENTER';
-            stage.resize(10, 60);
-            stage.fills = [];
-            stage.clipsContent = false;
-            stage.appendChild(n);
-
-            cell.appendChild(stage);
+            cell.clipsContent = false;
+            cell.appendChild(n);
 
             const propLabel = figma.createText();
             propLabel.fontName = await ensureFont(config.fontFamily.body, 500);
