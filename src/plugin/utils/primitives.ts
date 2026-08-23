@@ -248,7 +248,7 @@ export interface TextOptions {
 export function text(opts: TextOptions): TextNode {
   const t = figma.createText();
   t.name = opts.characters || 'text';
-  t.fontName = resolveFont(opts.fontFamily ?? 'Inter', opts.weight ?? 400);
+  t.fontName = resolveFont(opts.fontFamily ?? 'Google Sans', opts.weight ?? 400);
   t.fontSize = opts.fontSize ?? 14;
   t.characters = opts.characters;
   t.fills = [{ type: 'SOLID', color: hexToRgb(opts.fill ?? '#0F172A') }];
