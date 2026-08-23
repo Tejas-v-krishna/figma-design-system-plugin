@@ -111,6 +111,26 @@ export const Rail: React.FC<{ counts: TokenCounts }> = ({ counts }) => {
           </button>
         )}
 
+        <button
+          type="button"
+          className="dsk-build-btn"
+          style={{
+            marginTop: 6,
+            background: 'var(--surface-sunk)',
+            color: 'var(--text)',
+            border: '1px solid var(--hairline)',
+            boxShadow: 'none',
+            fontSize: '11px',
+            padding: '6px 10px',
+            fontWeight: 500,
+          }}
+          onClick={() => startGeneration('all')}
+          disabled={generateBusy}
+          title="Build all design system pages and token boards on canvas"
+        >
+          Build Full System ❖
+        </button>
+
         <div className="dsk-rail-icon-row">
           <button
             type="button"

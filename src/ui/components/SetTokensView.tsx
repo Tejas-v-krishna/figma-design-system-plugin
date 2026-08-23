@@ -67,6 +67,7 @@ export const SetTokensView: React.FC = () => {
   const current = useStore((s) => s.destination);
 
   const addCustomColorGroup = useStore((s) => s.addCustomColorGroup);
+  const customColorGroups = useStore((s) => s.customColorGroups);
 
   const storeSelectedColor = useStore((s) => s.selectedColor);
   const setSelectedColor = useStore((s) => s.setSelectedColor);
@@ -311,10 +312,10 @@ export const SetTokensView: React.FC = () => {
 
       case 'colour': {
         const handleAddColor = () => {
-          const name = prompt('Enter new color name (e.g. Purple, Cyan, Brand Accent):');
-          if (name) {
-            addCustomColorGroup(name, '#8B5CF6');
-          }
+          const nextIndex = customColorGroups.length + 1;
+          const defaultHues = ['#8B5CF6', '#EC4899', '#06B6D4', '#14B8A6', '#F43F5E'];
+          const nextHex = defaultHues[customColorGroups.length % defaultHues.length] || '#8B5CF6';
+          addCustomColorGroup(`Custom ${nextIndex}`, nextHex);
         };
 
         const neutShades = generateColorShades(config.neutralColor || '#64748B');

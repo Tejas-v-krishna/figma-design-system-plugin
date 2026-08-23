@@ -61,6 +61,20 @@ function firstModeId(collection: VariableCollection): string {
   return mode.modeId;
 }
 
+function findOrCreateCollection(name: string): VariableCollection {
+  const existing = figma.variables.getLocalVariableCollections().find((c) => c.name === name);
+  if (existing) return existing;
+  return figma.variables.createVariableCollection(name);
+}
+
+function findOrCreateVariable(name: string, collection: VariableCollection, type: VariableResolvedDataType): Variable {
+  const existing = collection.variableIds
+    .map((id) => figma.variables.getVariableById(id))
+    .find((v) => v && v.name === name);
+  if (existing) return existing;
+  return figma.variables.createVariable(name, collection, type);
+}
+
 export function createVariables(tokens: DesignTokens, config: GenerationConfig): VariableMap {
   const map = emptyVariableMap();
   if (!config.options.createVariables) return map;
@@ -68,13 +82,15 @@ export function createVariables(tokens: DesignTokens, config: GenerationConfig):
   const brand = config.brandName || 'Design System';
 
   // ---------- Tier 1: Primitives ----------
-  const primCollection = figma.variables.createVariableCollection(`${brand} / Primitives`);
+  const primCollection = findOrCreateCollection(`${brand} / Primitives`);
   const primMode = firstModeId(primCollection);
-  primCollection.renameMode(primMode, 'Light');
+  if (primCollection.modes[0]?.name !== 'Light') {
+    primCollection.renameMode(primMode, 'Light');
+  }
 
   const primitiveByName: Record<string, Variable> = {};
   const makePrimitive = (name: string, hex: string): Variable => {
-    const v = figma.variables.createVariable(name, primCollection, 'COLOR');
+    const v = findOrCreateVariable(name, primCollection, 'COLOR');
     v.setValueForMode(primMode, hexToRgb(hex));
     return v;
   };
@@ -105,10 +121,15 @@ export function createVariables(tokens: DesignTokens, config: GenerationConfig):
   };
 
   // ---------- Tier 2: Semantic ----------
-  const semCollection = figma.variables.createVariableCollection(`${brand} / Semantic`);
+  const semCollection = findOrCreateCollection(`${brand} / Semantic`);
   const semLight = firstModeId(semCollection);
-  semCollection.renameMode(semLight, 'Light');
-  const semDark = config.options.includeDarkMode ? semCollection.addMode('Dark') : undefined;
+  if (semCollection.modes[0]?.name !== 'Light') {
+    semCollection.renameMode(semLight, 'Light');
+  }
+  let semDark = semCollection.modes.find((m) => m.name === 'Dark')?.modeId;
+  if (config.options.includeDarkMode && !semDark) {
+    semDark = semCollection.addMode('Dark');
+  }
 
   for (const d of SEMANTIC_DEFS) {
     const name = semanticColorKey(d.name);
@@ -117,7 +138,7 @@ export function createVariables(tokens: DesignTokens, config: GenerationConfig):
       console.warn(`[design-system-kit] skipping semantic variable ${name}: no primitive for ${d.light.join('/')}`);
       continue;
     }
-    const v = figma.variables.createVariable(name, semCollection, 'COLOR');
+    const v = findOrCreateVariable(name, semCollection, 'COLOR');
     v.setValueForMode(semLight, figma.variables.createVariableAlias(lightRef));
     if (semDark) {
       const darkRef = lookupPrimitive(d.dark ?? d.light) ?? lightRef;
@@ -140,7 +161,7 @@ export function createVariables(tokens: DesignTokens, config: GenerationConfig):
       const lightVar = primitiveByName[key];
       const darkVar = semDark ? primitiveByName[colorStyleKey(colorName, mirrorShade(Number(shade)))] : undefined;
       if (!lightVar || (semDark && !darkVar)) continue;
-      const v = figma.variables.createVariable(key, semCollection, 'COLOR');
+      const v = findOrCreateVariable(key, semCollection, 'COLOR');
       v.setValueForMode(semLight, figma.variables.createVariableAlias(lightVar));
       if (semDark && darkVar) v.setValueForMode(semDark, figma.variables.createVariableAlias(darkVar));
       map.semantic[key] = v;
@@ -148,15 +169,20 @@ export function createVariables(tokens: DesignTokens, config: GenerationConfig):
   }
 
   // ---------- Tier 3: Component ----------
-  const compCollection = figma.variables.createVariableCollection(`${brand} / Components`);
+  const compCollection = findOrCreateCollection(`${brand} / Components`);
   const compLight = firstModeId(compCollection);
-  compCollection.renameMode(compLight, 'Light');
-  const compDark = config.options.includeDarkMode ? compCollection.addMode('Dark') : undefined;
+  if (compCollection.modes[0]?.name !== 'Light') {
+    compCollection.renameMode(compLight, 'Light');
+  }
+  let compDark = compCollection.modes.find((m) => m.name === 'Dark')?.modeId;
+  if (config.options.includeDarkMode && !compDark) {
+    compDark = compCollection.addMode('Dark');
+  }
 
   for (const d of COMPONENT_DEFS) {
     const target = map.semantic[semanticColorKey(d.semantic)];
     if (!target) continue;
-    const v = figma.variables.createVariable(d.name, compCollection, 'COLOR');
+    const v = findOrCreateVariable(d.name, compCollection, 'COLOR');
     // Both modes alias the same semantic variable — its own mode resolves the
     // dark primitive, so the component tier themes for free.
     v.setValueForMode(compLight, figma.variables.createVariableAlias(target));

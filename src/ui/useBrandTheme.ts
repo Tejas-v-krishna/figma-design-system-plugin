@@ -12,7 +12,7 @@ import { bestTextOn, clampLightness, nudgeToContrast } from '../shared/contrast'
  * headings. See docs/DESIGN.md — "the tool wears your system".
  */
 
-const INK = '#14161a';
+const RAIL_SURFACE = '#F7F7F6';
 
 // The chosen radius preset, applied to the panel's own controls. Not a literal
 // copy of the token value: a 9999px pill would swallow a 26px swatch button, so
@@ -35,14 +35,10 @@ function rgbaFrom(hex: string, alpha: number): string {
  * Exported separately from the hook so it can be tested without a DOM.
  */
 export function deriveBrandVars(brandHex: string): Record<string, string> {
-  // --brand-chrome is the variant used anywhere the brand meets the dark
-  // instrument: the rail's active marker and its focus rings. A brand colour of
-  // #0A0A0A or #FFFFFF would otherwise be invisible there, so lightness is
-  // clamped into a legible band and then nudged until it actually clears 3:1
-  // against the rail. Hue and saturation are preserved throughout, so it still
-  // reads as the user's colour.
-  const chromeBase = clampLightness(brandHex, 45, 82);
-  const chrome = nudgeToContrast(chromeBase, INK, 3);
+  // On a light rail, dark brands must clamp down (20..62) and nudge to 4.5:1
+  // contrast so the brand tick and focus rings remain distinct on light chrome.
+  const chromeBase = clampLightness(brandHex, 20, 62);
+  const chrome = nudgeToContrast(chromeBase, RAIL_SURFACE, 4.5);
 
   return {
     '--brand': brandHex,

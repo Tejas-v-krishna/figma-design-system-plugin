@@ -41,7 +41,16 @@ import { colorShade, radiusPx, shadow } from '../utils/tokenAccess';
 import { setLastTokens } from '../utils/tokensStore';
 import { generateComponents } from '../utils/factory';
 import { createVariables, VariableMap, emptyVariableMap } from '../utils/variables';
-import { BoardContext, TOKEN_BOARD_BUILDERS, TokenBoardTarget, isTokenBoardTarget } from '../utils/boards';
+import {
+  TOKEN_BOARD_BUILDERS,
+  TokenBoardTarget,
+  isTokenBoardTarget,
+  buildTypographyBoard,
+  buildSpacingBoard,
+  buildRadiusBoard,
+  buildStrokeBoard,
+  buildEffectsBoard,
+} from '../utils/boards';
 
 export type { GenerationProgress };
 
@@ -85,18 +94,20 @@ async function runGeneration(
 
   const targetMode = config.target || 'all';
 
-  // Isolated target mode handling (e.g. clicking 'Create colors variables in ❖' ONLY generates colors)
+  // Isolated target mode handling
   if (targetMode === 'colors') {
-    update('creating-pages', 50, 'Building Color System page…');
-    const colorPage = await openPage('🎨 Color System');
+    update('creating-pages', 50, 'Building Color Palette page…');
+    const colorPage = await openPage(FULL_RUN_PAGES.colors);
 
-    // Clear previous elements on Color System page
     for (const child of [...colorPage.children]) {
       child.remove();
     }
 
     await buildColorSystemBoard(colorPage, tokens, config, styleMap, varMap);
-    update('complete', 100, 'Color System generated successfully!');
+    if (colorPage.children.length) {
+      figma.viewport.scrollAndZoomIntoView([...colorPage.children]);
+    }
+    update('complete', 100, 'Color Palette generated successfully!');
     setLastTokens(tokens, config);
     return {
       stats: {
@@ -109,113 +120,17 @@ async function runGeneration(
     };
   }
 
-  if (targetMode === 'components') {
-    // An empty selection here is not the "build everything" sentinel it is on the
-    // full run: the user came from the components picker and chose nothing.
-    // Without this the run created an empty page and reported "Components
-    // generated successfully!", which is a silent no-op dressed up as a success.
-    if (config.componentsToGenerate.length === 0) {
-      throw new Error(
-        'No components are selected. Pick at least one in Build Components, or use Select all.'
-      );
-    }
-
-    update('creating-pages', 50, 'Generating Components page…');
-    const compPage = await openPage('🧩 Components');
-
-    const { count: componentsCreated } = await generateComponents(
-      tokens,
-      config,
-      styleMap,
-      compPage,
-      (fraction) => update('generating-components', 50 + Math.round(fraction * 45), 'Generating components…'),
-      varMap
-    );
-
-    update('complete', 100, 'Components generated successfully!');
-    setLastTokens(tokens, config);
-    return {
-      stats: {
-        tokensCreated: 0,
-        stylesCreated: 0,
-        variablesCreated: 0,
-        componentsCreated,
-        pagesCreated: 1,
-      },
-    };
-  }
-
-  // Every remaining token category maps to exactly one board. Before this,
-  // `typography`, `spacing`, `radius`, `stroke` and `effects` all fell through
-  // to the full five-page rebuild below — so "Create radius variables in Figma"
-  // silently regenerated the entire design system.
-  // Shape is one rail item over two boards. The rail merged radius and stroke
-  // into a single destination, so one press has to do what two used to: build
-  // both boards and replace each in place. This has to come *before* the check
-  // below, which does not recognise 'shape' — an unrecognised target falls all
-  // the way through to the full five-page rebuild, which is the bug the comment
-  // above describes.
-  if (targetMode === 'shape') {
-    update('creating-pages', 50, 'Building Shape boards…');
-
-    const tokensPage = await openPage('🎨 Tokens');
-
-    // Built and replaced one at a time, in this order, because replaceBoard
-    // positions each board below whatever is already on the page. That makes the
-    // canvas identical to pressing radius-Build and then stroke-Build.
-    const boards: FrameNode[] = [];
-    for (const part of SHAPE_BOARDS) {
-      const board = await TOKEN_BOARD_BUILDERS[part]({ tokens, config, styleMap, varMap });
-      replaceBoard(tokensPage, board);
-      boards.push(board);
-    }
-
-    figma.viewport.scrollAndZoomIntoView(boards);
-    update('complete', 100, 'Shape tokens generated successfully!');
-    setLastTokens(tokens, config);
-
-    // Both boards land on the one Tokens page, so pagesCreated stays 1 while
-    // everything else adds.
-    const radius = boardStats('radius', tokens, styleMap, varMap);
-    const stroke = boardStats('stroke', tokens, styleMap, varMap);
-    return {
-      stats: {
-        tokensCreated: radius.tokensCreated + stroke.tokensCreated,
-        stylesCreated: radius.stylesCreated + stroke.stylesCreated,
-        variablesCreated: radius.variablesCreated + stroke.variablesCreated,
-        componentsCreated: 0,
-        pagesCreated: 1,
-      },
-    };
-  }
-
-  if (isTokenBoardTarget(targetMode)) {
-    const label = TOKEN_BOARD_LABELS[targetMode];
-    update('creating-pages', 50, `Building ${label} board…`);
-
-    const tokensPage = await openPage('🎨 Tokens');
-    const board = await TOKEN_BOARD_BUILDERS[targetMode]({ tokens, config, styleMap, varMap });
-
-    // Replace this category's previous board rather than stacking duplicates,
-    // then drop the fresh one below whatever else is already on the page.
-    replaceBoard(tokensPage, board);
-
-    figma.viewport.scrollAndZoomIntoView([board]);
-    update('complete', 100, `${label} tokens generated successfully!`);
-    setLastTokens(tokens, config);
-    return { stats: boardStats(targetMode, tokens, styleMap, varMap) };
-  }
-
-  // `gradients` is derived from the brand colour rather than from a token
-  // array, so it routes to the colour-derived board instead of TOKEN_BOARDS.
   if (targetMode === 'gradients') {
-    update('creating-pages', 50, 'Building Gradients board…');
+    update('creating-pages', 50, 'Building Gradients page…');
+    const gradPage = await openPage(FULL_RUN_PAGES.gradients);
+    for (const child of [...gradPage.children]) {
+      child.remove();
+    }
 
-    const colorPage = await openPage('🎨 Color System');
     const cleanHex = config.primaryColor.replace('#', '').toUpperCase();
     const name = config.colorNames?.[cleanHex] || getColorName(config.primaryColor) || `#${cleanHex}`;
     const board = await buildGradientsBoard(config.primaryColor, name, `${name} Gradients Board`, undefined, config.fontFamily.heading);
-    replaceBoard(colorPage, board);
+    gradPage.appendChild(board);
 
     figma.viewport.scrollAndZoomIntoView([board]);
     update('complete', 100, 'Gradients generated successfully!');
@@ -231,9 +146,137 @@ async function runGeneration(
     };
   }
 
-  // Default / All mode. An empty list is the "build everything" sentinel, which
-  // is what a fresh config carries; sanitizeConfig guarantees the field is an
-  // array by the time it reaches here, so only the length needs checking.
+  if (targetMode === 'typography') {
+    update('creating-pages', 50, 'Building Typography page…');
+    const typoPage = await openPage(FULL_RUN_PAGES.typography);
+    for (const child of [...typoPage.children]) {
+      child.remove();
+    }
+
+    const board = await buildTypographyBoard({ tokens, config, styleMap, varMap });
+    typoPage.appendChild(board);
+
+    figma.viewport.scrollAndZoomIntoView([board]);
+    update('complete', 100, 'Typography tokens generated successfully!');
+    setLastTokens(tokens, config);
+    return { stats: boardStats('typography', tokens, styleMap, varMap) };
+  }
+
+  if (targetMode === 'spacing') {
+    update('creating-pages', 50, 'Building Spacing & Grid page…');
+    const spacingPage = await openPage(FULL_RUN_PAGES.spacing);
+    for (const child of [...spacingPage.children]) {
+      child.remove();
+    }
+
+    const board = await buildSpacingBoard({ tokens, config, styleMap, varMap });
+    spacingPage.appendChild(board);
+
+    figma.viewport.scrollAndZoomIntoView([board]);
+    update('complete', 100, 'Spacing tokens generated successfully!');
+    setLastTokens(tokens, config);
+    return { stats: boardStats('spacing', tokens, styleMap, varMap) };
+  }
+
+  if (targetMode === 'shape') {
+    update('creating-pages', 50, 'Building Shape & Radius page…');
+    const shapePage = await openPage(FULL_RUN_PAGES.shape);
+    for (const child of [...shapePage.children]) {
+      child.remove();
+    }
+
+    const radiusBoard = await buildRadiusBoard({ tokens, config, styleMap, varMap });
+    const strokeBoard = await buildStrokeBoard({ tokens, config, styleMap, varMap });
+    shapePage.appendChild(radiusBoard);
+    shapePage.appendChild(strokeBoard);
+    strokeBoard.y = radiusBoard.y + radiusBoard.height + 60;
+
+    figma.viewport.scrollAndZoomIntoView([radiusBoard, strokeBoard]);
+    update('complete', 100, 'Shape tokens generated successfully!');
+    setLastTokens(tokens, config);
+
+    const radius = boardStats('radius', tokens, styleMap, varMap);
+    const stroke = boardStats('stroke', tokens, styleMap, varMap);
+    return {
+      stats: {
+        tokensCreated: radius.tokensCreated + stroke.tokensCreated,
+        stylesCreated: radius.stylesCreated + stroke.stylesCreated,
+        variablesCreated: radius.variablesCreated + stroke.variablesCreated,
+        componentsCreated: 0,
+        pagesCreated: 1,
+      },
+    };
+  }
+
+  if (targetMode === 'effects') {
+    update('creating-pages', 50, 'Building Elevation & Depth page…');
+    const depthPage = await openPage(FULL_RUN_PAGES.effects);
+    for (const child of [...depthPage.children]) {
+      child.remove();
+    }
+
+    const board = await buildEffectsBoard({ tokens, config, styleMap, varMap });
+    depthPage.appendChild(board);
+
+    figma.viewport.scrollAndZoomIntoView([board]);
+    update('complete', 100, 'Elevation & Depth tokens generated successfully!');
+    setLastTokens(tokens, config);
+    return { stats: boardStats('effects', tokens, styleMap, varMap) };
+  }
+
+  if (targetMode === 'components') {
+    if (config.componentsToGenerate.length === 0) {
+      throw new Error(
+        'No components are selected. Pick at least one in Build Components, or use Select all.'
+      );
+    }
+
+    update('creating-pages', 50, 'Generating Components page…');
+    const compPage = await openPage(FULL_RUN_PAGES.components);
+
+    const { count: componentsCreated } = await generateComponents(
+      tokens,
+      config,
+      styleMap,
+      compPage,
+      (fraction) => update('generating-components', 50 + Math.round(fraction * 45), 'Generating components…'),
+      varMap
+    );
+
+    if (compPage.children.length) {
+      figma.viewport.scrollAndZoomIntoView([...compPage.children]);
+    }
+    update('complete', 100, 'Components generated successfully!');
+    setLastTokens(tokens, config);
+    return {
+      stats: {
+        tokensCreated: 0,
+        stylesCreated: 0,
+        variablesCreated: 0,
+        componentsCreated,
+        pagesCreated: 1,
+      },
+    };
+  }
+
+  if (isTokenBoardTarget(targetMode)) {
+    const label = TOKEN_BOARD_LABELS[targetMode];
+    update('creating-pages', 50, `Building ${label} board…`);
+
+    const boardPage = await openPage(TOKEN_BOARD_PAGES[targetMode] || FULL_RUN_PAGES.shape);
+    for (const child of [...boardPage.children]) {
+      child.remove();
+    }
+    const board = await TOKEN_BOARD_BUILDERS[targetMode]({ tokens, config, styleMap, varMap });
+    boardPage.appendChild(board);
+
+    figma.viewport.scrollAndZoomIntoView([board]);
+    update('complete', 100, `${label} tokens generated successfully!`);
+    setLastTokens(tokens, config);
+    return { stats: boardStats(targetMode, tokens, styleMap, varMap) };
+  }
+
+  // Default / All mode
   if (config.componentsToGenerate.length === 0) {
     config.componentsToGenerate = COMPONENT_DEFINITIONS.map((c) => c.name);
   }
@@ -253,6 +296,9 @@ async function runGeneration(
 
   const safePage = async (page: PageNode, label: string, build: () => Promise<void> | void) => {
     await figma.setCurrentPageAsync(page);
+    for (const child of [...page.children]) {
+      child.remove();
+    }
     try {
       await build();
     } catch (err) {
@@ -260,16 +306,55 @@ async function runGeneration(
     }
   };
 
-  await safePage(pages.tokens, 'Tokens', async () => await createTokensPage(pages.tokens, tokens, config, styleMap, varMap));
+  await safePage(pages.colors, 'Color Palette', async () => {
+    await buildColorSystemBoard(pages.colors, tokens, config, styleMap, varMap);
+  });
+
+  await safePage(pages.gradients, 'Gradients', async () => {
+    const cleanHex = config.primaryColor.replace('#', '').toUpperCase();
+    const name = config.colorNames?.[cleanHex] || getColorName(config.primaryColor) || `#${cleanHex}`;
+    const board = await buildGradientsBoard(config.primaryColor, name, `${name} Gradients Board`, undefined, config.fontFamily.heading);
+    pages.gradients.appendChild(board);
+  });
+
+  await safePage(pages.typography, 'Typography', async () => {
+    const board = await buildTypographyBoard({ tokens, config, styleMap, varMap });
+    pages.typography.appendChild(board);
+  });
+
+  await safePage(pages.spacing, 'Spacing', async () => {
+    const board = await buildSpacingBoard({ tokens, config, styleMap, varMap });
+    pages.spacing.appendChild(board);
+  });
+
+  await safePage(pages.shape, 'Shape & Radius', async () => {
+    const radiusBoard = await buildRadiusBoard({ tokens, config, styleMap, varMap });
+    const strokeBoard = await buildStrokeBoard({ tokens, config, styleMap, varMap });
+    pages.shape.appendChild(radiusBoard);
+    pages.shape.appendChild(strokeBoard);
+    strokeBoard.y = radiusBoard.y + radiusBoard.height + 60;
+  });
+
+  await safePage(pages.effects, 'Elevation', async () => {
+    if (tokens.shadows.length) {
+      const board = await buildEffectsBoard({ tokens, config, styleMap, varMap });
+      pages.effects.appendChild(board);
+    }
+  });
+
   await safePage(pages.patterns, 'Patterns', () => createPatternsPage(pages.patterns, tokens, config, styleMap, varMap));
   await safePage(pages.docs, 'Documentation', () => createDocumentationPage(pages.docs, config));
   await safePage(pages.playground, 'Playground', () =>
     createPlaygroundPage(pages.playground, tokens, config, styleMap, varMap, componentsByName)
   );
+
   update('organizing', 92, 'Finalizing…');
 
   setLastTokens(tokens, config);
-  await figma.setCurrentPageAsync(pages.components);
+  await figma.setCurrentPageAsync(pages.colors);
+  if (pages.colors.children.length) {
+    figma.viewport.scrollAndZoomIntoView([...pages.colors.children]);
+  }
 
   const stylesCreated = Object.keys(styleMap.color).length + Object.keys(styleMap.text).length + Object.keys(styleMap.effect).length;
   const variablesCreated =
@@ -406,18 +491,28 @@ async function createStyles(tokens: DesignTokens, config: GenerationConfig): Pro
 // ---------------- pages ----------------
 
 interface Pages {
-  tokens: PageNode;
+  colors: PageNode;
+  gradients: PageNode;
+  typography: PageNode;
+  spacing: PageNode;
+  shape: PageNode;
+  effects: PageNode;
   components: PageNode;
   patterns: PageNode;
   docs: PageNode;
   playground: PageNode;
 }
 
-/** The five pages a full generation lays out, in document order. */
+/** The 10 dedicated pages a full generation lays out, in document order. */
 const FULL_RUN_PAGES = {
-  tokens: '🎨 Tokens',
+  colors: '🎨 Color Palette',
+  gradients: '🌈 Gradients',
+  typography: '✍️ Typography',
+  spacing: '📐 Spacing & Grid',
+  shape: '🔘 Shape & Radius',
+  effects: '✨ Elevation & Depth',
   components: '🧩 Components',
-  patterns: '📐 Patterns',
+  patterns: '📱 Patterns',
   docs: '📚 Documentation',
   playground: '🎮 Playground',
 } as const satisfies Record<keyof Pages, string>;
@@ -426,16 +521,7 @@ const FULL_RUN_PAGES = {
 export const FULL_RUN_PAGE_NAMES: readonly string[] = Object.values(FULL_RUN_PAGES);
 
 /**
- * Find or create each of the five pages a full run uses.
- *
- * These were five unconditional `figma.createPage()` calls, so a second full
- * generate produced a second '🎨 Tokens', a third produced a third, and so on —
- * ten pages after two runs. Every other page in this file already goes through
- * `openPage`, which finds by name first; this was the one place that didn't.
- *
- * Deliberately does not call setCurrentPageAsync the way openPage does: five
- * pages resolved in a row would navigate the user five times before any content
- * existed on them.
+ * Find or create each of the 10 dedicated pages a full run uses.
  */
 function resolvePages(): { pages: Pages; created: number } {
   const byName = new Map(figma.root.children.map((p) => [p.name, p]));
@@ -451,7 +537,12 @@ function resolvePages(): { pages: Pages; created: number } {
 
   return {
     pages: {
-      tokens: resolve(FULL_RUN_PAGES.tokens),
+      colors: resolve(FULL_RUN_PAGES.colors),
+      gradients: resolve(FULL_RUN_PAGES.gradients),
+      typography: resolve(FULL_RUN_PAGES.typography),
+      spacing: resolve(FULL_RUN_PAGES.spacing),
+      shape: resolve(FULL_RUN_PAGES.shape),
+      effects: resolve(FULL_RUN_PAGES.effects),
       components: resolve(FULL_RUN_PAGES.components),
       patterns: resolve(FULL_RUN_PAGES.patterns),
       docs: resolve(FULL_RUN_PAGES.docs),
@@ -493,9 +584,9 @@ async function createBlackHeroBox(
   const box = figma.createFrame();
   box.name = 'Header Black Box';
   box.layoutMode = 'VERTICAL';
+  box.resize(width, 100);
   box.primaryAxisSizingMode = 'AUTO';
   box.counterAxisSizingMode = 'FIXED';
-  box.resize(width, 100);
   box.paddingTop = 28;
   box.paddingBottom = 28;
   box.paddingLeft = 36;
@@ -561,9 +652,9 @@ async function createBlackHeroBox(
     const listFrame = figma.createFrame();
     listFrame.name = 'Color Descriptions';
     listFrame.layoutMode = 'VERTICAL';
+    listFrame.resize(width - 72, 100);
     listFrame.primaryAxisSizingMode = 'AUTO';
     listFrame.counterAxisSizingMode = 'FIXED';
-    listFrame.resize(width - 72, 100);
     listFrame.itemSpacing = 8;
     listFrame.fills = [];
 
@@ -1076,38 +1167,6 @@ async function buildColorSystemBoard(
   }
 }
 
-async function createTokensPage(page: PageNode, tokens: DesignTokens, config: GenerationConfig, styleMap: StyleMap, varMap: VariableMap): Promise<void> {
-  await buildColorSystemBoard(page, tokens, config, styleMap, varMap);
-
-  const foundations = figma.createFrame();
-  foundations.name = 'Foundations';
-  foundations.layoutMode = 'VERTICAL';
-  foundations.primaryAxisSizingMode = 'AUTO';
-  foundations.counterAxisSizingMode = 'AUTO';
-  foundations.itemSpacing = 60;
-  foundations.fills = [];
-  foundations.clipsContent = false;
-  // Sits below whatever the colour board actually produced. The previous
-  // hardcoded y = 1200 overlapped it as soon as the palette grew.
-  foundations.y = bottomOf(page) + 80;
-  page.appendChild(foundations);
-
-  // Same builders the per-category buttons use, so a single "Create spacing
-  // variables" run and a full generate produce identical boards.
-  const ctx: BoardContext = { tokens, config, styleMap, varMap };
-  for (const target of TOKEN_BOARD_ORDER) {
-    if (target === 'effects' && !tokens.shadows.length) continue;
-    foundations.appendChild(await TOKEN_BOARD_BUILDERS[target](ctx));
-  }
-}
-
-/** Bottom edge of the lowest node on a page, or 0 when it's empty. */
-function bottomOf(page: PageNode): number {
-  return page.children.reduce((max, node) => Math.max(max, node.y + node.height), 0);
-}
-
-const TOKEN_BOARD_ORDER: TokenBoardTarget[] = ['typography', 'spacing', 'radius', 'stroke', 'effects'];
-
 const TOKEN_BOARD_LABELS: Record<TokenBoardTarget, string> = {
   typography: 'Typography',
   spacing: 'Spacing',
@@ -1116,12 +1175,13 @@ const TOKEN_BOARD_LABELS: Record<TokenBoardTarget, string> = {
   effects: 'Elevation',
 };
 
-/**
- * The two boards behind the rail's single Shape destination. They stay separate
- * boards — merging them into one frame would change what the full `all` build
- * draws, and this increment must not move a single pixel of that.
- */
-const SHAPE_BOARDS: TokenBoardTarget[] = ['radius', 'stroke'];
+const TOKEN_BOARD_PAGES: Record<TokenBoardTarget, string> = {
+  typography: FULL_RUN_PAGES.typography,
+  spacing: FULL_RUN_PAGES.spacing,
+  radius: FULL_RUN_PAGES.shape,
+  stroke: FULL_RUN_PAGES.shape,
+  effects: FULL_RUN_PAGES.effects,
+};
 
 /** Find an existing page by name or create it, then make it current. */
 async function openPage(name: string): Promise<PageNode> {
@@ -1129,21 +1189,6 @@ async function openPage(name: string): Promise<PageNode> {
   page.name = name;
   await figma.setCurrentPageAsync(page);
   return page;
-}
-
-/**
- * Put `board` on `page`, replacing any earlier board of the same name so
- * repeated runs update in place instead of piling up copies. Boards are keyed
- * by name, which is why every builder names its frame deterministically.
- */
-function replaceBoard(page: PageNode, board: FrameNode): void {
-  for (const child of [...page.children]) {
-    if (child.name === board.name) child.remove();
-  }
-  const bottom = bottomOf(page);
-  board.x = 0;
-  board.y = bottom === 0 ? 0 : bottom + 60;
-  page.appendChild(board);
 }
 
 /** Stats for a single-category run: only that category's styles count. */
@@ -1176,7 +1221,7 @@ function boardStats(
   };
 }
 
-function createPatternsPage(page: PageNode, tokens: DesignTokens, config: GenerationConfig, styleMap: StyleMap, varMap: VariableMap): void {
+async function createPatternsPage(page: PageNode, tokens: DesignTokens, config: GenerationConfig, styleMap: StyleMap, varMap: VariableMap): Promise<void> {
   const root = figma.createFrame();
   root.name = 'Patterns';
   root.layoutMode = 'HORIZONTAL';
@@ -1199,7 +1244,7 @@ function createPatternsPage(page: PageNode, tokens: DesignTokens, config: Genera
   setStroke(card, tokens.colors.neutral.shades['200'], 1, semanticColorKey('Border/Default'), styleMap, varMap);
   card.resize(300, 360);
   const title = figma.createText();
-  title.fontName = resolveFont(config.fontFamily.heading, 700);
+  title.fontName = await ensureFont(config.fontFamily.heading, 700);
   title.fontSize = 22; title.characters = 'Sign in'; title.fills = [{ type: 'SOLID', color: hexToRgb('#0F172A') }];
   card.appendChild(title);
   const field = figma.createFrame();
@@ -1207,14 +1252,14 @@ function createPatternsPage(page: PageNode, tokens: DesignTokens, config: Genera
   field.paddingLeft = field.paddingRight = 12; field.paddingTop = field.paddingBottom = 10; field.cornerRadius = 8;
   setFill(field, '#FFFFFF', semanticColorKey('Surface/Default'), styleMap, varMap);
   setStroke(field, tokens.colors.neutral.shades['300'], 1, semanticColorKey('Border/Default'), styleMap, varMap); field.resize(252, 40);
-  const ph = figma.createText(); ph.fontName = resolveFont(config.fontFamily.body, 400); ph.fontSize = 14; ph.characters = 'Email'; ph.fills = [{ type: 'SOLID', color: hexToRgb(tokens.colors.neutral.shades['400']) }];
+  const ph = figma.createText(); ph.fontName = await ensureFont(config.fontFamily.body, 400); ph.fontSize = 14; ph.characters = 'Email'; ph.fills = [{ type: 'SOLID', color: hexToRgb(tokens.colors.neutral.shades['400']) }];
   field.appendChild(ph); card.appendChild(field);
   const btn = figma.createFrame();
   btn.name = 'Submit'; btn.layoutMode = 'HORIZONTAL'; btn.primaryAxisAlignItems = 'CENTER'; btn.counterAxisAlignItems = 'CENTER';
   btn.paddingLeft = btn.paddingRight = 16; btn.paddingTop = btn.paddingBottom = 10; btn.cornerRadius = 8;
   setFill(btn, tokens.colors.primary.shades['500'], 'Button/Background/Default', styleMap, varMap);
   btn.resize(252, 40);
-  const bl = figma.createText(); bl.fontName = resolveFont(config.fontFamily.body, 600); bl.fontSize = 14; bl.characters = 'Continue'; bl.fills = [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }];
+  const bl = figma.createText(); bl.fontName = await ensureFont(config.fontFamily.body, 600); bl.fontSize = 14; bl.characters = 'Continue'; bl.fills = [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }];
   btn.appendChild(bl); card.appendChild(btn);
   root.appendChild(card);
 
@@ -1226,17 +1271,17 @@ function createPatternsPage(page: PageNode, tokens: DesignTokens, config: Genera
     { label: 'Revenue', value: '$84k' },
     { label: 'Growth', value: '+18%' },
   ];
-  wireStats.forEach(({ label, value }) => {
+  for (const { label, value } of wireStats) {
     const s = figma.createFrame(); s.name = label; s.layoutMode = 'VERTICAL'; s.itemSpacing = 4; s.paddingTop = s.paddingBottom = 16; s.paddingLeft = s.paddingRight = 20;
     s.cornerRadius = 12; s.fills = [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }]; s.strokes = [{ type: 'SOLID', color: hexToRgb(tokens.colors.neutral.shades['200']) }]; s.strokeWeight = 1; s.resize(140, 90);
-    const v = figma.createText(); v.fontName = resolveFont(config.fontFamily.heading, 700); v.fontSize = 24; v.characters = value; v.fills = [{ type: 'SOLID', color: hexToRgb(tokens.colors.primary.shades['600']) }]; s.appendChild(v);
-    const l = figma.createText(); l.fontName = resolveFont(config.fontFamily.body, 400); l.fontSize = 12; l.characters = label; l.fills = [{ type: 'SOLID', color: hexToRgb(tokens.colors.neutral.shades['500']) }]; s.appendChild(l);
+    const v = figma.createText(); v.fontName = await ensureFont(config.fontFamily.heading, 700); v.fontSize = 24; v.characters = value; v.fills = [{ type: 'SOLID', color: hexToRgb(tokens.colors.primary.shades['600']) }]; s.appendChild(v);
+    const l = figma.createText(); l.fontName = await ensureFont(config.fontFamily.body, 400); l.fontSize = 12; l.characters = label; l.fills = [{ type: 'SOLID', color: hexToRgb(tokens.colors.neutral.shades['500']) }]; s.appendChild(l);
     stats.appendChild(s);
-  });
+  }
   root.appendChild(stats);
 }
 
-function createDocumentationPage(page: PageNode, config: GenerationConfig): void {
+async function createDocumentationPage(page: PageNode, config: GenerationConfig): Promise<void> {
   const root = figma.createFrame();
   root.name = 'Guidelines';
   root.layoutMode = 'VERTICAL';
@@ -1246,28 +1291,28 @@ function createDocumentationPage(page: PageNode, config: GenerationConfig): void
   root.clipsContent = false;
   page.appendChild(root);
 
-  const add = (text: string, size: number, weight: number) => {
+  const add = async (text: string, size: number, weight: number) => {
     const t = figma.createText();
-    t.fontName = resolveFont(config.fontFamily.heading, weight);
+    t.fontName = await ensureFont(config.fontFamily.heading, weight);
     t.fontSize = size; t.characters = text; t.fills = [{ type: 'SOLID', color: hexToRgb('#0F172A') }];
     t.textAutoResize = 'WIDTH_AND_HEIGHT';
     root.appendChild(t);
     return t;
   };
-  add(config.brandName, 32, 700);
-  add('Design System Documentation', 18, 600);
-  add(`Primary: ${config.primaryColor}   Neutral: ${config.neutralColor ?? '#64748B'}`, 14, 400);
-  add(`Heading font: ${config.fontFamily.heading}   Body font: ${config.fontFamily.body}`, 14, 400);
-  add('Components are organized by category and linked to the generated color, text, and effect styles.', 13, 400);
+  await add(config.brandName, 32, 700);
+  await add('Design System Documentation', 18, 600);
+  await add(`Primary: ${config.primaryColor}   Neutral: ${config.neutralColor ?? '#64748B'}`, 14, 400);
+  await add(`Heading font: ${config.fontFamily.heading}   Body font: ${config.fontFamily.body}`, 14, 400);
+  await add('Components are organized by category and linked to the generated color, text, and effect styles.', 13, 400);
   if (config.options.createVariables) {
-    add(
+    await add(
       `Color tokens are also published as a 3-tier Figma Variables system — Primitives → Semantic → Components — in "${config.brandName} / Primitives", "${config.brandName} / Semantic", and "${config.brandName} / Components"${config.options.includeDarkMode ? ' (Light + Dark modes).' : '.'}`,
       13,
       400
     );
   }
   if (config.options.generateFullVariantSets) {
-    add('Components are emitted as full Figma variant sets (Variant / State / Size properties).', 13, 400);
+    await add('Components are emitted as full Figma variant sets (Variant / State / Size properties).', 13, 400);
   }
 }
 
@@ -1294,7 +1339,7 @@ async function createPlaygroundPage(
 
   await sectionTitle(root, 'Playground', config.fontFamily.heading);
   const sub = figma.createText();
-  sub.fontName = resolveFont(config.fontFamily.body, 400);
+  sub.fontName = await ensureFont(config.fontFamily.body, 400);
   sub.fontSize = 14;
   sub.characters = 'Interactive examples composed from your tokens and the generated components.';
   sub.fills = [{ type: 'SOLID', color: hexToRgb('#64748B') }];
@@ -1646,7 +1691,7 @@ async function runColorExtensions(
   config?: GenerationConfig,
   customGradientStops?: Record<string, string[]>
 ): Promise<void> {
-  const colorPage = await openPage('🎨 Color System');
+  const colorPage = await openPage(FULL_RUN_PAGES.colors);
 
   const cleanHex = baseHex.replace('#', '').toUpperCase();
   const apiName = config?.colorNames?.[cleanHex] || getColorName(baseHex);
@@ -1770,8 +1815,9 @@ async function runColorExtensions(
 
   // --- SEPARATE BOARD 2: GRADIENTS BOARD ---
   const gradientsBoard = await buildGradientsBoard(baseHex, displayTitle, gradientsBoardName, customGradientStops, headingFont);
+  const shadesBoardHeight = 112 + shadesHeroHeader.height + 24 + shadeRows.length * (220 + 24);
   gradientsBoard.x = 0;
-  gradientsBoard.y = startY + shadesBoard.height + 60;
+  gradientsBoard.y = shadesBoard.y + Math.max(shadesBoard.height, shadesBoardHeight) + 60;
   colorPage.appendChild(gradientsBoard);
 }
 

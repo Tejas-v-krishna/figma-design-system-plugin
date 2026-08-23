@@ -28,6 +28,8 @@
     "check": "npm run typecheck && npm run lint && npm run check:config && npm run check:dtcg && npm run check:snapshot"
   },
   "dependencies": {
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
     "culori": "^4.0.2",
     "lucide-react": "^0.294.0",
     "react": "^18.2.0",

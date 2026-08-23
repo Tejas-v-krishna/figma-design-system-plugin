@@ -22,7 +22,7 @@ import { resolve } from 'path';
 export default defineConfig({
   build: {
     outDir: 'dist',
-    emptyOutDir: true,
+    emptyOutDir: false, // preserve existing files (e.g. code.js) so Figma watcher never sees ENOENT
     rollupOptions: {
       input: { ui: resolve(__dirname, 'src/ui/index.tsx') },
       output: {
@@ -34,6 +34,7 @@ export default defineConfig({
       },
     },
     minify: 'esbuild',
+    assetsInlineLimit: 4_000_000,
     sourcemap: true,
   },
 });

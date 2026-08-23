@@ -1,10 +1,9 @@
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import './styles.css';
-// theme.css comes last on purpose: it re-points the palette variables that
-// styles.css declares, and later :root wins on equal specificity.
+import './tokens.css';
 import './theme.css';
+import './styles.css';
 
 const container = document.getElementById('root');
 if (container) {

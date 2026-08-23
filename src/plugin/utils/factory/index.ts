@@ -10,6 +10,9 @@ import { fallbackTemplate } from './categoryFallback';
 import { makeComponent } from '../primitives';
 import { VariableMap, emptyVariableMap } from '../variables';
 import { yieldToUI } from '../yield';
+import { hexToRgb } from '../../../shared/color-utils';
+import { CW, boardShell, createBlackHeroBox, mkDivider } from '../boards';
+import { ensureFont } from '../fonts';
 
 const CATEGORY_LABELS: Record<string, string> = {
   buttons: 'Buttons',
@@ -57,7 +60,8 @@ function buildOne(
   vLabel?: string,
   sLabel?: string,
   szLabel?: string,
-  varMap?: VariableMap
+  varMap?: VariableMap,
+  showcaseType?: 'variant' | 'size' | 'state'
 ): ComponentNode {
   const name = formatComponentName(def.category, def.name, vLabel, sLabel, szLabel, DEFAULT_NAMING);
   const root = makeComponent(name);
@@ -73,40 +77,67 @@ function buildOne(
     stateProps: state.properties,
     sizeName: size.name,
     sizeProps: size.properties,
+    showcaseType,
   };
   return tmpl(root, ctx);
 }
 
-function buildSet(
+interface ComponentSection {
+  title: string;
+  nodes: ComponentNode[];
+}
+
+function buildComponentShowcase(
   def: ComponentDefinition,
   tokens: DesignTokens,
   config: GenerationConfig,
   styleMap: StyleMap,
   varMap?: VariableMap
-): { nodes: ComponentNode[]; primary: ComponentNode } {
+): { sections: ComponentSection[]; primary: ComponentNode; totalCount: number } {
   const tmpl = TEMPLATES[def.name] ?? fallbackTemplate;
-  const dv = pickDefault(def.variants, ['default']);
+  const dv = pickDefault(def.variants, ['default', 'primary']);
   const ds = pickDefault(def.states, ['default']);
   const dz = pickDefault(def.sizes, ['md', 'default', 'sm']);
 
-  const nodes: ComponentNode[] = [];
-  const primary = buildOne(def, tokens, config, styleMap, tmpl, dv, ds, dz, undefined, undefined, undefined, varMap);
-  nodes.push(primary);
+  const sections: ComponentSection[] = [];
+  let totalCount = 0;
 
-  if (config.options.includeVariants) {
-    for (const v of def.variants) {
-      if (v !== dv) nodes.push(buildOne(def, tokens, config, styleMap, tmpl, v, ds, dz, v.name, undefined, undefined, varMap));
-    }
+  // 1. Variants (All declared variants at default size & state)
+  const variantNodes: ComponentNode[] = [];
+  for (const v of def.variants) {
+    const node = buildOne(def, tokens, config, styleMap, tmpl, v, ds, dz, v.name, undefined, undefined, varMap, 'variant');
+    variantNodes.push(node);
+  }
+  const primary = variantNodes[0] ?? buildOne(def, tokens, config, styleMap, tmpl, dv, ds, dz, undefined, undefined, undefined, varMap);
+  if (variantNodes.length > 0) {
+    sections.push({ title: 'Variants', nodes: variantNodes });
+    totalCount += variantNodes.length;
+  } else {
+    sections.push({ title: 'Default', nodes: [primary] });
+    totalCount += 1;
+  }
+
+  // 2. Sizes (All declared sizes at default variant & state)
+  if (config.options.includeVariants && def.sizes.length > 1) {
+    const sizeNodes: ComponentNode[] = [];
     for (const sz of def.sizes) {
-      if (sz !== dz) nodes.push(buildOne(def, tokens, config, styleMap, tmpl, dv, ds, sz, undefined, undefined, sz.name, varMap));
+      sizeNodes.push(buildOne(def, tokens, config, styleMap, tmpl, dv, ds, sz, undefined, undefined, sz.name, varMap, 'size'));
     }
+    sections.push({ title: 'Sizes', nodes: sizeNodes });
+    totalCount += sizeNodes.length;
   }
-  if (config.options.includeStates) {
+
+  // 3. Interactive States (All declared states at default variant & size)
+  if (config.options.includeStates && def.states.length > 1) {
+    const stateNodes: ComponentNode[] = [];
     for (const st of def.states) {
-      if (st !== ds) nodes.push(buildOne(def, tokens, config, styleMap, tmpl, dv, st, dz, undefined, st.name, undefined, varMap));
+      stateNodes.push(buildOne(def, tokens, config, styleMap, tmpl, dv, st, dz, undefined, st.name, undefined, varMap, 'state'));
     }
+    sections.push({ title: 'Interactive States', nodes: stateNodes });
+    totalCount += stateNodes.length;
   }
-  return { nodes, primary };
+
+  return { sections, primary, totalCount };
 }
 
 export async function generateComponents(
@@ -121,82 +152,220 @@ export async function generateComponents(
   const frames: Record<string, FrameNode> = {};
   const byName = new Map<string, ComponentNode | ComponentSetNode>();
   let count = 0;
+  let catIndex = 0;
+  const boardWidth = CW + 48 * 2;
+  const gutter = 120;
+
+  // Remove previous category frames so repeated runs update cleanly
+  for (const child of [...componentsPage.children]) {
+    if (Object.values(CATEGORY_LABELS).includes(child.name) || child.name === 'Components Master') {
+      child.remove();
+    }
+  }
 
   for (const [index, def] of selected.entries()) {
-    // Looked up and created in one step. Reading it back out of the record
-    // afterwards left `frame` typed as possibly missing for the rest of the
-    // loop, which is the one thing it definitely is not.
     let frame = frames[def.category];
     if (!frame) {
-      frame = figma.createFrame();
-      frame.name = CATEGORY_LABELS[def.category] ?? def.category;
-      frame.layoutMode = 'HORIZONTAL';
-      frame.primaryAxisAlignItems = 'MIN';
-      frame.counterAxisAlignItems = 'MIN';
-      frame.itemSpacing = 48;
-      frame.fills = [];
-      frame.clipsContent = false;
+      const catLabel = CATEGORY_LABELS[def.category] ?? def.category;
+      frame = boardShell(`${catLabel} Components`);
+      frame.x = catIndex * (boardWidth + gutter);
+      frame.y = 0;
+      catIndex++;
       componentsPage.appendChild(frame);
       frames[def.category] = frame;
+
+      const hero = await createBlackHeroBox(
+        'Components',
+        `${catLabel} Library`,
+        `Production-ready UI components for ${catLabel.toLowerCase()} styled with active design tokens.`,
+        undefined,
+        CW,
+        config.fontFamily.heading
+      );
+      frame.appendChild(hero);
+      frame.appendChild(mkDivider());
     }
     let primary: ComponentNode | ComponentSetNode | undefined;
-    // Isolate each component: a single failing template must never abort the
-    // whole run (which would leave later components and pages blank). Skip the
-    // offender and keep going.
     try {
       if (config.options.generateFullVariantSets) {
         const result = buildVariantSet(def, tokens, config, styleMap, varMap, frame);
         count += result.count;
         primary = result.primary;
       } else {
-        const result = buildSet(def, tokens, config, styleMap, varMap);
-        result.nodes.forEach((n) => frame.appendChild(n));
-        count += result.nodes.length;
-        primary = result.primary;
+        const sec = figma.createFrame();
+        sec.name = `Component ${def.name}`;
+        sec.layoutMode = 'VERTICAL';
+        sec.primaryAxisSizingMode = 'AUTO';
+        sec.counterAxisSizingMode = 'FIXED';
+        sec.resize(CW, 100);
+        sec.itemSpacing = 0;
+        sec.cornerRadius = 16;
+        sec.fills = [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }];
+        sec.strokes = [{ type: 'SOLID', color: hexToRgb('#E2E8F0') }];
+        sec.strokeWeight = 1;
+        sec.clipsContent = true;
+        sec.effects = [
+          {
+            type: 'DROP_SHADOW',
+            color: { r: 0.05, g: 0.09, b: 0.16, a: 0.04 },
+            offset: { x: 0, y: 2 },
+            radius: 8,
+            spread: 0,
+            visible: true,
+            blendMode: 'NORMAL',
+          },
+        ];
+
+        // 1. Integrated Header inside the card
+        const cardHead = figma.createFrame();
+        cardHead.name = 'Card Header';
+        cardHead.layoutMode = 'HORIZONTAL';
+        cardHead.primaryAxisSizingMode = 'FIXED';
+        cardHead.counterAxisSizingMode = 'AUTO';
+        cardHead.primaryAxisAlignItems = 'SPACE_BETWEEN';
+        cardHead.counterAxisAlignItems = 'CENTER';
+        cardHead.resize(CW, 64);
+        cardHead.paddingTop = 18;
+        cardHead.paddingBottom = 18;
+        cardHead.paddingLeft = 28;
+        cardHead.paddingRight = 28;
+        cardHead.fills = [{ type: 'SOLID', color: hexToRgb('#F8FAFC') }];
+        cardHead.strokes = [{ type: 'SOLID', color: hexToRgb('#E2E8F0') }];
+        cardHead.strokeWeight = 1;
+        cardHead.strokeAlign = 'INSIDE';
+
+        const titleLeft = figma.createFrame();
+        titleLeft.name = 'Title & Badge';
+        titleLeft.layoutMode = 'HORIZONTAL';
+        titleLeft.counterAxisAlignItems = 'CENTER';
+        titleLeft.itemSpacing = 12;
+        titleLeft.fills = [];
+
+        const catBadge = figma.createFrame();
+        catBadge.name = 'Category Badge';
+        catBadge.layoutMode = 'HORIZONTAL';
+        catBadge.paddingTop = 3;
+        catBadge.paddingBottom = 3;
+        catBadge.paddingLeft = 8;
+        catBadge.paddingRight = 8;
+        catBadge.cornerRadius = 6;
+        catBadge.fills = [{ type: 'SOLID', color: hexToRgb('#EFF6FF') }];
+        catBadge.strokes = [{ type: 'SOLID', color: hexToRgb('#DBEAFE') }];
+        catBadge.strokeWeight = 1;
+
+        const catTxt = figma.createText();
+        catTxt.fontName = await ensureFont(config.fontFamily.mono, 600);
+        catTxt.fontSize = 11;
+        catTxt.characters = (CATEGORY_LABELS[def.category] ?? def.category).toUpperCase();
+        catTxt.fills = [{ type: 'SOLID', color: hexToRgb('#2563EB') }];
+        catBadge.appendChild(catTxt);
+        titleLeft.appendChild(catBadge);
+
+        const compTitle = figma.createText();
+        compTitle.fontName = await ensureFont(config.fontFamily.heading, 700);
+        compTitle.fontSize = 20;
+        compTitle.letterSpacing = { value: -1, unit: 'PERCENT' };
+        compTitle.characters = def.name;
+        compTitle.fills = [{ type: 'SOLID', color: hexToRgb('#0F172A') }];
+        titleLeft.appendChild(compTitle);
+
+        cardHead.appendChild(titleLeft);
+
+        // Meta tags on the right
+        const metaTxt = figma.createText();
+        metaTxt.fontName = await ensureFont(config.fontFamily.body, 500);
+        metaTxt.fontSize = 12;
+        metaTxt.characters = `${def.variants.length} Variants  •  ${def.sizes.length || 1} Sizes  •  ${def.states.length || 1} States`;
+        metaTxt.fills = [{ type: 'SOLID', color: hexToRgb('#64748B') }];
+        cardHead.appendChild(metaTxt);
+
+        sec.appendChild(cardHead);
+
+        // 2. Card Content with Sections
+        const cardBody = figma.createFrame();
+        cardBody.name = 'Card Body';
+        cardBody.layoutMode = 'VERTICAL';
+        cardBody.primaryAxisSizingMode = 'AUTO';
+        cardBody.counterAxisSizingMode = 'FIXED';
+        cardBody.resize(CW, 100);
+        cardBody.itemSpacing = 28;
+        cardBody.paddingTop = 28;
+        cardBody.paddingBottom = 32;
+        cardBody.paddingLeft = 28;
+        cardBody.paddingRight = 28;
+        cardBody.fills = [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }];
+        cardBody.clipsContent = false;
+
+        const showcase = buildComponentShowcase(def, tokens, config, styleMap, varMap);
+        for (const [sIdx, section] of showcase.sections.entries()) {
+          if (sIdx > 0) {
+            const innerDiv = figma.createFrame();
+            innerDiv.name = 'SubDivider';
+            innerDiv.resize(CW - 56, 1);
+            innerDiv.fills = [{ type: 'SOLID', color: hexToRgb('#F1F5F9') }];
+            cardBody.appendChild(innerDiv);
+          }
+
+          const groupFrame = figma.createFrame();
+          groupFrame.name = section.title;
+          groupFrame.layoutMode = 'VERTICAL';
+          groupFrame.resize(CW - 56, 50);
+          groupFrame.itemSpacing = 14;
+          groupFrame.fills = [];
+          groupFrame.clipsContent = false;
+
+          const groupLabel = figma.createText();
+          groupLabel.fontName = await ensureFont(config.fontFamily.mono, 600);
+          groupLabel.fontSize = 11;
+          groupLabel.letterSpacing = { value: 6, unit: 'PERCENT' };
+          groupLabel.characters = section.title.toUpperCase();
+          groupLabel.fills = [{ type: 'SOLID', color: hexToRgb('#94A3B8') }];
+          groupFrame.appendChild(groupLabel);
+
+          const rowFrame = figma.createFrame();
+          rowFrame.name = 'Row';
+          rowFrame.layoutMode = 'HORIZONTAL';
+          rowFrame.layoutWrap = 'WRAP';
+          rowFrame.resize(CW - 56, 40);
+          rowFrame.itemSpacing = 24;
+          rowFrame.counterAxisSpacing = 24;
+          rowFrame.counterAxisAlignItems = 'MIN';
+          rowFrame.fills = [];
+          rowFrame.clipsContent = false;
+
+          section.nodes.forEach((n) => rowFrame.appendChild(n));
+          rowFrame.primaryAxisSizingMode = 'FIXED';
+          rowFrame.counterAxisSizingMode = 'AUTO';
+
+          groupFrame.appendChild(rowFrame);
+          groupFrame.primaryAxisSizingMode = 'AUTO';
+          groupFrame.counterAxisSizingMode = 'FIXED';
+
+          cardBody.appendChild(groupFrame);
+        }
+
+        sec.appendChild(cardBody);
+        frame.appendChild(sec);
+        frame.appendChild(mkDivider());
+
+        count += showcase.totalCount;
+        primary = showcase.primary;
       }
     } catch (err) {
       console.error(`[design-system-kit] component "${def.name}" failed to generate:`, err);
     }
-    // Record the default node per component so downstream consumers (e.g. the
-    // Playground) can instantiate real components by name.
     if (primary && !byName.has(def.name)) {
       byName.set(def.name, primary);
     }
-    // `count` is a running total of *variants* built, and `selected.length` is a
-    // count of *components*. Dividing one by the other gave a fraction well past
-    // 1 as soon as any component produced more than one variant — the caller
-    // scales it into a percentage, so the bar shot past 100 and the numbers the
-    // user saw were nonsense. It is the component index that is out of a total.
     onProgress?.((index + 1) / Math.max(1, selected.length));
-
-    // Building a full variant matrix is the longest uninterrupted stretch of work
-    // the plugin does. Without a yield here the whole loop runs as one blocking
-    // task: every progress message sits in the queue until it finishes, so the
-    // bar froze at the starting value and Figma stopped responding for the
-    // duration. Per component rather than per variant — a yield costs a frame,
-    // and one per variant would be slower than not yielding at all.
     await yieldToUI();
   }
 
   let currentY = 0;
   Object.values(frames).forEach((f) => {
-    // Wrap so a board with many components grows downward instead of running
-    // off to the right. Guarded on layoutMode, not on `'layoutWrap' in f`:
-    // every FrameNode has the property, so that test was always true, while
-    // Figma rejects the assignment on a frame that has no auto-layout. The
-    // precondition being checked was not the one that throws.
-    if (f.layoutMode !== 'NONE') {
-      f.layoutWrap = 'WRAP';
-    }
-    // Auto-layout height is up to date as soon as a child is appended, so this
-    // reads the real height rather than a stale one.
+    f.x = 0;
     f.y = currentY;
-    currentY += Math.max(400, f.height) + 120;
-    // Only widen a board that is narrower than the page grid; a wrapped board
-    // that already hugs a wider set of contents keeps its own width.
-    if (f.width < 1600) {
-      f.resize(1600, Math.max(400, f.height));
-    }
+    currentY += f.height + 80;
   });
 
   return { count, byName };
@@ -271,6 +440,7 @@ function buildVariantSet(
   const only = combos[0];
   if (combos.length > 1) {
     const setNode = figma.combineAsVariants(combos, parent);
+    setNode.name = def.name;
     // combineAsVariants leaves the variants absolutely positioned, all at the
     // same coordinates — a 24-variant set arrived as one opaque stack. Auto-
     // layout has to be turned on explicitly, and before layoutWrap, which Figma
