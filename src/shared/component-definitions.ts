@@ -196,17 +196,16 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
     category: 'inputs',
     variants: [
       { name: 'Default', properties: { variant: 'default' } },
-      { name: 'WithStrengthMeter', properties: { variant: 'withstrengthmeter' } },
+      { name: 'StrengthMeter', properties: { variant: 'strengthmeter' } },
     ],
     states: [
       { name: 'Default', properties: { state: 'default' } },
-      { name: 'Hover', properties: { state: 'hover' } },
       { name: 'Focus', properties: { state: 'focus' } },
       { name: 'Revealed', properties: { state: 'revealed' } },
       { name: 'Disabled', properties: { state: 'disabled' } },
     ],
     sizes: [
-      { name: 'md', properties: { name: 'md', height: 40, fontSize: 14 } },
+      { name: 'md', properties: { name: 'md', height: 44, fontSize: 14 } },
     ],
     defaultProps: { variant: 'default', state: 'default' },
   },

@@ -3377,37 +3377,79 @@ const CopyButton: Template = (root, ctx) => {
 };
 
 const PasswordInput: Template = (root, ctx) => {
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const fieldHeight = 44;
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 176;
+
   root.layoutMode = 'VERTICAL';
   root.primaryAxisSizingMode = 'AUTO';
   root.counterAxisSizingMode = 'FIXED';
   root.itemSpacing = 6;
-  root.resize(240, 40);
+  root.resize(fieldWidth, fieldHeight);
+  root.fills = [];
+  root.strokes = [];
+
+  const isFocus = sKey === 'focus' || sKey === 'focused';
+  const isRevealed = sKey === 'revealed';
+  const isDisabled = sKey === 'disabled';
+
+  let bg = '#F1F3F5';
+  let textFill = '#18181B';
+  let iconColor = '#71717A';
+
+  if (isDisabled) {
+    bg = '#F8FAFC';
+    textFill = '#A1A1AA';
+    iconColor = '#A1A1AA';
+    root.opacity = 0.6;
+  } else if (isFocus) {
+    bg = '#EEF2FF';
+    textFill = '#18181B';
+    iconColor = '#3B82F6';
+  } else if (isRevealed) {
+    bg = '#F1F3F5';
+    textFill = '#18181B';
+    iconColor = '#18181B';
+  }
 
   const box = makeFrame('box');
   box.layoutMode = 'HORIZONTAL';
   box.counterAxisAlignItems = 'CENTER';
   box.primaryAxisAlignItems = 'SPACE_BETWEEN';
-  box.resize(240, 40);
-  pad(box, 8, 12);
-  box.cornerRadius = 8;
-  setFill(box, '#FFFFFF');
-  setStroke(box, colorShade(ctx.tokens, 'neutral', 300), 1);
+  box.resize(fieldWidth, fieldHeight);
+  pad(box, 0, 14);
+  box.cornerRadius = 10;
+  setFill(box, bg);
 
   const left = hbox('left');
   left.itemSpacing = 8;
-  left.appendChild(buildIcon(14, colorShade(ctx.tokens, 'neutral', 400), 'lock'));
-  left.appendChild(text({ characters: '••••••••••••', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+  left.appendChild(buildIcon(14, iconColor, 'lock'));
+
+  let passStr = '••••••••••••';
+  if (isFocus) passStr = '••••••••|';
+  else if (isRevealed) passStr = 'p@ssw0rd99';
+
+  left.appendChild(text({
+    characters: passStr,
+    fontFamily: ctx.config.fontFamily.body,
+    weight: 500,
+    fontSize: isRevealed ? 12 : 14,
+    fill: textFill,
+  }));
   box.appendChild(left);
-  box.appendChild(buildIcon(14, colorShade(ctx.tokens, 'neutral', 500), 'eye'));
+  box.appendChild(buildIcon(14, iconColor, 'eye'));
   root.appendChild(box);
 
-  if (variantKey(ctx).includes('strength')) {
+  if (vKey.includes('strength')) {
     const bar = makeFrame('strengthBar');
     bar.layoutMode = 'HORIZONTAL';
     bar.itemSpacing = 4;
-    bar.resize(240, 4);
+    bar.resize(fieldWidth, 3);
+    const segW = Math.floor((fieldWidth - 12) / 4);
+    const filledCount = isDisabled ? 0 : isFocus || isRevealed ? 4 : 3;
     for (let i = 0; i < 4; i++) {
-      const seg = rect(`seg-${i}`, 56, 4, i < 3 ? colorShade(ctx.tokens, 'success', 500) : colorShade(ctx.tokens, 'neutral', 200));
+      const seg = rect(`seg-${i}`, segW, 3, i < filledCount ? '#16A34A' : '#E4E4E7');
       seg.cornerRadius = 9999;
       bar.appendChild(seg);
     }
@@ -3417,28 +3459,46 @@ const PasswordInput: Template = (root, ctx) => {
 };
 
 const SearchInput: Template = (root, ctx) => {
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const fieldHeight = 44;
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 176;
+
   root.layoutMode = 'HORIZONTAL';
   root.counterAxisAlignItems = 'CENTER';
   root.primaryAxisAlignItems = 'SPACE_BETWEEN';
-  root.resize(260, 40);
-  pad(root, 8, 12);
-  root.cornerRadius = variantKey(ctx).includes('pill') ? 9999 : 8;
-  setFill(root, '#FFFFFF');
-  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 0, 14);
+  root.cornerRadius = vKey.includes('pill') ? 9999 : 10;
+
+  const isFocus = sKey === 'focus' || sKey === 'focused';
+  const isResults = sKey === 'withresults';
+
+  let bg = '#F1F3F5';
+  let textFill = '#71717A';
+  if (isFocus) {
+    bg = '#EEF2FF';
+    textFill = '#18181B';
+  } else if (isResults) {
+    bg = '#E8F8EE';
+    textFill = '#18181B';
+  }
+
+  setFill(root, bg);
+  root.strokes = [];
 
   const left = hbox('left');
   left.itemSpacing = 8;
-  left.appendChild(buildIcon(14, colorShade(ctx.tokens, 'neutral', 400), 'search'));
-  left.appendChild(text({ characters: 'Search anything…', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 400) }));
+  left.appendChild(buildIcon(14, isFocus ? '#3B82F6' : '#71717A', 'search'));
+  left.appendChild(text({ characters: isFocus ? 'Search query|' : isResults ? 'Found 12 items' : 'Search…', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 13, fill: textFill }));
   root.appendChild(left);
 
   const kbd = makeFrame('kbd');
   kbd.layoutMode = 'HORIZONTAL';
   pad(kbd, 2, 6);
   kbd.cornerRadius = 4;
-  setFill(kbd, colorShade(ctx.tokens, 'neutral', 100));
-  setStroke(kbd, colorShade(ctx.tokens, 'neutral', 200), 1);
-  kbd.appendChild(text({ characters: '⌘K', fontFamily: ctx.config.fontFamily.mono, weight: 500, fontSize: 10, fill: colorShade(ctx.tokens, 'neutral', 600) }));
+  setFill(kbd, '#E4E4E7');
+  kbd.appendChild(text({ characters: '⌘K', fontFamily: ctx.config.fontFamily.mono, weight: 500, fontSize: 10, fill: '#71717A' }));
   root.appendChild(kbd);
 
   return root;
