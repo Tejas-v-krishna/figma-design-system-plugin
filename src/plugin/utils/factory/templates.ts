@@ -98,25 +98,44 @@ const ICONS = {
   star: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
 };
 
-function buildIcon(size: number, hex: string, kind: keyof typeof ICONS | 'circle' | 'square' | 'ring' = 'info'): FrameNode {
+type IconKind = keyof typeof ICONS;
+
+/**
+ * A real vector icon, not a placeholder shape.
+ *
+ * Every icon slot in these templates used to be a filled circle or square, so
+ * a generated close button, a chevron and a warning glyph were the same grey
+ * dot. `figma.createNodeFromSvg` is available in the sandbox and produces
+ * editable vector nodes, so there is no reason to approximate.
+ */
+function buildIcon(size: number, hex: string, kind: IconKind = 'info'): FrameNode {
   const f = makeFrame('icon');
   f.resize(size, size);
-  
-  if (kind === 'ring' || kind === 'circle' || kind === 'square') {
-    kind = 'info'; // Default fallback for old shapes
-  }
-  
-  const svgString = ICONS[kind as keyof typeof ICONS] || ICONS.info;
-  const svgStrWithColor = svgString.replace('currentColor', hex);
-  
+
+  // Global, not the default first-match replace: `fill` and `stroke` both
+  // carry currentColor in some of these glyphs, and a half-recoloured icon
+  // renders one stroke in the requested colour and the rest in Figma's
+  // default black.
+  const svg = ICONS[kind].split('currentColor').join(hex);
+
   try {
-    const node = figma.createNodeFromSvg(svgStrWithColor);
-    node.resize(size, size);
+    const node = figma.createNodeFromSvg(svg);
+    node.name = kind;
+    // rescale, not resize. The SVGs declare a 24x24 viewBox, so Figma hands
+    // back a 24x24 frame; resizing that frame moves its edges without touching
+    // the vectors inside, which then overflow or clip. rescale scales the
+    // children and the stroke weights with it, which is what "a 16px icon"
+    // means.
+    const scale = size / Math.max(node.width, node.height, 1);
+    // Figma rejects a scale at or below 0.01, and a no-op rescale is wasted work.
+    if (scale > 0.01 && Math.abs(scale - 1) > 0.001) node.rescale(scale);
     f.appendChild(node);
-  } catch(e) {
-    // Fallback if SVG fails
-    const fallback = ellipse('icon-shape', size, hex);
-    f.appendChild(fallback);
+  } catch (err) {
+    // An icon is never worth failing a component over. Fall back to the plain
+    // dot this function used to always draw, and say why on the console so a
+    // malformed glyph in ICONS is findable rather than just visibly wrong.
+    console.warn(`[design-system-kit] icon "${kind}" failed to render as SVG:`, err);
+    f.appendChild(ellipse('icon-shape', size, hex));
   }
   return f;
 }
@@ -187,7 +206,7 @@ const IconButton: Template = (root, ctx) => {
   setFill(root, outlined ? '#FFFFFF' : colorShade(ctx.tokens, t, baseShade), colorStyleKey(t, baseShade), ctx.styleMap, ctx.varMap);
   if (outlined) setStroke(root, colorShade(ctx.tokens, t, 300), 1, colorStyleKey(t, 300), ctx.styleMap, ctx.varMap);
   root.opacity = disabledOpacity(ctx);
-  let iconType: keyof typeof ICONS = 'search';
+  let iconType: IconKind = 'search';
   if (t === 'error') iconType = 'close';
   if (t === 'success') iconType = 'check';
   root.appendChild(buildIcon(m.height * 0.45, outlined ? colorShade(ctx.tokens, t, 600) : '#FFFFFF', iconType));
@@ -395,7 +414,7 @@ function populateAlert(root: ComponentNode, ctx: TemplateCtx, toneName: ColorNam
   setFill(root, colorShade(ctx.tokens, toneName, 50), colorStyleKey(toneName, 50), ctx.styleMap, ctx.varMap);
   setStroke(root, colorShade(ctx.tokens, toneName, 200), 1, colorStyleKey(toneName, 200), ctx.styleMap, ctx.varMap);
   root.resize(360, 60);
-  let iconType: keyof typeof ICONS = 'info';
+  let iconType: IconKind = 'info';
   if (toneName === 'error' || toneName === 'warning') iconType = 'warning';
   if (toneName === 'success') iconType = 'check';
   root.appendChild(buildIcon(20, colorShade(ctx.tokens, toneName, 500), iconType));
@@ -420,7 +439,7 @@ const Toast: Template = (root, ctx) => {
   setFill(root, '#1E293B');
   setEffect(root, shadow(ctx.tokens, 'lg'), effectStyleKey('lg'), ctx.styleMap, ctx.varMap);
   root.resize(320, 56);
-  let iconType: keyof typeof ICONS = 'info';
+  let iconType: IconKind = 'info';
   if (t === 'error' || t === 'warning') iconType = 'warning';
   if (t === 'success') iconType = 'check';
   root.appendChild(buildIcon(20, colorShade(ctx.tokens, t, 400), iconType));
@@ -993,7 +1012,7 @@ const ScrollArea: Template = (root, ctx) => {
 };
 
 const Icon: Template = (root, ctx) => {
-  root.appendChild(buildIcon(24, colorShade(ctx.tokens, 'neutral', 700), 'square'));
+  root.appendChild(buildIcon(24, colorShade(ctx.tokens, 'neutral', 700), 'star'));
   return root;
 };
 
