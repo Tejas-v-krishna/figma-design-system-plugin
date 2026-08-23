@@ -126,11 +126,18 @@ body {
 
 /* ==========================================================================
    Utility type. All data in this tool is set in mono — see DESIGN.md.
+
+   11px is the floor, everywhere, including the uppercase mono eyebrows and the
+   numeric counts. DESIGN.md states it as part of the quality floor alongside
+   visible focus and 4.5:1 body text, and these utilities were authored at 9px
+   and 10px — small enough that the letter-spacing on an uppercase mono eyebrow
+   is doing more work than the glyphs. The hierarchy here comes from the mono
+   face, the caps and the dim tier, not from shrinking the text further.
    ========================================================================== */
 
 .dsk-eyebrow {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -272,7 +279,7 @@ body {
 /* Live token count. Structure encoding something true: how big your system is. */
 .dsk-rail-count {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   color: var(--on-ink-faint);
   font-variant-numeric: tabular-nums;
   flex: none;
@@ -558,12 +565,15 @@ body {
   margin-top: 4px;
 }
 
+/* 11px, not the 9px this was authored at — the floor applies to the scale
+   labels too. Eleven steps at 11px mono is ~3ch per label against ~44ch of
+   available width in the 720px frame, so they still sit one per segment. */
 .dsk-ramp-step {
   flex: 1;
   min-width: 0;
   text-align: center;
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--on-paper-faint);
   font-variant-numeric: tabular-nums;
 }
@@ -640,7 +650,7 @@ body {
   background: transparent;
   padding: 5px 11px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--on-paper-dim);

@@ -149,6 +149,46 @@ async function runGeneration(
   // `typography`, `spacing`, `radius`, `stroke` and `effects` all fell through
   // to the full five-page rebuild below — so "Create radius variables in Figma"
   // silently regenerated the entire design system.
+  // Shape is one rail item over two boards. The rail merged radius and stroke
+  // into a single destination, so one press has to do what two used to: build
+  // both boards and replace each in place. This has to come *before* the check
+  // below, which does not recognise 'shape' — an unrecognised target falls all
+  // the way through to the full five-page rebuild, which is the bug the comment
+  // above describes.
+  if (targetMode === 'shape') {
+    update('creating-pages', 50, 'Building Shape boards…');
+
+    const tokensPage = await openPage('🎨 Tokens');
+
+    // Built and replaced one at a time, in this order, because replaceBoard
+    // positions each board below whatever is already on the page. That makes the
+    // canvas identical to pressing radius-Build and then stroke-Build.
+    const boards: FrameNode[] = [];
+    for (const part of SHAPE_BOARDS) {
+      const board = await TOKEN_BOARD_BUILDERS[part]({ tokens, config, styleMap, varMap });
+      replaceBoard(tokensPage, board);
+      boards.push(board);
+    }
+
+    figma.viewport.scrollAndZoomIntoView(boards);
+    update('complete', 100, 'Shape tokens generated successfully!');
+    setLastTokens(tokens, config);
+
+    // Both boards land on the one Tokens page, so pagesCreated stays 1 while
+    // everything else adds.
+    const radius = boardStats('radius', tokens, styleMap, varMap);
+    const stroke = boardStats('stroke', tokens, styleMap, varMap);
+    return {
+      stats: {
+        tokensCreated: radius.tokensCreated + stroke.tokensCreated,
+        stylesCreated: radius.stylesCreated + stroke.stylesCreated,
+        variablesCreated: radius.variablesCreated + stroke.variablesCreated,
+        componentsCreated: 0,
+        pagesCreated: 1,
+      },
+    };
+  }
+
   if (isTokenBoardTarget(targetMode)) {
     const label = TOKEN_BOARD_LABELS[targetMode];
     update('creating-pages', 50, `Building ${label} board…`);
@@ -1075,6 +1115,13 @@ const TOKEN_BOARD_LABELS: Record<TokenBoardTarget, string> = {
   stroke: 'Stroke',
   effects: 'Elevation',
 };
+
+/**
+ * The two boards behind the rail's single Shape destination. They stay separate
+ * boards — merging them into one frame would change what the full `all` build
+ * draws, and this increment must not move a single pixel of that.
+ */
+const SHAPE_BOARDS: TokenBoardTarget[] = ['radius', 'stroke'];
 
 /** Find an existing page by name or create it, then make it current. */
 async function openPage(name: string): Promise<PageNode> {

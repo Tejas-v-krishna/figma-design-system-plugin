@@ -1,14 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useStore, isGenerateBusy, TokenCategory } from '../store';
+import { useStore } from '../store';
 import { generateColorShades, generateGradientsForColor, hexToHsl, hexToRgb, interpolateOklchStops } from '../../shared/color-utils';
 import {
   generateBorderRadiusTokens,
   generateShadowTokens,
   generateStrokeTokens,
 } from '../../shared/typography-utils';
+import { DURATION_TOKENS, EASING_TOKENS } from '../../shared/motion-tokens';
 import type { EffectsIntensity, RadiusPreset } from '../../shared/types';
 import { getColorName, getNearestColorName } from '../../shared/color-naming';
-import { ChevronUp, Sparkles, Layers, Palette, Loader2 } from 'lucide-react';
+import { Sparkles, Layers, Palette } from 'lucide-react';
 import { ColorPickerModal } from './ColorPickerModal';
 
 const RADIUS_PRESETS: { value: RadiusPreset; label: string; hint: string }[] = [
@@ -57,9 +58,13 @@ function PresetSwitch<T extends string>({ value, options, onChange }: {
   );
 }
 
+/**
+ * The foundations. Every one of the seven rail items under FOUNDATIONS renders
+ * from the switch below, into the sheet App has already framed — so this file no
+ * longer owns a sidebar, a title or a Build button. It owns specimens.
+ */
 export const SetTokensView: React.FC = () => {
-  const tokenCategory = useStore((s) => s.tokenCategory);
-  const setTokenCategory = useStore((s) => s.setTokenCategory);
+  const current = useStore((s) => s.destination);
 
   const addCustomColorGroup = useStore((s) => s.addCustomColorGroup);
 
@@ -70,9 +75,6 @@ export const SetTokensView: React.FC = () => {
   const config = useStore((s) => s.config);
   const updateConfig = useStore((s) => s.updateConfig);
   const updateFont = useStore((s) => s.updateFont);
-  const startGeneration = useStore((s) => s.startGeneration);
-  const checkingExisting = useStore((s) => s.checkingExisting);
-  const generateBusy = useStore(isGenerateBusy);
 
   const [colorNames, setColorNames] = useState<Record<string, string>>(
     () => config.colorNames ?? {}
@@ -131,111 +133,89 @@ export const SetTokensView: React.FC = () => {
     updateConfig,
   ]);
 
-  const categories: { key: TokenCategory; label: string }[] = [
-    { key: 'colors', label: 'Colors' },
-    { key: 'gradients', label: 'Gradients' },
-    { key: 'typography', label: 'Typography' },
-    { key: 'spacing', label: 'Spacing' },
-    { key: 'radius', label: 'Radius' },
-    { key: 'stroke', label: 'Stroke' },
-    { key: 'effects', label: 'Effects' },
-  ];
-
   const activeShades = generateColorShades(selectedColor.hex);
   const activeGradients = generateGradientsForColor(selectedColor.hex);
   const activeHsl = hexToHsl(selectedColor.hex);
 
   const renderContent = () => {
-    switch (tokenCategory) {
-      case 'radius': {
+    switch (current) {
+      // Radius and stroke share one sheet. They are one design decision read two
+      // ways — how hard an interface's edges are — and the two smallest scales in
+      // the system, so a rail item each was a click for four rows of content.
+      case 'shape': {
         // The same call buildTokens makes, so what this panel lists is what a
         // build emits. It used to read a hand-written list in the UI store that
         // nothing downstream consulted: editing a number here changed a row on
         // screen and nothing else, and the names it showed (none, 1…7) were not
         // even the names the exporter wrote.
         const radii = generateBorderRadiusTokens(config.radiusPreset);
-        return (
-          <div className="dsk-token-panel">
-            <div className="dsk-token-header">
-              <h2>Radius</h2>
-              <span className="dsk-token-count">{radii.length} steps</span>
-            </div>
-
-            <PresetSwitch
-              value={config.radiusPreset}
-              options={RADIUS_PRESETS}
-              onChange={(radiusPreset) => updateConfig({ radiusPreset })}
-            />
-
-            <div className="dsk-token-group-bar">
-              <span>Corner scale</span>
-              <span className="dsk-token-group-meta">--radius-*</span>
-            </div>
-            <div className="dsk-token-rows">
-              {radii.map((r) => (
-                <div className="dsk-token-row" key={r.name}>
-                  <span
-                    className="dsk-radius-swatch"
-                    // Clamped to half the swatch: `full` is 9999px, and asking
-                    // for a 9999px corner on a 32px box is the same shape as
-                    // asking for 16px. Passed as a custom property because the
-                    // rule rounds one corner, not all four.
-                    style={{ ['--dsk-corner' as string]: `${Math.min(r.px, 16)}px` }}
-                    aria-hidden="true"
-                  />
-                  <span className="dsk-token-name">{r.name}</span>
-                  <code className="dsk-token-value">{r.value}</code>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      }
-
-      case 'stroke': {
         const strokes = generateStrokeTokens();
         return (
-          <div className="dsk-token-panel">
-            <div className="dsk-token-header">
-              <h2>Stroke</h2>
-              <span className="dsk-token-count">{strokes.length} steps</span>
-            </div>
+          <>
+            <section className="dsk-spec-section">
+              <p className="dsk-spec-section-head dsk-eyebrow">Corner radius</p>
 
-            <p className="dsk-token-note">
-              Border widths are a fixed four-step scale — there is no preset to
-              choose, so this panel reports rather than edits.
-            </p>
+              <PresetSwitch
+                value={config.radiusPreset}
+                options={RADIUS_PRESETS}
+                onChange={(radiusPreset) => updateConfig({ radiusPreset })}
+              />
 
-            <div className="dsk-token-group-bar">
-              <span>Width scale</span>
-              <span className="dsk-token-group-meta">--stroke-*</span>
-            </div>
-            <div className="dsk-token-rows">
-              {strokes.map((s) => (
-                <div className="dsk-token-row" key={s.name}>
-                  <span className="dsk-stroke-swatch" aria-hidden="true">
-                    <span style={{ height: s.value }} />
-                  </span>
-                  <span className="dsk-token-name">{s.name}</span>
-                  <code className="dsk-token-value">{s.value}px</code>
-                </div>
-              ))}
-            </div>
-          </div>
+              <div className="dsk-token-group-bar">
+                <span>Corner scale</span>
+                <span className="dsk-token-group-meta">--radius-*</span>
+              </div>
+              <div className="dsk-token-rows">
+                {radii.map((r) => (
+                  <div className="dsk-token-row" key={r.name}>
+                    <span
+                      className="dsk-radius-swatch"
+                      // Clamped to half the swatch: `full` is 9999px, and asking
+                      // for a 9999px corner on a 32px box is the same shape as
+                      // asking for 16px. Passed as a custom property because the
+                      // rule rounds one corner, not all four.
+                      style={{ ['--dsk-corner' as string]: `${Math.min(r.px, 16)}px` }}
+                      aria-hidden="true"
+                    />
+                    <span className="dsk-token-name">{r.name}</span>
+                    <code className="dsk-token-value">{r.value}</code>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="dsk-spec-section">
+              <p className="dsk-spec-section-head dsk-eyebrow">Stroke width</p>
+
+              <p className="dsk-token-note">
+                Border widths are a fixed four-step scale — there is no preset to
+                choose, so this section reports rather than edits.
+              </p>
+
+              <div className="dsk-token-group-bar">
+                <span>Width scale</span>
+                <span className="dsk-token-group-meta">--stroke-*</span>
+              </div>
+              <div className="dsk-token-rows">
+                {strokes.map((s) => (
+                  <div className="dsk-token-row" key={s.name}>
+                    <span className="dsk-stroke-swatch" aria-hidden="true">
+                      <span style={{ height: s.value }} />
+                    </span>
+                    <span className="dsk-token-name">{s.name}</span>
+                    <code className="dsk-token-value">{s.value}px</code>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
         );
       }
 
-      case 'effects': {
+      case 'depth': {
         const shadows = generateShadowTokens(config.effectsIntensity);
         return (
           <div className="dsk-token-panel">
-            <div className="dsk-token-header">
-              <h2>Effects</h2>
-              <span className="dsk-token-count">
-                {shadows.length ? `${shadows.length} steps` : 'no elevation'}
-              </span>
-            </div>
-
             <PresetSwitch
               value={config.effectsIntensity}
               options={EFFECT_INTENSITIES}
@@ -275,7 +255,61 @@ export const SetTokensView: React.FC = () => {
         );
       }
 
-      case 'colors': {
+      // Motion is the one foundation with no Build. Nothing generates it —
+      // buildTokens has no motion field and no exporter emits one — so the sheet
+      // reports the reference set and says outright that it does. Giving it a
+      // Build would have meant giving the sandbox an unrecognised target, which
+      // falls through to a full five-page rebuild.
+      case 'motion':
+        return (
+          <>
+            <p className="dsk-token-note">
+              Reference values, not yet part of a build. Nothing on this sheet is
+              written to canvas or included in an export — copy the numbers into
+              your prototype’s Smart Animate settings or your CSS by hand.
+            </p>
+
+            <section className="dsk-spec-section">
+              <p className="dsk-spec-section-head dsk-eyebrow">Duration</p>
+              <div className="dsk-token-group-bar">
+                <span>Named by intent</span>
+                <span className="dsk-token-group-meta">reference only</span>
+              </div>
+              <div className="dsk-token-rows">
+                {DURATION_TOKENS.map((d) => (
+                  <div className="dsk-token-row dsk-token-row-stack" key={d.name}>
+                    <div className="dsk-token-row-top">
+                      <span className="dsk-token-name">{d.name}</span>
+                      <code className="dsk-token-value">{d.ms}ms</code>
+                    </div>
+                    <span className="dsk-token-usage">{d.usage}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="dsk-spec-section">
+              <p className="dsk-spec-section-head dsk-eyebrow">Easing</p>
+              <div className="dsk-token-group-bar">
+                <span>Shaped by role</span>
+                <span className="dsk-token-group-meta">reference only</span>
+              </div>
+              <div className="dsk-token-rows">
+                {EASING_TOKENS.map((e) => (
+                  <div className="dsk-token-row dsk-token-row-stack" key={e.name}>
+                    <div className="dsk-token-row-top">
+                      <span className="dsk-token-name">{e.name}</span>
+                      <code className="dsk-token-value">{e.value}</code>
+                    </div>
+                    <span className="dsk-token-usage">{e.usage}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
+        );
+
+      case 'colour': {
         const handleAddColor = () => {
           const name = prompt('Enter new color name (e.g. Purple, Cyan, Brand Accent):');
           if (name) {
@@ -358,7 +392,6 @@ export const SetTokensView: React.FC = () => {
         return (
           <div className="dsk-token-panel">
             <div className="dsk-token-header">
-              <h2>Colors</h2>
               <button className="dsk-link-btn" onClick={handleAddColor}>
                 + Add another color
               </button>
@@ -464,7 +497,6 @@ export const SetTokensView: React.FC = () => {
         return (
           <div className="dsk-token-panel">
             <div className="dsk-token-header">
-              <h2>Gradients</h2>
               <button
                 className="dsk-link-btn"
                 onClick={() => generateColorExtensions(selectedColor.hex, selectedColor.name, customStops)}
@@ -581,12 +613,9 @@ export const SetTokensView: React.FC = () => {
           </div>
         );
 
-      case 'typography':
+      case 'type':
         return (
           <div className="dsk-token-panel">
-            <div className="dsk-token-header">
-              <h2>Typography</h2>
-            </div>
             <div className="dsk-color-settings">
               <div className="dsk-color-row">
                 <label>Heading Font Family</label>
@@ -610,12 +639,9 @@ export const SetTokensView: React.FC = () => {
           </div>
         );
 
-      case 'spacing':
+      case 'space':
         return (
           <div className="dsk-token-panel">
-            <div className="dsk-token-header">
-              <h2>Spacing</h2>
-            </div>
             <div className="dsk-color-settings">
               <div className="dsk-color-row">
                 <label>Base Grid Spacing (px)</label>
@@ -629,57 +655,22 @@ export const SetTokensView: React.FC = () => {
             </div>
           </div>
         );
+
+      // Reachable only if a foundation is added to destinations.ts without a
+      // panel here. Says so rather than leaving the sheet blank, which is how the
+      // old router's missing 'review' view failed.
+      default:
+        return (
+          <p className="dsk-spec-note">
+            No specimen for “{current}” yet.
+          </p>
+        );
     }
   };
 
   return (
-    <div className="dsk-set-tokens-container">
-      <aside className="dsk-sidebar-subnav">
-        {categories.map((cat) => (
-          <button
-            key={cat.key}
-            className={`dsk-sidebar-item ${tokenCategory === cat.key ? 'active' : ''}`}
-            onClick={() => setTokenCategory(cat.key)}
-          >
-            {cat.label}
-          </button>
-        ))}
-      </aside>
-
-      <main className="dsk-token-main">
-        {renderContent()}
-      </main>
-
-      <footer className="dsk-bottom-bar">
-        <div className="dsk-split-action">
-          {/* The press does not start the run — it asks the sandbox what is
-              already in the file, and on a large file that answer takes seconds.
-              See BuildComponentsView for the same pair. */}
-          <button
-            className="dsk-primary-btn"
-            onClick={() => startGeneration(tokenCategory)}
-            disabled={generateBusy}
-          >
-            {checkingExisting ? (
-              <>
-                <Loader2 size={15} className="dsk-spin" />
-                Checking this file…
-              </>
-            ) : (
-              <>
-                Create {tokenCategory} variables in <span className="figma-icon">❖</span>
-              </>
-            )}
-          </button>
-          <button
-            className="dsk-split-caret"
-            onClick={() => startGeneration(tokenCategory)}
-            disabled={generateBusy}
-          >
-            <ChevronUp size={16} />
-          </button>
-        </div>
-      </footer>
+    <>
+      {renderContent()}
 
       {activePicker && (
         <ColorPickerModal
@@ -689,6 +680,6 @@ export const SetTokensView: React.FC = () => {
           title={activePicker.title}
         />
       )}
-    </div>
+    </>
   );
 };

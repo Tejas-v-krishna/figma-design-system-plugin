@@ -1,7 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useStore } from './store';
 import { onPluginMessage } from './plugin';
-import { Header } from './components/Header';
+import { destination } from './destinations';
+import { useBrandTheme } from './useBrandTheme';
+import { countTokens } from '../shared/token-counts';
+import { Rail } from './components/Rail';
+import { Sheet } from './components/Sheet';
 import { SetTokensView } from './components/SetTokensView';
 import { BuildComponentsView } from './components/BuildComponentsView';
 import { CodeExportView } from './components/CodeExportView';
@@ -13,12 +17,23 @@ import { OverwriteConfirmModal } from './components/OverwriteConfirmModal';
 import { OptionsDrawer } from './components/OptionsDrawer';
 
 export default function App() {
-  const view = useStore((s) => s.view);
+  const current = useStore((s) => s.destination);
+  const config = useStore((s) => s.config);
   const overlay = useStore((s) => s.overlay);
   const lastError = useStore((s) => s.lastError);
   const clearError = useStore((s) => s.clearError);
   const warnings = useStore((s) => s.warnings);
   const clearWarnings = useStore((s) => s.clearWarnings);
+
+  // The panel takes its accent, its corner radius and its specimen face from the
+  // system being configured. See docs/DESIGN.md — "the tool wears your system".
+  useBrandTheme(config);
+
+  // countTokens runs the whole token pipeline, and the colour fields re-render
+  // this tree on every keystroke. Memoised on config so it runs when the system
+  // actually changes rather than when a character does.
+  const counts = useMemo(() => countTokens(config), [config]);
+  const active = destination(current);
 
   useEffect(() => {
     const off = onPluginMessage((msg) => {
@@ -70,47 +85,54 @@ export default function App() {
     return off;
   }, []);
 
+  const notice =
+    lastError !== null || warnings.length > 0 ? (
+      <div className="dsk-notice-stack">
+        {lastError && (
+          <div className="error-banner" role="alert">
+            <span>{lastError}</span>
+            <button onClick={clearError} aria-label="Dismiss">×</button>
+          </div>
+        )}
+        {warnings.length > 0 && (
+          <div className="dsk-warning-banner" role="status">
+            <div className="dsk-warning-banner-body">
+              <strong>
+                {warnings.length === 1
+                  ? 'One saved setting was repaired'
+                  : `${warnings.length} saved settings were repaired`}
+              </strong>
+              <ul>
+                {warnings.map((w) => (
+                  <li key={w}>{w}</li>
+                ))}
+              </ul>
+            </div>
+            <button onClick={clearWarnings} aria-label="Dismiss">×</button>
+          </div>
+        )}
+      </div>
+    ) : undefined;
+
   return (
-    <div className="dsk-app-shell">
-      <Header />
-      {/* Notices sit outside .dsk-main-content on purpose. That element is a flex
-          row holding the sidebar and the active view, so a banner placed inside it
-          became a third column — the message showed up as a narrow full-height
-          strip and squeezed the panel into a sliver. The shell is a column, so as
-          a sibling of <main> a banner stacks above the content the way it reads. */}
-      {(lastError !== null || warnings.length > 0) && (
-        <div className="dsk-notice-stack">
-          {lastError && (
-            <div className="error-banner" role="alert">
-              <span>{lastError}</span>
-              <button onClick={clearError} aria-label="Dismiss">×</button>
-            </div>
-          )}
-          {warnings.length > 0 && (
-            <div className="dsk-warning-banner" role="status">
-              <div className="dsk-warning-banner-body">
-                <strong>
-                  {warnings.length === 1
-                    ? 'One saved setting was repaired'
-                    : `${warnings.length} saved settings were repaired`}
-                </strong>
-                <ul>
-                  {warnings.map((w) => (
-                    <li key={w}>{w}</li>
-                  ))}
-                </ul>
-              </div>
-              <button onClick={clearWarnings} aria-label="Dismiss">×</button>
-            </div>
-          )}
-        </div>
-      )}
-      <main className="dsk-main-content">
-        {view === 'set-tokens' && <SetTokensView />}
-        {view === 'build-components' && <BuildComponentsView />}
-        {view === 'code' && <CodeExportView />}
-        {view === 'scan' && <AuditView />}
-      </main>
+    <div className="dsk-shell">
+      <Rail counts={counts} />
+
+      {/* Every destination renders into the same sheet, so the head and the
+          scroll position belong to the frame rather than to the view. The
+          foundations all share one component because they are all token
+          specimens; only the three library destinations differ in kind. */}
+      <Sheet
+        title={active.title}
+        sub={active.sub}
+        meta={active.meta?.(counts)}
+        notice={notice}
+      >
+        {active.group === 'foundations' && <SetTokensView />}
+        {current === 'components' && <BuildComponentsView />}
+        {current === 'export' && <CodeExportView />}
+        {current === 'audit' && <AuditView />}
+      </Sheet>
 
       {overlay === 'generating' && <GeneratingOverlay />}
       {overlay === 'success' && <SuccessOverlay />}

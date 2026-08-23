@@ -13,7 +13,10 @@ export default defineConfig({
   root: resolve(__dirname, 'dev'),
   plugins: [react()],
   server: {
-    port: 5178,
+    // 5178 by default so `npm run dev` lands somewhere predictable, but
+    // overridable so a second harness can run alongside the first instead of
+    // failing to start against strictPort.
+    port: Number(process.env.PORT) || 5178,
     strictPort: true,
   },
 });
