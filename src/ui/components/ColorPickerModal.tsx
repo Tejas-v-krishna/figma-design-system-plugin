@@ -29,7 +29,18 @@ function rgbToHsl(r: number, g: number, b: number) {
   return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
 }
 
-// HSV / RGB Conversions for 2D Color Area
+/**
+ * HSV, unrounded.
+ *
+ * The handle positions are the only consumers, and integer HSV cannot represent
+ * every 8-bit RGB colour: #2563EB round-tripped to #2664EB, so opening the
+ * picker on the default primary showed a hex two channels off the one stored,
+ * and touching either slider committed the drift. 221.19deg / 84.26% / 92.16%
+ * comes back as #2563EB exactly.
+ *
+ * Display rounding happens at the edge — `rgbToHsl` for the HSL fields, and the
+ * hex string is built from rounded RGB either way.
+ */
 function rgbToHsv(r: number, g: number, b: number) {
   r /= 255; g /= 255; b /= 255;
   const max = Math.max(r, g, b), min = Math.min(r, g, b);
@@ -46,7 +57,7 @@ function rgbToHsv(r: number, g: number, b: number) {
     }
     h /= 6;
   }
-  return { h: Math.round(h * 360), s: Math.round(s * 100), v: Math.round(v * 100) };
+  return { h: h * 360, s: s * 100, v: v * 100 };
 }
 
 function hsvToRgb(h: number, s: number, v: number) {
@@ -136,8 +147,8 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
     const el = areaRef.current;
     if (!el) return;
     const { x, y } = ratio(el, clientX, clientY);
-    const s = Math.round(x * 100);
-    const v = Math.round((1 - y) * 100);
+    const s = x * 100;
+    const v = (1 - y) * 100;
     setSat(s);
     setVal(v);
     emit(hue, s, v);
@@ -146,7 +157,7 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
   const applyHue = (clientX: number) => {
     const el = hueRef.current;
     if (!el) return;
-    const h = Math.round(ratio(el, clientX, 0).x * 360);
+    const h = ratio(el, clientX, 0).x * 360;
     setHue(h);
     emit(h, sat, val);
   };
