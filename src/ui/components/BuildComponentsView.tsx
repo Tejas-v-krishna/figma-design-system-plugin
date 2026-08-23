@@ -2,7 +2,7 @@ import React from 'react';
 import { useStore } from '../store';
 import { COMPONENT_DEFINITIONS } from '../../shared/component-definitions';
 import { countComponentsFor } from '../../shared/variant-count';
-import { Search, CheckSquare, XSquare, CheckCircle, ChevronUp } from 'lucide-react';
+import { Search, SearchX, CheckSquare, XSquare, CheckCircle, ChevronUp } from 'lucide-react';
 
 export const BuildComponentsView: React.FC = () => {
   const search = useStore((s) => s.componentSearch);
@@ -24,6 +24,14 @@ export const BuildComponentsView: React.FC = () => {
   // shared/ so this can't drift from what the factory does.
   const getVariantCount = (comp: typeof COMPONENT_DEFINITIONS[0]) =>
     countComponentsFor(comp, config.options);
+
+  // The number of Figma components the run will actually create, which is what
+  // the options in the drawer change — the selection count alone doesn't show
+  // that turning on full variant sets multiplies the work several times over.
+  const totalVariants = COMPONENT_DEFINITIONS.filter((c) => selectedSet.has(c.name)).reduce(
+    (sum, c) => sum + getVariantCount(c),
+    0,
+  );
 
   return (
     <div className="dsk-build-components-container">
@@ -54,48 +62,78 @@ export const BuildComponentsView: React.FC = () => {
       </p>
 
       <div className="dsk-components-count">
-        Showing All {filteredComponents.length} Components
+        {search
+          ? `${filteredComponents.length} of ${COMPONENT_DEFINITIONS.length} match “${search}”`
+          : `Showing all ${COMPONENT_DEFINITIONS.length} components`}
       </div>
 
-      <div className="dsk-components-grid">
-        {filteredComponents.map((comp) => {
-          const isSelected = selectedSet.has(comp.name);
-          const variants = getVariantCount(comp);
+      {filteredComponents.length === 0 ? (
+        <div className="dsk-audit-empty">
+          <SearchX size={30} />
+          <p>
+            Nothing matches “{search}”. Component names and categories are searched —
+            try “button”, “form” or “nav”.
+          </p>
+          <button className="dsk-secondary-btn" onClick={() => setSearch('')}>
+            Clear search
+          </button>
+        </div>
+      ) : (
+        <div className="dsk-components-grid">
+          {filteredComponents.map((comp) => {
+            const isSelected = selectedSet.has(comp.name);
+            const variants = getVariantCount(comp);
 
-          return (
-            <div
-              key={comp.name}
-              className={`dsk-component-card ${isSelected ? 'selected' : ''}`}
-              onClick={() => toggleComponent(comp.name, !isSelected)}
-            >
-              <div className="dsk-card-preview">
-                {/* SVG Illustration Placeholder / Component Preview Box */}
-                <div className="dsk-card-preview-inner">
-                  <span className="dsk-preview-text">{comp.name[0]}</span>
+            return (
+              <div
+                key={comp.name}
+                className={`dsk-component-card ${isSelected ? 'selected' : ''}`}
+                onClick={() => toggleComponent(comp.name, !isSelected)}
+              >
+                <div className="dsk-card-preview">
+                  {/* SVG Illustration Placeholder / Component Preview Box */}
+                  <div className="dsk-card-preview-inner">
+                    <span className="dsk-preview-text">{comp.name[0]}</span>
+                  </div>
+                  {isSelected && <CheckCircle size={18} className="dsk-card-check" />}
                 </div>
-                {isSelected && <CheckCircle size={18} className="dsk-card-check" />}
+                <div className="dsk-card-info">
+                  <span className="dsk-card-title">{comp.name}</span>
+                  <span className="dsk-card-variants">
+                    {variants} {variants === 1 ? 'variant' : 'variants'}
+                  </span>
+                </div>
               </div>
-              <div className="dsk-card-info">
-                <span className="dsk-card-title">{comp.name}</span>
-                <span className="dsk-card-variants">
-                  {variants} {variants === 1 ? 'variant' : 'variants'}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       <footer className="dsk-bottom-bar">
         <div className="dsk-selection-count">
-          <span>{selectedSet.size} components selected</span>
+          {/* Was "0 components selected" next to an enabled Generate button. The
+              run then built an empty page and reported success, so the only
+              honest options were to explain or to disable — this does both. */}
+          <span>
+            {selectedSet.size === 0
+              ? 'Select at least one component'
+              : `${selectedSet.size} of ${COMPONENT_DEFINITIONS.length} selected · ${totalVariants} variants`}
+          </span>
         </div>
 
         <div className="dsk-split-action">
-          <button className="dsk-primary-btn" onClick={() => startGeneration('components')}>
+          <button
+            className="dsk-primary-btn"
+            onClick={() => startGeneration('components')}
+            disabled={selectedSet.size === 0}
+          >
             Generate Components in <span className="figma-icon">❖</span>
           </button>
-          <button className="dsk-split-caret" onClick={() => startGeneration('components')}>
+          <button
+            className="dsk-split-caret"
+            onClick={() => startGeneration('components')}
+            disabled={selectedSet.size === 0}
+          >
             <ChevronUp size={16} />
           </button>
         </div>
