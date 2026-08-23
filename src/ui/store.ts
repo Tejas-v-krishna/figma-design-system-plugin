@@ -340,8 +340,10 @@ export const useStore = create<UIState>((set, get) => ({
         ...clone(DEFAULT_CONFIG),
         ...saved,
         fontFamily: { ...clone(DEFAULT_CONFIG).fontFamily, ...(saved.fontFamily ?? {}) },
-        options: { ...clone(DEFAULT_CONFIG).options, ...(saved.options ?? {}) },
-        componentsToGenerate: saved.componentsToGenerate ?? [],
+        componentsToGenerate:
+          saved.componentsToGenerate && saved.componentsToGenerate.length > 0
+            ? saved.componentsToGenerate
+            : COMPONENT_DEFINITIONS.map((c) => c.name),
       },
     });
   },
