@@ -444,7 +444,7 @@ export async function generateComponents(
             rowLine.counterAxisAlignItems = 'CENTER';
             rowLine.primaryAxisSizingMode = 'FIXED';
             rowLine.counterAxisSizingMode = 'AUTO';
-            rowLine.itemSpacing = 36;
+            rowLine.itemSpacing = 28;
             rowLine.fills = [];
             rowLine.clipsContent = false;
             rowLine.resize(CW - 80, 44);
@@ -454,7 +454,7 @@ export async function generateComponents(
             rowLabel.fontSize = 13;
             rowLabel.characters = section.title;
             rowLabel.fills = [{ type: 'SOLID', color: hexToRgb('#3F3F46') }];
-            rowLabel.resize(100, 20);
+            rowLabel.resize(80, 20);
             rowLabel.textAlignHorizontal = 'RIGHT';
             rowLine.appendChild(rowLabel);
 
@@ -465,7 +465,7 @@ export async function generateComponents(
             buttonsContainer.counterAxisAlignItems = 'CENTER';
             buttonsContainer.primaryAxisSizingMode = 'AUTO';
             buttonsContainer.counterAxisSizingMode = 'AUTO';
-            buttonsContainer.itemSpacing = 20;
+            buttonsContainer.itemSpacing = 16;
             buttonsContainer.fills = [];
             buttonsContainer.clipsContent = false;
 

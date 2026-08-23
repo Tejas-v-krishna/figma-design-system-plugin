@@ -3242,14 +3242,14 @@ const SocialButton: Template = (root, ctx) => {
   root.strokes = [];
   root.effects = [];
 
-  let label = 'Continue with Google';
+  let label = 'Sign in with Google';
   let iconName: IconKind = 'google';
   let bg = '#FFFFFF';
   let fg = '#18181B';
   let stroke = '#E4E4E7';
 
   if (v.includes('apple')) {
-    label = 'Continue with Apple';
+    label = 'Sign in with Apple';
     iconName = 'apple';
     if (isDisabled) {
       bg = '#71717A';
@@ -3269,7 +3269,7 @@ const SocialButton: Template = (root, ctx) => {
       stroke = '#09090B';
     }
   } else if (v.includes('github')) {
-    label = 'Continue with GitHub';
+    label = 'Sign in with GitHub';
     iconName = 'github';
     if (isDisabled) {
       bg = '#71717A';
@@ -3289,7 +3289,7 @@ const SocialButton: Template = (root, ctx) => {
       stroke = '#24292E';
     }
   } else if (v.includes('microsoft')) {
-    label = 'Continue with Microsoft';
+    label = 'Sign in with Microsoft';
     iconName = 'microsoft';
     if (isDisabled) {
       bg = '#FAFAFA';
@@ -3310,7 +3310,7 @@ const SocialButton: Template = (root, ctx) => {
     }
   } else {
     // Google
-    label = 'Continue with Google';
+    label = 'Sign in with Google';
     iconName = 'google';
     if (isDisabled) {
       bg = '#FAFAFA';
