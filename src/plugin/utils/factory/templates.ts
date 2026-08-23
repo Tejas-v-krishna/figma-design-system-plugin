@@ -220,13 +220,13 @@ const Button: Template = (root, ctx) => {
   const isFocused = sKey === 'focused' || sKey === 'focus';
   const isDisabled = sKey === 'disabled';
 
-  const isSecondary = vKey === 'secondary' || vKey === 'outline';
+  const isSecondary = vKey === 'secondary';
+  const isOutline = vKey === 'outline' || vKey === 'brand' || vKey === 'bordered';
   const isGhost = vKey === 'ghost';
   const isDestructive = vKey === 'destructive' || vKey === 'danger';
-  const isBrand = vKey === 'brand' || vKey === 'accent';
   const isTonal = vKey === 'tonal' || vKey === 'soft' || vKey === 'tertiary';
   const isLink = vKey === 'link';
-  const isPrimary = !isSecondary && !isGhost && !isDestructive && !isBrand && !isTonal && !isLink;
+  const isPrimary = !isSecondary && !isOutline && !isGhost && !isDestructive && !isTonal && !isLink;
 
   root.layoutMode = 'HORIZONTAL';
   root.primaryAxisAlignItems = 'CENTER';
@@ -286,7 +286,7 @@ const Button: Template = (root, ctx) => {
       setFill(root, '#8E8E93');
       textHex = '#FFFFFF';
     } else if (isHover) {
-      setFill(root, '#323236');
+      setFill(root, '#27272A');
       textHex = '#FFFFFF';
       root.effects = [{
         type: 'DROP_SHADOW',
@@ -298,7 +298,7 @@ const Button: Template = (root, ctx) => {
         blendMode: 'NORMAL',
       }];
     } else if (isFocused) {
-      setFill(root, '#1C1C1E');
+      setFill(root, '#18181B');
       textHex = '#FFFFFF';
       root.effects = [{
         type: 'DROP_SHADOW',
@@ -310,7 +310,7 @@ const Button: Template = (root, ctx) => {
         blendMode: 'NORMAL',
       }];
     } else {
-      setFill(root, '#1C1C1E');
+      setFill(root, '#18181B');
       textHex = '#FFFFFF';
       root.effects = [{
         type: 'DROP_SHADOW',
@@ -322,46 +322,32 @@ const Button: Template = (root, ctx) => {
         blendMode: 'NORMAL',
       }];
     }
-  } else if (isBrand) {
+  } else if (isOutline) {
     if (isDisabled) {
-      setFill(root, '#71717A');
-      textHex = '#FFFFFF';
+      root.fills = [];
+      setStroke(root, '#E4E4E7', 1.5);
+      textHex = '#A1A1AA';
     } else if (isHover) {
-      setFill(root, '#27272A');
-      textHex = '#FFFFFF';
-      root.effects = [{
-        type: 'DROP_SHADOW',
-        color: { r: 0, g: 0, b: 0, a: 0.25 },
-        offset: { x: 0, y: 3 },
-        radius: 6,
-        spread: 0,
-        visible: true,
-        blendMode: 'NORMAL',
-      }];
+      setFill(root, '#F4F4F5');
+      setStroke(root, '#18181B', 1.5);
+      textHex = '#18181B';
     } else if (isFocused) {
-      setFill(root, '#09090B');
-      textHex = '#FFFFFF';
+      setFill(root, '#FFFFFF');
+      setStroke(root, '#18181B', 2);
+      textHex = '#18181B';
       root.effects = [{
         type: 'DROP_SHADOW',
-        color: { r: 0, g: 0, b: 0, a: 0.15 },
+        color: { r: 0, g: 0, b: 0, a: 0.08 },
         offset: { x: 0, y: 0 },
         radius: 0,
-        spread: 4,
+        spread: 3,
         visible: true,
         blendMode: 'NORMAL',
       }];
     } else {
-      setFill(root, '#09090B');
-      textHex = '#FFFFFF';
-      root.effects = [{
-        type: 'DROP_SHADOW',
-        color: { r: 0, g: 0, b: 0, a: 0.2 },
-        offset: { x: 0, y: 2 },
-        radius: 4,
-        spread: 0,
-        visible: true,
-        blendMode: 'NORMAL',
-      }];
+      root.fills = [];
+      setStroke(root, '#18181B', 1.5);
+      textHex = '#18181B';
     }
   } else if (isSecondary) {
     if (isDisabled) {
@@ -572,9 +558,9 @@ const IconButton: Template = (root, ctx) => {
   const isFocused = sKey === 'focused' || sKey === 'focus';
   const isDisabled = sKey === 'disabled';
 
-  const isSecondary = vKey === 'secondary' || vKey === 'outline';
+  const isSecondary = vKey === 'secondary';
+  const isOutline = vKey === 'outline' || vKey === 'obsidian' || vKey === 'bordered';
   const isGhost = vKey === 'ghost';
-  const isObsidian = vKey === 'obsidian' || vKey === 'dark' || vKey === 'black';
 
   root.layoutMode = 'HORIZONTAL';
   root.primaryAxisAlignItems = 'CENTER';
@@ -588,12 +574,12 @@ const IconButton: Template = (root, ctx) => {
 
   let fgHex = '#FFFFFF';
 
-  if (isObsidian) {
-    if (isActive) setFill(root, '#020617');
-    else if (isHover) setFill(root, '#1E293B');
-    else setFill(root, '#0F172A');
-    setStroke(root, '#1E293B', 1);
-    fgHex = '#FFFFFF';
+  if (isOutline) {
+    if (isActive) setFill(root, '#E4E4E7');
+    else if (isHover) setFill(root, '#F4F4F5');
+    else root.fills = [];
+    setStroke(root, isDisabled ? '#E4E4E7' : '#18181B', 1.5);
+    fgHex = isDisabled ? '#A1A1AA' : '#18181B';
   } else if (isGhost) {
     if (isActive) setFill(root, colorShade(ctx.tokens, 'neutral', 200));
     else if (isHover) setFill(root, colorShade(ctx.tokens, 'neutral', 100));
@@ -2898,7 +2884,7 @@ const SplitButton: Template = (root, ctx) => {
   const isDisabled = sKey === 'disabled';
 
   const isSecondary = vKey.includes('secondary');
-  const isObsidian = vKey.includes('obsidian');
+  const isOutline = vKey.includes('outline') || vKey.includes('obsidian');
 
   const szHeight = Number(ctx.sizeProps.height ?? (ctx.sizeName === 'sm' ? 32 : ctx.sizeName === 'lg' ? 48 : 40));
   const padY = szHeight <= 32 ? 4 : szHeight >= 48 ? 10 : 8;
@@ -2919,12 +2905,13 @@ const SplitButton: Template = (root, ctx) => {
   let textFill = '#FFFFFF';
   let sepColor = '#FFFFFF';
 
-  if (isObsidian) {
-    if (isActive) setFill(root, '#020617');
-    else if (isHover) setFill(root, '#1E293B');
-    else setFill(root, '#0F172A');
-    textFill = '#FFFFFF';
-    sepColor = '#334155';
+  if (isOutline) {
+    if (isActive) setFill(root, '#E4E4E7');
+    else if (isHover) setFill(root, '#F4F4F5');
+    else root.fills = [];
+    setStroke(root, isDisabled ? '#E4E4E7' : '#18181B', 1.5);
+    textFill = isDisabled ? '#A1A1AA' : '#18181B';
+    sepColor = isDisabled ? '#E4E4E7' : '#18181B';
   } else if (isSecondary) {
     if (isActive) setFill(root, colorShade(ctx.tokens, 'neutral', 100));
     else if (isHover) setFill(root, colorShade(ctx.tokens, 'neutral', 50));
@@ -2933,14 +2920,14 @@ const SplitButton: Template = (root, ctx) => {
     textFill = colorShade(ctx.tokens, 'neutral', 800);
     sepColor = colorShade(ctx.tokens, 'neutral', 200);
   } else {
-    if (isActive) setFill(root, colorShade(ctx.tokens, 'primary', 700));
-    else if (isHover) setFill(root, colorShade(ctx.tokens, 'primary', 600));
-    else setFill(root, colorShade(ctx.tokens, 'primary', 500), colorStyleKey('primary', 500), ctx.styleMap, ctx.varMap);
+    if (isActive) setFill(root, '#09090B');
+    else if (isHover) setFill(root, '#27272A');
+    else setFill(root, '#18181B');
     textFill = '#FFFFFF';
-    sepColor = '#FFFFFF';
+    sepColor = '#3F3F46';
   }
 
-  if (isDisabled) {
+  if (isDisabled && !isOutline) {
     root.opacity = 0.5;
   }
 
