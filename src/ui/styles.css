@@ -995,6 +995,15 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
 .error-banner { background: var(--danger-soft); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 11px 14px; border-radius: 10px; font-size: 13px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
 .error-banner button { background: none; border: none; color: #fca5a5; cursor: pointer; font-size: 16px; line-height: 1; }
 
+/* Repaired-settings notice. Amber, not red: nothing failed, a value was
+   substituted, and the list says which — so it needs to be readable rather than
+   alarming. Aligned to flex-start because the body is a list, not one line. */
+.dsk-warning-banner { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.35); color: #fcd34d; padding: 11px 14px; border-radius: 10px; font-size: 12.5px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.dsk-warning-banner-body strong { display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 5px; }
+.dsk-warning-banner-body ul { margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 2px; }
+.dsk-warning-banner-body li { color: rgba(252, 211, 77, 0.82); line-height: 1.45; }
+.dsk-warning-banner button { background: none; border: none; color: #fcd34d; cursor: pointer; font-size: 16px; line-height: 1; flex-shrink: 0; }
+
 /* ---------- Shades & Gradients Inspector ---------- */
 .dsk-inspector-card {
   margin-top: 20px;
