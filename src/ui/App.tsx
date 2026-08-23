@@ -73,30 +73,39 @@ export default function App() {
   return (
     <div className="dsk-app-shell">
       <Header />
-      <main className="dsk-main-content">
-        {lastError && (
-          <div className="error-banner">
-            <span>{lastError}</span>
-            <button onClick={clearError} aria-label="Dismiss">×</button>
-          </div>
-        )}
-        {warnings.length > 0 && (
-          <div className="dsk-warning-banner" role="status">
-            <div className="dsk-warning-banner-body">
-              <strong>
-                {warnings.length === 1
-                  ? 'One saved setting was repaired'
-                  : `${warnings.length} saved settings were repaired`}
-              </strong>
-              <ul>
-                {warnings.map((w) => (
-                  <li key={w}>{w}</li>
-                ))}
-              </ul>
+      {/* Notices sit outside .dsk-main-content on purpose. That element is a flex
+          row holding the sidebar and the active view, so a banner placed inside it
+          became a third column — the message showed up as a narrow full-height
+          strip and squeezed the panel into a sliver. The shell is a column, so as
+          a sibling of <main> a banner stacks above the content the way it reads. */}
+      {(lastError !== null || warnings.length > 0) && (
+        <div className="dsk-notice-stack">
+          {lastError && (
+            <div className="error-banner" role="alert">
+              <span>{lastError}</span>
+              <button onClick={clearError} aria-label="Dismiss">×</button>
             </div>
-            <button onClick={clearWarnings} aria-label="Dismiss">×</button>
-          </div>
-        )}
+          )}
+          {warnings.length > 0 && (
+            <div className="dsk-warning-banner" role="status">
+              <div className="dsk-warning-banner-body">
+                <strong>
+                  {warnings.length === 1
+                    ? 'One saved setting was repaired'
+                    : `${warnings.length} saved settings were repaired`}
+                </strong>
+                <ul>
+                  {warnings.map((w) => (
+                    <li key={w}>{w}</li>
+                  ))}
+                </ul>
+              </div>
+              <button onClick={clearWarnings} aria-label="Dismiss">×</button>
+            </div>
+          )}
+        </div>
+      )}
+      <main className="dsk-main-content">
         {(view === 'set-tokens' || view === 'brand' || view === 'typography') && <SetTokensView />}
         {(view === 'build-components' || view === 'components') && <BuildComponentsView />}
         {(view === 'code' || view === 'export') && <CodeExportView />}
