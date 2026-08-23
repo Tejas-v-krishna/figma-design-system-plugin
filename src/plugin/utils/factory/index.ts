@@ -369,10 +369,14 @@ export async function generateComponents(
         metaRight.itemSpacing = 8;
         metaRight.fills = [];
 
+        const numVar = def.variants.length;
+        const numSz = def.sizes.length || 1;
+        const numSt = def.states.length || 1;
+
         const specLabels = [
-          `${def.variants.length} Variants`,
-          `${def.sizes.length || 1} Sizes`,
-          `${def.states.length || 1} States`,
+          `${numVar} ${numVar === 1 ? 'Variant' : 'Variants'}`,
+          `${numSz} ${numSz === 1 ? 'Size' : 'Sizes'}`,
+          `${numSt} ${numSt === 1 ? 'State' : 'States'}`,
         ];
 
         for (const sText of specLabels) {
