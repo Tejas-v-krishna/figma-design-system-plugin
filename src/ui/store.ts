@@ -258,13 +258,18 @@ export const useStore = create<UIState>((set, get) => ({
   setView: (v) => set({ view: v, lastError: null }),
   setTokenCategory: (c) => set({ tokenCategory: c }),
   setSelectedColor: (hex, name) => set({ selectedColor: { hex, name: name || hex } }),
-  generateColorExtensions: (hex, name) => {
+  generateColorExtensions: (hex, name, customStops) => {
     const targetHex = hex || get().selectedColor?.hex || get().config.primaryColor;
     const targetName = name || get().selectedColor?.name || 'Color';
     set({ overlay: 'generating', progress: 0, progressMessage: 'Generating Shades & Gradients…', statusMessage: '', lastError: null });
     postToPlugin({
       type: 'GENERATE_COLOR_EXTENSIONS',
-      payload: { hex: targetHex, name: targetName, config: get().config },
+      // customStops carries the gradient stops the user hand-edited in the
+      // Gradients panel. The parameter was declared, both call sites passed it and
+      // the sandbox parsed it — this function was the one link that dropped it, so
+      // every edited stop was silently discarded and the board came back with the
+      // derived colours instead.
+      payload: { hex: targetHex, name: targetName, config: get().config, customStops },
     });
   },
 
