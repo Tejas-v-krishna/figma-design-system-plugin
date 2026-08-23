@@ -12,6 +12,7 @@
 // Request types (UI -> sandbox) and response types (sandbox -> UI) are disjoint
 // sets, so neither side mistakes its own traffic for the other's.
 import { GenerationConfig } from '../src/shared/types';
+import { sanitizeConfig } from '../src/shared/config-schema';
 import { exportTokens, ExportFormat } from '../src/plugin/commands/export';
 import { COMPONENT_DEFINITIONS } from '../src/shared/component-definitions';
 import { countComponentsForAll } from '../src/shared/variant-count';
@@ -24,14 +25,26 @@ const MOCK_FONTS = [
   'SF Pro Text', 'Segoe UI', 'Times New Roman', 'Verdana',
 ];
 
-function reply(type: string, payload?: unknown): void {
-  window.postMessage({ pluginMessage: { type, payload } }, '*');
+function reply(type: string, payload?: unknown, warnings?: string[]): void {
+  window.postMessage({ pluginMessage: { type, payload, warnings } }, '*');
 }
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-/** Mimics generateDesignSystem's progress cadence without touching a canvas. */
-async function fakeGenerate(config: GenerationConfig & { target?: string }): Promise<void> {
+/**
+ * Mimics generateDesignSystem's progress cadence without touching a canvas.
+ *
+ * Takes the raw payload and sanitizes it exactly as main.ts does, so the harness
+ * reproduces the real plugin's handling of a malformed config rather than
+ * trusting it and hiding the difference.
+ */
+async function fakeGenerate(payload: unknown): Promise<void> {
+  const { config, repairs } = sanitizeConfig(payload);
+  const target =
+    typeof payload === 'object' && payload !== null && typeof (payload as { target?: unknown }).target === 'string'
+      ? (payload as { target: string }).target
+      : undefined;
+
   const steps: [number, string][] = [
     [5, 'Initializing generation…'],
     [15, 'Fonts loaded'],
@@ -45,19 +58,21 @@ async function fakeGenerate(config: GenerationConfig & { target?: string }): Pro
     await wait(220);
   }
 
-  const chosen = config.componentsToGenerate?.length
-    ? COMPONENT_DEFINITIONS.filter((d) => config.componentsToGenerate.includes(d.name))
-    : COMPONENT_DEFINITIONS;
+  const chosen =
+    config.componentsToGenerate.length > 0
+      ? COMPONENT_DEFINITIONS.filter((d) => config.componentsToGenerate.includes(d.name))
+      : COMPONENT_DEFINITIONS;
 
   reply('GENERATION_COMPLETE', {
     success: true,
-    message: `Mock generate finished (target: ${config.target ?? 'all'}). Nothing was drawn — this is the browser harness.`,
+    message: `Mock generate finished (target: ${target ?? 'all'}). Nothing was drawn — this is the browser harness.`,
+    warnings: repairs,
     stats: {
       tokensCreated: 214,
       stylesCreated: 186,
       variablesCreated: 214,
       componentsCreated: countComponentsForAll(chosen, config.options),
-      pagesCreated: config.target && config.target !== 'all' ? 1 : 5,
+      pagesCreated: target && target !== 'all' ? 1 : 5,
     },
   });
 }
@@ -75,7 +90,8 @@ export function installMockPlugin(): void {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
           try {
-            reply('PERSISTED_CONFIG', JSON.parse(raw));
+            const { config, repairs } = sanitizeConfig(JSON.parse(raw));
+            reply('PERSISTED_CONFIG', config, repairs);
           } catch {
             localStorage.removeItem(STORAGE_KEY);
           }
@@ -85,7 +101,7 @@ export function installMockPlugin(): void {
       }
 
       case 'SAVE_CONFIG':
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(msg.payload));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitizeConfig(msg.payload).config));
         break;
 
       case 'EXPORT_TOKENS': {
