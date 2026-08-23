@@ -324,7 +324,9 @@ function handleExport(payload: unknown) {
 
 async function handleScan() {
   try {
-    const report = await scanUsage();
+    const report = await scanUsage((p) => {
+      figma.ui.postMessage({ type: 'SCAN_PROGRESS', payload: p });
+    });
     figma.ui.postMessage({
       type: 'SCAN_COMPLETE',
       payload: { success: true, report },
