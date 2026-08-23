@@ -195,9 +195,10 @@ export async function generateComponents(
   }
 
   // 4. Generate all remaining component categories in clean boards
-  const nonMatrixComponents = selected.filter(
-    (d) => !['Button', 'IconButton', 'Input', 'Textarea'].includes(d.name)
-  );
+  // Exclude components that are rendered in their own dedicated matrix boards
+  // or are sub-components of matrix-board components (ButtonGroup → covered by Button matrix)
+  const MATRIX_HANDLED = new Set(['Button', 'IconButton', 'ButtonGroup', 'Input', 'Textarea', 'Select']);
+  const nonMatrixComponents = selected.filter((d) => !MATRIX_HANDLED.has(d.name));
 
   for (const [index, def] of nonMatrixComponents.entries()) {
     let frame = frames[def.category];

@@ -2115,9 +2115,12 @@ const DatePicker: Template = (root, ctx) => {
 
   const cal = makeFrame('cal');
   cal.layoutMode = 'VERTICAL';
-  cal.itemSpacing = 10;
-  pad(cal, 16);
+  cal.primaryAxisSizingMode = 'AUTO';
+  cal.counterAxisSizingMode = 'AUTO';
+  cal.itemSpacing = 8;
+  pad(cal, 14);
   cal.cornerRadius = containerRadius(ctx, 'lg', 16);
+  cal.clipsContent = true;  // clip so content never bleeds outside the card
   setFill(cal, '#FFFFFF');
   setStroke(cal, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
   setEffect(cal, shadow(ctx.tokens, 'md'), effectStyleKey('md'), ctx.styleMap, ctx.varMap);
@@ -2126,9 +2129,12 @@ const DatePicker: Template = (root, ctx) => {
   // Month navigation header
   const header = makeFrame('header');
   header.layoutMode = 'HORIZONTAL';
+  header.primaryAxisSizingMode = 'FIXED';
+  header.counterAxisSizingMode = 'AUTO';
   header.primaryAxisAlignItems = 'SPACE_BETWEEN';
   header.counterAxisAlignItems = 'CENTER';
   header.resize(252, 28);
+  header.fills = [];
   header.appendChild(buildIcon(16, colorShade(ctx.tokens, 'neutral', 500), 'chevronDown'));
   header.appendChild(text({ characters: 'October 2026', fontFamily: ctx.config.fontFamily.heading, weight: 600, fontSize: 14, fill: colorShade(ctx.tokens, 'neutral', 900) }));
   header.appendChild(buildIcon(16, colorShade(ctx.tokens, 'neutral', 500), 'chevronDown'));
@@ -2137,6 +2143,8 @@ const DatePicker: Template = (root, ctx) => {
   // Day of week headers
   const daysHeader = makeFrame('days-header');
   daysHeader.layoutMode = 'HORIZONTAL';
+  daysHeader.primaryAxisSizingMode = 'AUTO';
+  daysHeader.counterAxisSizingMode = 'AUTO';
   daysHeader.itemSpacing = 4;
   ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].forEach((day) => {
     const dh = text({ characters: day, fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 400), align: 'CENTER' });
@@ -2145,7 +2153,7 @@ const DatePicker: Template = (root, ctx) => {
   });
   cal.appendChild(daysHeader);
 
-  // Weekly calendar grid
+  // Weekly calendar grid — 5 rows × 7 cols = max 35 days
   let dayNum = 1;
   const isRange = vKey === 'range';
   const isMultiple = vKey === 'multiple';
@@ -2153,13 +2161,20 @@ const DatePicker: Template = (root, ctx) => {
   for (let r = 0; r < 5; r++) {
     const weekRow = makeFrame(`week-${r + 1}`);
     weekRow.layoutMode = 'HORIZONTAL';
+    weekRow.primaryAxisSizingMode = 'AUTO';
+    weekRow.counterAxisSizingMode = 'AUTO';
     weekRow.itemSpacing = 4;
+
     for (let c = 0; c < 7; c++) {
       const cell = makeFrame(`day-${dayNum}`);
-      cell.resize(32, 32);
-      cell.cornerRadius = containerRadius(ctx, 'md', 8);
+      cell.layoutMode = 'HORIZONTAL';
+      cell.primaryAxisSizingMode = 'FIXED';
+      cell.counterAxisSizingMode = 'FIXED';
       cell.primaryAxisAlignItems = 'CENTER';
       cell.counterAxisAlignItems = 'CENTER';
+      cell.resize(32, 32);
+      cell.cornerRadius = 8;
+      cell.clipsContent = true;
 
       let isSelected = false;
       let inRange = false;
@@ -2179,21 +2194,23 @@ const DatePicker: Template = (root, ctx) => {
         setFill(cell, colorShade(ctx.tokens, 'primary', 100));
       }
 
-      cell.appendChild(text({
-        characters: dayNum <= 31 ? String(dayNum) : '',
-        fontFamily: ctx.config.fontFamily.body,
-        weight: isSelected ? 600 : inRange ? 500 : 400,
-        fontSize: 12,
-        fill: isSelected ? '#FFFFFF' : inRange ? colorShade(ctx.tokens, 'primary', 800) : colorShade(ctx.tokens, 'neutral', 800),
-        align: 'CENTER',
-      }));
+      if (dayNum <= 31) {
+        const dayTxt = text({
+          characters: String(dayNum),
+          fontFamily: ctx.config.fontFamily.body,
+          weight: isSelected ? 600 : inRange ? 500 : 400,
+          fontSize: 12,
+          fill: isSelected ? '#FFFFFF' : inRange ? colorShade(ctx.tokens, 'primary', 800) : colorShade(ctx.tokens, 'neutral', 800),
+          align: 'CENTER',
+        });
+        cell.appendChild(dayTxt);
+      }
       weekRow.appendChild(cell);
       dayNum++;
     }
     cal.appendChild(weekRow);
   }
 
-  cal.resize(280, 270);
   root.appendChild(cal);
   return root;
 };
