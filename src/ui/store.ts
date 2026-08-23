@@ -109,13 +109,11 @@ interface UIState {
 
   exportFormat: ExportFormat;
   exportResult: string | null;
-  exportError: string | null;
   exportBusy: boolean;
 
   availableFonts: string[] | null;
 
   scanResult: UsageReport | null;
-  scanError: string | null;
   scanBusy: boolean;
   /** 0–100 while a scan runs. A large file takes seconds, so this is not decorative. */
   scanProgress: number;
@@ -242,7 +240,6 @@ export const useStore = create<UIState>((set, get) => ({
 
   exportFormat: 'json',
   exportResult: null,
-  exportError: null,
   exportBusy: false,
 
   availableFonts: null,
@@ -250,7 +247,6 @@ export const useStore = create<UIState>((set, get) => ({
   selectedColor: { hex: '#2563EB', name: 'Primary' },
 
   scanResult: null,
-  scanError: null,
   scanBusy: false,
   scanProgress: 0,
   scanMessage: '',
@@ -283,7 +279,7 @@ export const useStore = create<UIState>((set, get) => ({
   setImportOpen: (b) => set({ importOpen: b }),
   // Dismissing the banner has to clear the feature-level errors too, otherwise
   // the next exportComplete/scanComplete would leave stale state behind.
-  clearError: () => set({ lastError: null, exportError: null, scanError: null }),
+  clearError: () => set({ lastError: null }),
 
   // A crash inside the sandbox used to reach a `switch` in App with no case for
   // it, so the panel sat on whatever it was showing — spinner included — with no
@@ -421,7 +417,7 @@ export const useStore = create<UIState>((set, get) => ({
   persist: () => postToPlugin({ type: 'SAVE_CONFIG', payload: get().config }),
   loadPersisted: () => postToPlugin({ type: 'LOAD_CONFIG' }),
 
-  setExportFormat: (f) => set({ exportFormat: f, exportResult: null, exportError: null }),
+  setExportFormat: (f) => set({ exportFormat: f, exportResult: null }),
   setProgress: (p, m) => set({ progress: p, progressMessage: m }),
 
   generationComplete: (success, message, stats) =>
@@ -434,9 +430,9 @@ export const useStore = create<UIState>((set, get) => ({
       progress: success ? 100 : 0,
     }),
 
-  // Export and scan failures also raise lastError so App's banner shows them.
-  // Without this the only feedback for a failed export was the button leaving
-  // its busy state — exportError was set and never rendered anywhere.
+  // Export and scan failures raise lastError so App's banner shows them. Before
+  // that, the only feedback for a failed export was the button leaving its busy
+  // state: the message went into an exportError field nothing rendered.
   //
   // Neither clears lastError on success: requestExport and requestScan do that
   // when they start, which is the moment a previous failure stops being true.
@@ -444,7 +440,6 @@ export const useStore = create<UIState>((set, get) => ({
     set({
       exportBusy: false,
       exportResult: success ? result : null,
-      exportError: success ? null : message ?? 'Export failed',
       ...(success ? {} : { lastError: message ?? 'Export failed' }),
     }),
 
@@ -452,7 +447,6 @@ export const useStore = create<UIState>((set, get) => ({
     set({
       scanBusy: false,
       scanResult: success ? report : null,
-      scanError: success ? null : message ?? 'Scan failed',
       ...(success ? {} : { lastError: message ?? 'Scan failed' }),
     }),
 
@@ -532,7 +526,7 @@ export const useStore = create<UIState>((set, get) => ({
     // this action moot; a *success* arriving later says nothing about an error
     // raised by some other action, and clearing it there wiped messages the user
     // had not read yet.
-    set({ exportBusy: true, exportResult: null, exportError: null, lastError: null });
+    set({ exportBusy: true, exportResult: null, lastError: null });
     // Send the config too: the plugin sandbox loses its token cache on every
     // reopen, and tokens are derivable from config, so this makes export work
     // without forcing a generate first.
@@ -542,7 +536,6 @@ export const useStore = create<UIState>((set, get) => ({
     set({
       scanBusy: true,
       scanResult: null,
-      scanError: null,
       lastError: null,
       scanProgress: 0,
       scanMessage: 'Starting scan…',
