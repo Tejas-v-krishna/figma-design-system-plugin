@@ -11,9 +11,6 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
       { name: 'Secondary', properties: { variant: 'secondary' } },
       { name: 'Ghost', properties: { variant: 'ghost' } },
       { name: 'Destructive', properties: { variant: 'destructive' } },
-      { name: 'Brand', properties: { variant: 'brand' } },
-      { name: 'Tertiary', properties: { variant: 'tertiary' } },
-      { name: 'Link', properties: { variant: 'link' } },
     ],
     states: [
       { name: 'Default', properties: { state: 'default' } },

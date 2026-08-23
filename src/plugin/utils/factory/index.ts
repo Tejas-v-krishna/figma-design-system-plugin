@@ -334,10 +334,10 @@ export async function generateComponents(
         cardBody.counterAxisSizingMode = 'FIXED';
         cardBody.resize(CW, 100);
         cardBody.itemSpacing = 28;
-        cardBody.paddingTop = 28;
-        cardBody.paddingBottom = 32;
-        cardBody.paddingLeft = 28;
-        cardBody.paddingRight = 28;
+        cardBody.paddingTop = 36;
+        cardBody.paddingBottom = 36;
+        cardBody.paddingLeft = 36;
+        cardBody.paddingRight = 36;
         cardBody.fills = [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }];
         cardBody.clipsContent = false;
 

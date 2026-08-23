@@ -200,16 +200,6 @@ export function buildIcon(size: number, hex: string, kind: IconKind = 'info'): F
   return f;
 }
 
-function buildSpinner(size: number, hex: string): FrameNode {
-  const f = makeFrame('spinner');
-  f.resize(size, size);
-  const e = ellipse('ring', size);
-  e.fills = [];
-  e.strokes = [{ type: 'SOLID', color: hexToRgbSafe(hex) }];
-  e.strokeWeight = Math.max(2, size * 0.14);
-  f.appendChild(e);
-  return f;
-}
 
 function hexToRgbSafe(hex: string): RGB {
   const clean = hex.replace('#', '');
@@ -221,58 +211,42 @@ function hexToRgbSafe(hex: string): RGB {
 }
 
 // ---------------- templates ----------------
-
 const Button: Template = (root, ctx) => {
   const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
   const isHover = sKey === 'hover';
-  const isActive = sKey === 'active';
   const isFocused = sKey === 'focused' || sKey === 'focus';
   const isDisabled = sKey === 'disabled';
-  const isLoading = sKey === 'loading';
 
   const isSecondary = vKey === 'secondary' || vKey === 'outline';
-  const isTertiary = vKey === 'tertiary' || vKey === 'tonal' || vKey === 'soft';
   const isGhost = vKey === 'ghost';
   const isDestructive = vKey === 'destructive' || vKey === 'danger';
-  const isBrand = vKey === 'brand';
-  const isLink = vKey === 'link';
-  const isPrimary = !isSecondary && !isTertiary && !isGhost && !isDestructive && !isBrand && !isLink;
-
-  const fontSize = Number(ctx.sizeProps.fontSize ?? 14);
-  const padX = Number(ctx.sizeProps.paddingX ?? 22);
+  const isPrimary = !isSecondary && !isGhost && !isDestructive;
 
   root.layoutMode = 'HORIZONTAL';
-  root.primaryAxisSizingMode = 'AUTO';
-  root.counterAxisSizingMode = 'AUTO';
+  root.primaryAxisSizingMode = 'FIXED';
+  root.counterAxisSizingMode = 'FIXED';
   root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
-  root.itemSpacing = 8;
-
-  if (isLink) {
-    pad(root, 4, 4);
-    root.cornerRadius = 4;
-  } else {
-    pad(root, 10, padX);
-    root.cornerRadius = 9999;
-  }
-
-  let textHex = '#FFFFFF';
+  root.resize(108, 40);
+  root.cornerRadius = 9999;
   root.strokes = [];
   root.effects = [];
+
+  let textHex = '#FFFFFF';
 
   if (isPrimary) {
     if (isDisabled) {
       setFill(root, '#8E8E93');
-      textHex = 'rgba(255, 255, 255, 0.8)';
+      textHex = '#FFFFFF';
     } else if (isHover) {
       setFill(root, '#323236');
       textHex = '#FFFFFF';
       root.effects = [{
         type: 'DROP_SHADOW',
-        color: { r: 0, g: 0, b: 0, a: 0.28 },
+        color: { r: 0, g: 0, b: 0, a: 0.22 },
         offset: { x: 0, y: 3 },
-        radius: 8,
+        radius: 6,
         spread: 0,
         visible: true,
         blendMode: 'NORMAL',
@@ -282,22 +256,21 @@ const Button: Template = (root, ctx) => {
       textHex = '#FFFFFF';
       root.effects = [{
         type: 'DROP_SHADOW',
-        color: { r: 0, g: 0, b: 0, a: 0.16 },
+        color: { r: 0, g: 0, b: 0, a: 0.12 },
         offset: { x: 0, y: 0 },
         radius: 0,
-        spread: 5,
+        spread: 4,
         visible: true,
         blendMode: 'NORMAL',
       }];
     } else {
       setFill(root, '#1C1C1E');
-      setStroke(root, '#2C2C2E', 1);
       textHex = '#FFFFFF';
       root.effects = [{
         type: 'DROP_SHADOW',
-        color: { r: 0, g: 0, b: 0, a: 0.2 },
+        color: { r: 0, g: 0, b: 0, a: 0.16 },
         offset: { x: 0, y: 2 },
-        radius: 5,
+        radius: 4,
         spread: 0,
         visible: true,
         blendMode: 'NORMAL',
@@ -327,10 +300,10 @@ const Button: Template = (root, ctx) => {
       textHex = '#1C1C1E';
       root.effects = [{
         type: 'DROP_SHADOW',
-        color: { r: 0, g: 0, b: 0, a: 0.08 },
+        color: { r: 0, g: 0, b: 0, a: 0.06 },
         offset: { x: 0, y: 0 },
         radius: 0,
-        spread: 5,
+        spread: 4,
         visible: true,
         blendMode: 'NORMAL',
       }];
@@ -349,8 +322,8 @@ const Button: Template = (root, ctx) => {
       }];
     }
   } else if (isGhost) {
-    root.fills = [];
     if (isDisabled) {
+      root.fills = [];
       textHex = '#A1A1AA';
     } else if (isHover) {
       setFill(root, '#F4F4F5');
@@ -364,138 +337,63 @@ const Button: Template = (root, ctx) => {
         color: { r: 0, g: 0, b: 0, a: 0.06 },
         offset: { x: 0, y: 0 },
         radius: 0,
-        spread: 5,
+        spread: 4,
         visible: true,
         blendMode: 'NORMAL',
       }];
     } else {
+      root.fills = [];
       textHex = '#1C1C1E';
     }
   } else if (isDestructive) {
     if (isDisabled) {
       setFill(root, '#FCA5A5');
-      textHex = 'rgba(255, 255, 255, 0.85)';
+      textHex = '#FFFFFF';
     } else if (isHover) {
       setFill(root, '#C93030');
       textHex = '#FFFFFF';
       root.effects = [{
         type: 'DROP_SHADOW',
-        color: { r: 0.79, g: 0.19, b: 0.19, a: 0.35 },
+        color: { r: 0.79, g: 0.19, b: 0.19, a: 0.3 },
         offset: { x: 0, y: 3 },
-        radius: 8,
+        radius: 6,
         spread: 0,
         visible: true,
         blendMode: 'NORMAL',
       }];
     } else if (isFocused) {
-      setFill(root, '#E03E3E');
-      textHex = '#FFFFFF';
-      root.effects = [{
-        type: 'DROP_SHADOW',
-        color: { r: 0.88, g: 0.24, b: 0.24, a: 0.25 },
-        offset: { x: 0, y: 0 },
-        radius: 0,
-        spread: 5,
-        visible: true,
-        blendMode: 'NORMAL',
-      }];
-    } else {
       setFill(root, '#E03E3E');
       textHex = '#FFFFFF';
       root.effects = [{
         type: 'DROP_SHADOW',
         color: { r: 0.88, g: 0.24, b: 0.24, a: 0.28 },
-        offset: { x: 0, y: 2 },
-        radius: 6,
-        spread: 0,
-        visible: true,
-        blendMode: 'NORMAL',
-      }];
-    }
-  } else if (isBrand) {
-    if (isDisabled) {
-      setFill(root, colorShade(ctx.tokens, 'primary', 200));
-      textHex = 'rgba(255, 255, 255, 0.85)';
-    } else if (isHover) {
-      setFill(root, colorShade(ctx.tokens, 'primary', 600));
-      textHex = '#FFFFFF';
-      root.effects = [{
-        type: 'DROP_SHADOW',
-        color: { r: 0.15, g: 0.39, b: 0.92, a: 0.35 },
-        offset: { x: 0, y: 3 },
-        radius: 8,
-        spread: 0,
-        visible: true,
-        blendMode: 'NORMAL',
-      }];
-    } else if (isFocused) {
-      setFill(root, colorShade(ctx.tokens, 'primary', 500));
-      textHex = '#FFFFFF';
-      root.effects = [{
-        type: 'DROP_SHADOW',
-        color: { r: 0.15, g: 0.39, b: 0.92, a: 0.25 },
         offset: { x: 0, y: 0 },
         radius: 0,
-        spread: 5,
+        spread: 4,
         visible: true,
         blendMode: 'NORMAL',
       }];
     } else {
-      setFill(root, colorShade(ctx.tokens, 'primary', 500));
+      setFill(root, '#E03E3E');
       textHex = '#FFFFFF';
       root.effects = [{
         type: 'DROP_SHADOW',
-        color: { r: 0.15, g: 0.39, b: 0.92, a: 0.28 },
+        color: { r: 0.88, g: 0.24, b: 0.24, a: 0.25 },
         offset: { x: 0, y: 2 },
-        radius: 6,
+        radius: 4,
         spread: 0,
         visible: true,
         blendMode: 'NORMAL',
       }];
     }
-  } else if (isTertiary) {
-    if (isDisabled) {
-      setFill(root, colorShade(ctx.tokens, 'neutral', 100));
-      textHex = colorShade(ctx.tokens, 'neutral', 400);
-    } else if (isActive) {
-      setFill(root, colorShade(ctx.tokens, 'primary', 200));
-      textHex = colorShade(ctx.tokens, 'primary', 800);
-    } else if (isHover) {
-      setFill(root, colorShade(ctx.tokens, 'primary', 100));
-      textHex = colorShade(ctx.tokens, 'primary', 700);
-    } else {
-      setFill(root, colorShade(ctx.tokens, 'primary', 50), colorStyleKey('primary', 50), ctx.styleMap, ctx.varMap);
-      textHex = colorShade(ctx.tokens, 'primary', 600);
-    }
-  } else if (isLink) {
-    root.fills = [];
-    if (isDisabled) {
-      textHex = colorShade(ctx.tokens, 'neutral', 300);
-    } else if (isHover) {
-      textHex = colorShade(ctx.tokens, 'primary', 700);
-    } else {
-      textHex = colorShade(ctx.tokens, 'primary', 600);
-    }
   }
 
-  if (isLoading) {
-    root.appendChild(buildSpinner(14, textHex));
-  }
-
-  let btnLabel = ctx.stateName || 'Button';
-  if (isLoading) {
-    btnLabel = 'Loading…';
-  } else if (ctx.showcaseType === 'size') {
-    btnLabel = ctx.sizeName === 'sm' ? 'Small' : ctx.sizeName === 'lg' ? 'Large' : 'Medium';
-  } else if (ctx.variantProps.customLabel) {
-    btnLabel = String(ctx.variantProps.customLabel);
-  }
-
+  const btnLabel = ctx.stateName || 'Button';
   const label = text({
     characters: btnLabel,
     fontFamily: ctx.config.fontFamily.body,
     weight: 500,
-    fontSize,
+    fontSize: 14,
     fill: textHex,
   });
   root.appendChild(label);
