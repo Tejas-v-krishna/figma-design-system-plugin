@@ -2,6 +2,7 @@
 import { generateDesignSystem, generateColorExtensions } from './commands/generate';
 import { exportTokens, ExportFormat } from './commands/export';
 import { scanUsage } from './commands/scan';
+import { summarizeExisting } from './commands/existing';
 import { GenerationConfig } from '../shared/types';
 import { sanitizeConfig } from '../shared/config-schema';
 
@@ -95,6 +96,9 @@ async function route(msg: PluginMessage): Promise<void> {
       break;
     case 'SCAN_USAGE':
       await handleScan();
+      break;
+    case 'CHECK_EXISTING':
+      await handleCheckExisting();
       break;
     case 'LOAD_CONFIG':
       await loadConfig();
@@ -335,6 +339,34 @@ async function handleScan() {
     figma.ui.postMessage({
       type: 'SCAN_COMPLETE',
       payload: { success: false, message: errorMessage(error, 'Scan failed') },
+    });
+  }
+}
+
+/**
+ * Tell the UI what a generate would overwrite, so it can ask first.
+ *
+ * On failure this reports "nothing found" rather than an error. The check exists
+ * to add a confirmation step, and a broken check should not be able to block the
+ * user from generating at all — the worst case is the old behaviour, which is
+ * overwriting without asking, and that is better than a plugin that refuses to
+ * run because it could not read the style list.
+ */
+async function handleCheckExisting() {
+  try {
+    figma.ui.postMessage({ type: 'EXISTING_SUMMARY', payload: await summarizeExisting() });
+  } catch (error: unknown) {
+    console.warn('[design-system-kit] could not check for existing styles:', error);
+    figma.ui.postMessage({
+      type: 'EXISTING_SUMMARY',
+      payload: {
+        pages: [],
+        paintStyles: 0,
+        textStyles: 0,
+        effectStyles: 0,
+        duplicateStyles: 0,
+        hasAny: false,
+      },
     });
   }
 }
