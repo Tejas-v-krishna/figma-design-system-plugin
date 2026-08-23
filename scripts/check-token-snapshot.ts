@@ -37,7 +37,11 @@ const CASES: { label: string; config: GenerationConfig }[] = [
   { label: 'effects-strong', config: { ...DEFAULT_CONFIG, effectsIntensity: 'strong' } },
   { label: 'brand-crimson', config: { ...DEFAULT_CONFIG, primaryColor: '#B3261E' } },
   { label: 'spacing-base-8', config: { ...DEFAULT_CONFIG, baseSpacing: 8 } },
-  { label: 'type-scale-1-333', config: { ...DEFAULT_CONFIG, typographyScale: 1.333 } },
+  { label: 'type-scale-system', config: { ...DEFAULT_CONFIG, typographyScale: 'system' } },
+  {
+    label: 'type-scale-custom-20',
+    config: { ...DEFAULT_CONFIG, typographyScale: 'custom', baseFontSize: 20 },
+  },
 ];
 
 const update = process.argv.includes('--update');
