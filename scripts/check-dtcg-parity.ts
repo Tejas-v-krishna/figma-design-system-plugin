@@ -5,7 +5,7 @@ import { DEFAULT_CONFIG, DesignTokens } from '../src/shared/types';
 import { exportTokens } from '../src/plugin/commands/export';
 import { buildTokens } from '../src/shared/build-tokens';
 
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-explicit-any -- deliberately reproduces the pre-refactor code verbatim */
 function legacyToDtcg(tokens: DesignTokens): string {
   const dtcg: any = { color: {}, dimension: {}, borderRadius: {}, strokeWidth: {}, shadow: {} };
   for (const [name, ct] of Object.entries(tokens.colors)) {
@@ -34,7 +34,7 @@ function legacyToDtcg(tokens: DesignTokens): string {
   }
   return JSON.stringify(dtcg, null, 2);
 }
-/* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 const CASES: { label: string; config: typeof DEFAULT_CONFIG }[] = [
   { label: 'defaults (dark mode on)', config: DEFAULT_CONFIG },
