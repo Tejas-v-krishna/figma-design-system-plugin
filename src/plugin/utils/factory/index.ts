@@ -499,9 +499,9 @@ export async function generateComponents(
 
           let subtitle = '';
           if (section.title === 'Sizes Scale') {
-            subtitle = '—  Proportional scale from XS (28px) to XL (56px)';
+            subtitle = 'Proportional scale from XS (28px) to XL (56px)';
           } else if (section.title === 'Icons & Contextual') {
-            subtitle = '—  Adornments, counter badges & async feedback';
+            subtitle = 'Adornments, counter badges & async feedback';
           }
 
           if (subtitle) {

@@ -356,7 +356,7 @@ export async function buildTypographyBoard(ctx: BoardContext): Promise<FrameNode
     sec.appendChild(await mkSecHead(`Scale / ${group}`, groupTitle(group), config.fontFamily.heading));
     sec.appendChild(mkDivider());
 
-    const panel = list(`Typography — ${group}`, 20);
+    const panel = list(`Typography: ${group}`, 20);
     sec.appendChild(panel);
 
     for (const t of inGroup) {

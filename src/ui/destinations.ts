@@ -109,7 +109,7 @@ export const DESTINATIONS: Destination[] = [
     group: 'foundations',
     label: 'Shape',
     title: 'Shape',
-    sub: 'Corner radius and stroke width — the two scales that set an interface’s edge.',
+    sub: 'Corner radius and stroke width: the two scales that set an interface edge.',
     // A composite target: the sandbox runs both board builders under it. Radius
     // and stroke are one design decision read two ways, and they are the two
     // smallest scales in the system, so they share a sheet.

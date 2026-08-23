@@ -3610,7 +3610,7 @@ const ReviewCard: Template = (root, ctx) => {
   root.appendChild(stars);
 
   root.appendChild(text({ characters: '“The best design token generator for Figma by far.”', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 800) }));
-  root.appendChild(text({ characters: '— Alex R., Product Designer', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 10, fill: colorShade(ctx.tokens, 'neutral', 500) }));
+  root.appendChild(text({ characters: 'Alex R., Product Designer', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 10, fill: colorShade(ctx.tokens, 'neutral', 500) }));
   return root;
 };
 

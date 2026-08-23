@@ -56,7 +56,7 @@ export function OverwriteConfirmModal() {
           {styleTotal > 0 && (
             <li>
               <strong>{styleTotal.toLocaleString()} styles</strong> will be updated
-              {counts.length > 0 && <span className="dsk-confirm-detail"> — {counts.join(', ')}</span>}
+              {counts.length > 0 && <span className="dsk-confirm-detail"> ({counts.join(', ')})</span>}
             </li>
           )}
           {summary.pages.length > 0 && (
@@ -65,7 +65,7 @@ export function OverwriteConfirmModal() {
                 {summary.pages.length} {summary.pages.length === 1 ? 'page' : 'pages'}
               </strong>{' '}
               will be reused
-              <span className="dsk-confirm-detail"> — {summary.pages.join(', ')}</span>
+              <span className="dsk-confirm-detail"> ({summary.pages.join(', ')})</span>
             </li>
           )}
         </ul>
