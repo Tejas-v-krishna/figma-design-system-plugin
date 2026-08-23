@@ -22,7 +22,7 @@ function MiniPreview({ name, category }: { name: string; category: string }) {
     case 'buttons':
       return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
-          <div style={{ background: 'var(--brand, #2563EB)', borderRadius: 6, padding: '4px 14px', color: '#fff', fontSize: 10, fontWeight: 600 }}>
+          <div style={{ background: '#18181B', borderRadius: 6, padding: '4px 14px', color: '#fff', fontSize: 10, fontWeight: 600 }}>
             {name === 'IconButton' ? '❖' : 'Button'}
           </div>
         </div>
@@ -32,7 +32,7 @@ function MiniPreview({ name, category }: { name: string; category: string }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 3, width: '70%', alignItems: 'flex-start' }}>
           <div style={{ width: '40%', height: 4, background: '#CBD5E1', borderRadius: 2 }} />
           <div style={{ width: '100%', height: 16, border: '1.5px solid #94A3B8', borderRadius: 4, background: '#FFF', display: 'flex', alignItems: 'center', padding: '0 4px' }}>
-            <div style={{ width: 2, height: 8, background: 'var(--brand, #2563EB)' }} />
+            <div style={{ width: 2, height: 8, background: '#18181B' }} />
           </div>
         </div>
       );
@@ -46,15 +46,15 @@ function MiniPreview({ name, category }: { name: string; category: string }) {
       );
     case 'feedback':
       return (
-        <div style={{ width: '75%', height: 18, borderRadius: 4, background: '#EFF6FF', border: '1px solid #BFDBFE', display: 'flex', alignItems: 'center', padding: '0 6px', gap: 4 }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--brand, #2563EB)' }} />
-          <div style={{ width: '60%', height: 3, background: 'var(--brand, #2563EB)', borderRadius: 1.5 }} />
+        <div style={{ width: '75%', height: 18, borderRadius: 4, background: '#F4F4F5', border: '1px solid #E4E4E7', display: 'flex', alignItems: 'center', padding: '0 6px', gap: 4 }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#18181B' }} />
+          <div style={{ width: '60%', height: 3, background: '#18181B', borderRadius: 1.5 }} />
         </div>
       );
     case 'navigation':
       return (
         <div style={{ display: 'flex', gap: 3, alignItems: 'center' }}>
-          <div style={{ padding: '2px 6px', background: '#E2E8F0', borderRadius: 4, fontSize: 9, fontWeight: 600, color: '#334155' }}>Tab 1</div>
+          <div style={{ padding: '2px 6px', background: '#18181B', borderRadius: 4, fontSize: 9, fontWeight: 600, color: '#FFFFFF' }}>Tab 1</div>
           <div style={{ padding: '2px 6px', background: 'transparent', borderRadius: 4, fontSize: 9, color: '#64748B' }}>Tab 2</div>
         </div>
       );
