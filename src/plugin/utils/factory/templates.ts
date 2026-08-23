@@ -3357,23 +3357,42 @@ const CopyButton: Template = (root, ctx) => {
   const isBordered = v.includes('bordered');
   const isGhost = v.includes('ghost');
 
+  const szHeight = Number(ctx.sizeProps.height ?? (ctx.sizeName === 'sm' ? 32 : 38));
+  const padY = szHeight <= 32 ? 6 : 8;
+  const padX = szHeight <= 32 ? 10 : 14;
+  const fontSize = szHeight <= 32 ? 12 : 13;
+  const iconSz = szHeight <= 32 ? 13 : 15;
+
   root.layoutMode = 'HORIZONTAL';
   root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
   root.itemSpacing = 6;
-  pad(root, 6, 12);
+  pad(root, padY, padX);
   root.cornerRadius = 6;
+  root.strokes = [];
+  root.effects = [];
 
-  let bg = isCopied ? colorShade(ctx.tokens, 'success', 50) : colorShade(ctx.tokens, 'neutral', 100);
-  let stroke = isCopied ? colorShade(ctx.tokens, 'success', 300) : colorShade(ctx.tokens, 'neutral', 200);
-  const fg = isCopied ? colorShade(ctx.tokens, 'success', 700) : colorShade(ctx.tokens, 'neutral', 700);
+  let bg = '#F4F4F5';
+  let stroke = '#F4F4F5';
+  let fg = '#18181B';
 
-  if (isGhost) {
-    bg = isHover ? colorShade(ctx.tokens, 'neutral', 100) : 'transparent';
+  if (isCopied) {
+    bg = '#ECFDF5';
+    stroke = '#A7F3D0';
+    fg = '#059669';
+  } else if (isGhost) {
+    bg = isHover ? '#F4F4F5' : 'transparent';
     stroke = 'transparent';
+    fg = '#18181B';
   } else if (isBordered) {
-    bg = '#FFFFFF';
-    stroke = colorShade(ctx.tokens, 'neutral', 300);
+    bg = isHover ? '#F4F4F5' : '#FFFFFF';
+    stroke = isHover ? '#D4D4D8' : '#E4E4E7';
+    fg = '#18181B';
+  } else {
+    // Filled
+    bg = isHover ? '#E4E4E7' : '#F4F4F5';
+    stroke = isHover ? '#E4E4E7' : '#F4F4F5';
+    fg = '#18181B';
   }
 
   if (bg !== 'transparent') setFill(root, bg);
@@ -3382,12 +3401,12 @@ const CopyButton: Template = (root, ctx) => {
   if (stroke !== 'transparent') setStroke(root, stroke, 1);
   else root.strokes = [];
 
-  root.appendChild(buildIcon(14, fg, isCopied ? 'check' : 'copy'));
+  root.appendChild(buildIcon(iconSz, fg, isCopied ? 'check' : 'copy'));
   root.appendChild(text({
     characters: isCopied ? 'Copied!' : 'Copy snippet',
     fontFamily: ctx.config.fontFamily.body,
-    weight: 500,
-    fontSize: 12,
+    weight: 600,
+    fontSize,
     fill: fg,
   }));
   return root;
