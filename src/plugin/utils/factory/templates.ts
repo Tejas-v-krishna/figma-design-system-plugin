@@ -656,51 +656,148 @@ const IconButton: Template = (root, ctx) => {
 };
 
 const ButtonGroup: Template = (root, ctx) => {
+  const vKey = variantKey(ctx);
+  const szHeight = Number(ctx.sizeProps.height ?? (ctx.sizeName === 'sm' ? 32 : 40));
+  const padY = szHeight <= 32 ? 4 : 6;
+  const padX = szHeight <= 32 ? 10 : 14;
+  const fontSize = szHeight <= 32 ? 11 : 13;
+
+  const isSegmented = vKey.includes('segmented');
+  const isConnected = vKey.includes('connected');
+  const isPill = ctx.config.radiusPreset === 'pill';
+  const baseRadius = isPill ? 9999 : radiusPx(ctx.tokens, 'md');
+
   root.layoutMode = 'HORIZONTAL';
   root.primaryAxisSizingMode = 'AUTO';
   root.counterAxisSizingMode = 'AUTO';
   root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
-  root.itemSpacing = 2;
-  root.cornerRadius = ctx.config.radiusPreset === 'pill' ? 9999 : radiusPx(ctx.tokens, 'lg');
-  pad(root, 3, 3);
-  setFill(root, colorShade(ctx.tokens, 'neutral', 100), colorStyleKey('neutral', 100), ctx.styleMap, ctx.varMap);
-  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
 
-  for (const [i, label] of SEGMENT_LABELS.entries()) {
-    const b = figma.createFrame();
-    b.name = `item-${i}`;
-    b.layoutMode = 'HORIZONTAL';
-    b.primaryAxisSizingMode = 'AUTO';
-    b.counterAxisSizingMode = 'AUTO';
-    b.primaryAxisAlignItems = 'CENTER';
-    b.counterAxisAlignItems = 'CENTER';
-    pad(b, 6, 14);
-    b.cornerRadius = ctx.config.radiusPreset === 'pill' ? 9999 : radiusPx(ctx.tokens, 'md');
-    const selected = i === 1;
-    if (selected) {
-      setFill(b, '#FFFFFF');
-      b.effects = [{
-        type: 'DROP_SHADOW',
-        color: { r: 0, g: 0, b: 0, a: 0.08 },
-        offset: { x: 0, y: 1 },
-        radius: 3,
-        spread: 0,
-        visible: true,
-        blendMode: 'NORMAL',
-      }];
-    } else {
-      b.fills = [];
+  if (isSegmented) {
+    // Segmented: Enclosed tray container with subtle background
+    root.itemSpacing = 2;
+    root.cornerRadius = baseRadius;
+    pad(root, 3, 3);
+    setFill(root, colorShade(ctx.tokens, 'neutral', 100), colorStyleKey('neutral', 100), ctx.styleMap, ctx.varMap);
+    setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
+
+    for (const [i, label] of SEGMENT_LABELS.entries()) {
+      const b = figma.createFrame();
+      b.name = `item-${i}`;
+      b.layoutMode = 'HORIZONTAL';
+      b.primaryAxisSizingMode = 'AUTO';
+      b.counterAxisSizingMode = 'AUTO';
+      b.primaryAxisAlignItems = 'CENTER';
+      b.counterAxisAlignItems = 'CENTER';
+      pad(b, padY, padX);
+      b.cornerRadius = isPill ? 9999 : Math.max(2, baseRadius - 2);
+      const selected = i === 1;
+      if (selected) {
+        setFill(b, '#FFFFFF');
+        b.effects = [{
+          type: 'DROP_SHADOW',
+          color: { r: 0, g: 0, b: 0, a: 0.08 },
+          offset: { x: 0, y: 1 },
+          radius: 3,
+          spread: 0,
+          visible: true,
+          blendMode: 'NORMAL',
+        }];
+      } else {
+        b.fills = [];
+      }
+      b.appendChild(text({
+        characters: label,
+        fontFamily: ctx.config.fontFamily.body,
+        weight: selected ? 600 : 500,
+        fontSize,
+        fill: selected ? colorShade(ctx.tokens, 'neutral', 900) : colorShade(ctx.tokens, 'neutral', 600),
+      }));
+      root.appendChild(b);
     }
-    b.appendChild(text({
-      characters: label,
-      fontFamily: ctx.config.fontFamily.body,
-      weight: selected ? 600 : 500,
-      fontSize: 13,
-      fill: selected ? colorShade(ctx.tokens, 'neutral', 900) : colorShade(ctx.tokens, 'neutral', 600),
-    }));
-    root.appendChild(b);
+  } else if (isConnected) {
+    // Connected: Joined buttons with shared borders
+    root.itemSpacing = 0;
+    root.cornerRadius = baseRadius;
+    root.fills = [];
+
+    for (const [i, label] of SEGMENT_LABELS.entries()) {
+      const b = figma.createFrame();
+      b.name = `item-${i}`;
+      b.layoutMode = 'HORIZONTAL';
+      b.primaryAxisSizingMode = 'AUTO';
+      b.counterAxisSizingMode = 'AUTO';
+      b.primaryAxisAlignItems = 'CENTER';
+      b.counterAxisAlignItems = 'CENTER';
+      pad(b, padY + 2, padX + 2);
+
+      if (i === 0) {
+        b.topLeftRadius = baseRadius;
+        b.bottomLeftRadius = baseRadius;
+        b.topRightRadius = 0;
+        b.bottomRightRadius = 0;
+      } else if (i === SEGMENT_LABELS.length - 1) {
+        b.topLeftRadius = 0;
+        b.bottomLeftRadius = 0;
+        b.topRightRadius = baseRadius;
+        b.bottomRightRadius = baseRadius;
+      } else {
+        b.cornerRadius = 0;
+      }
+
+      const selected = i === 1;
+      if (selected) {
+        setFill(b, colorShade(ctx.tokens, 'primary', 500), colorStyleKey('primary', 500), ctx.styleMap, ctx.varMap);
+        setStroke(b, colorShade(ctx.tokens, 'primary', 600), 1);
+      } else {
+        setFill(b, '#FFFFFF');
+        setStroke(b, colorShade(ctx.tokens, 'neutral', 300), 1, colorStyleKey('neutral', 300), ctx.styleMap, ctx.varMap);
+      }
+
+      b.appendChild(text({
+        characters: label,
+        fontFamily: ctx.config.fontFamily.body,
+        weight: selected ? 600 : 500,
+        fontSize,
+        fill: selected ? '#FFFFFF' : colorShade(ctx.tokens, 'neutral', 700),
+      }));
+      root.appendChild(b);
+    }
+  } else {
+    // Default: Individual discrete buttons with gaps
+    root.itemSpacing = 6;
+    root.fills = [];
+
+    for (const [i, label] of SEGMENT_LABELS.entries()) {
+      const b = figma.createFrame();
+      b.name = `item-${i}`;
+      b.layoutMode = 'HORIZONTAL';
+      b.primaryAxisSizingMode = 'AUTO';
+      b.counterAxisSizingMode = 'AUTO';
+      b.primaryAxisAlignItems = 'CENTER';
+      b.counterAxisAlignItems = 'CENTER';
+      pad(b, padY + 2, padX + 2);
+      b.cornerRadius = baseRadius;
+
+      const selected = i === 1;
+      if (selected) {
+        setFill(b, colorShade(ctx.tokens, 'primary', 500), colorStyleKey('primary', 500), ctx.styleMap, ctx.varMap);
+      } else {
+        setFill(b, '#FFFFFF');
+        setStroke(b, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
+      }
+
+      b.appendChild(text({
+        characters: label,
+        fontFamily: ctx.config.fontFamily.body,
+        weight: selected ? 600 : 500,
+        fontSize,
+        fill: selected ? '#FFFFFF' : colorShade(ctx.tokens, 'neutral', 700),
+      }));
+      root.appendChild(b);
+    }
   }
+
   return root;
 };
 
@@ -2734,23 +2831,34 @@ const Link: Template = (root, ctx) => {
 
 
 const SegmentedControl: Template = (root, ctx) => {
+  const vKey = variantKey(ctx);
+  const szHeight = Number(ctx.sizeProps.height ?? (ctx.sizeName === 'sm' ? 32 : ctx.sizeName === 'lg' ? 44 : 38));
+  const padY = szHeight <= 32 ? 3 : szHeight >= 44 ? 7 : 5;
+  const padX = szHeight <= 32 ? 8 : szHeight >= 44 ? 18 : 12;
+  const fontSize = szHeight <= 32 ? 11 : szHeight >= 44 ? 13 : 12;
+
+  const isRounded = vKey.includes('rounded');
+  const isBlock = vKey.includes('block');
+  const trackRadius = isBlock ? 4 : isRounded ? 8 : 9999;
+  const itemRadius = isBlock ? 2 : isRounded ? 6 : 9999;
+
   root.layoutMode = 'HORIZONTAL';
   root.primaryAxisSizingMode = 'AUTO';
   root.counterAxisSizingMode = 'AUTO';
   root.counterAxisAlignItems = 'CENTER';
   root.itemSpacing = 2;
-  root.cornerRadius = 9999;
+  root.cornerRadius = trackRadius;
   pad(root, 3, 3);
-  setFill(root, colorShade(ctx.tokens, 'neutral', 100));
-  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1);
+  setFill(root, colorShade(ctx.tokens, 'neutral', 100), colorStyleKey('neutral', 100), ctx.styleMap, ctx.varMap);
+  setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
 
   ['Overview', 'Analytics', 'Reports'].forEach((label, i) => {
     const item = makeFrame(`seg-${i}`);
     item.layoutMode = 'HORIZONTAL';
     item.primaryAxisAlignItems = 'CENTER';
     item.counterAxisAlignItems = 'CENTER';
-    pad(item, 6, 14);
-    item.cornerRadius = 9999;
+    pad(item, padY, padX);
+    item.cornerRadius = itemRadius;
     const isSel = i === 0;
     if (isSel) {
       setFill(item, '#FFFFFF');
@@ -2770,7 +2878,7 @@ const SegmentedControl: Template = (root, ctx) => {
       characters: label,
       fontFamily: ctx.config.fontFamily.body,
       weight: isSel ? 600 : 500,
-      fontSize: 12,
+      fontSize,
       fill: isSel ? colorShade(ctx.tokens, 'neutral', 900) : colorShade(ctx.tokens, 'neutral', 600),
     }));
     root.appendChild(item);
@@ -2779,32 +2887,78 @@ const SegmentedControl: Template = (root, ctx) => {
 };
 
 const SplitButton: Template = (root, ctx) => {
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const isHover = sKey === 'hover';
+  const isActive = sKey === 'active';
+  const isDisabled = sKey === 'disabled';
+
+  const isSecondary = vKey.includes('secondary');
+  const isObsidian = vKey.includes('obsidian');
+
+  const szHeight = Number(ctx.sizeProps.height ?? (ctx.sizeName === 'sm' ? 32 : ctx.sizeName === 'lg' ? 48 : 40));
+  const padY = szHeight <= 32 ? 4 : szHeight >= 48 ? 10 : 8;
+  const padMainX = szHeight <= 32 ? 10 : szHeight >= 48 ? 20 : 16;
+  const padDropX = szHeight <= 32 ? 6 : szHeight >= 48 ? 12 : 10;
+  const fontSize = szHeight <= 32 ? 11 : szHeight >= 48 ? 15 : 13;
+  const iconSz = szHeight <= 32 ? 12 : szHeight >= 48 ? 16 : 14;
+
+  const isPill = ctx.config.radiusPreset === 'pill';
+  const radius = isPill ? 9999 : radiusPx(ctx.tokens, 'md');
+
   root.layoutMode = 'HORIZONTAL';
   root.primaryAxisSizingMode = 'AUTO';
   root.counterAxisSizingMode = 'AUTO';
   root.counterAxisAlignItems = 'CENTER';
-  root.cornerRadius = 9999;
-  setFill(root, colorShade(ctx.tokens, 'primary', 500));
-  
+  root.cornerRadius = radius;
+
+  let textFill = '#FFFFFF';
+  let sepColor = '#FFFFFF';
+
+  if (isObsidian) {
+    if (isActive) setFill(root, '#020617');
+    else if (isHover) setFill(root, '#1E293B');
+    else setFill(root, '#0F172A');
+    textFill = '#FFFFFF';
+    sepColor = '#334155';
+  } else if (isSecondary) {
+    if (isActive) setFill(root, colorShade(ctx.tokens, 'neutral', 100));
+    else if (isHover) setFill(root, colorShade(ctx.tokens, 'neutral', 50));
+    else setFill(root, '#FFFFFF');
+    setStroke(root, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
+    textFill = colorShade(ctx.tokens, 'neutral', 800);
+    sepColor = colorShade(ctx.tokens, 'neutral', 200);
+  } else {
+    if (isActive) setFill(root, colorShade(ctx.tokens, 'primary', 700));
+    else if (isHover) setFill(root, colorShade(ctx.tokens, 'primary', 600));
+    else setFill(root, colorShade(ctx.tokens, 'primary', 500), colorStyleKey('primary', 500), ctx.styleMap, ctx.varMap);
+    textFill = '#FFFFFF';
+    sepColor = '#FFFFFF';
+  }
+
+  if (isDisabled) {
+    root.opacity = 0.5;
+  }
+
   const mainBtn = makeFrame('mainBtn');
   mainBtn.layoutMode = 'HORIZONTAL';
   mainBtn.counterAxisAlignItems = 'CENTER';
-  pad(mainBtn, 8, 16);
+  pad(mainBtn, padY, padMainX);
   mainBtn.fills = [];
-  mainBtn.appendChild(text({ characters: 'Publish Action', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 13, fill: '#FFFFFF' }));
+  mainBtn.appendChild(text({ characters: 'Publish Action', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize, fill: textFill }));
   root.appendChild(mainBtn);
 
-  const sep = line(20, '#FFFFFF', 1);
-  sep.opacity = 0.3;
+  const sep = line(Math.max(12, szHeight - 16), sepColor, 1);
+  sep.opacity = isSecondary ? 1 : 0.3;
   root.appendChild(sep);
 
   const dropTrigger = makeFrame('dropTrigger');
   dropTrigger.layoutMode = 'HORIZONTAL';
   dropTrigger.primaryAxisAlignItems = 'CENTER';
   dropTrigger.counterAxisAlignItems = 'CENTER';
-  pad(dropTrigger, 8, 10);
+  pad(dropTrigger, padY, padDropX);
   dropTrigger.fills = [];
-  dropTrigger.appendChild(buildIcon(14, '#FFFFFF', 'chevronDown'));
+  dropTrigger.appendChild(buildIcon(iconSz, textFill, 'chevronDown'));
   root.appendChild(dropTrigger);
 
   return root;
@@ -2842,43 +2996,102 @@ const FloatingActionButton: Template = (root, ctx) => {
 
 const SocialButton: Template = (root, ctx) => {
   const v = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const isHover = sKey === 'hover';
+  const isActive = sKey === 'active';
+  const isDisabled = sKey === 'disabled';
+
   root.layoutMode = 'HORIZONTAL';
   root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
   root.itemSpacing = 8;
   pad(root, 8, 16);
   root.cornerRadius = 8;
-  setFill(root, '#FFFFFF');
-  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
-  
+
   let label = 'Continue with Google';
   let iconName: IconKind = 'user';
-  if (v.includes('apple')) { label = 'Continue with Apple'; iconName = 'lock'; }
-  else if (v.includes('github')) { label = 'Continue with GitHub'; iconName = 'code'; }
-  else if (v.includes('microsoft')) { label = 'Continue with Microsoft'; iconName = 'grid'; }
+  let bg = '#FFFFFF';
+  let fg = colorShade(ctx.tokens, 'neutral', 800);
+  let stroke = colorShade(ctx.tokens, 'neutral', 300);
 
-  root.appendChild(buildIcon(16, colorShade(ctx.tokens, 'neutral', 800), iconName));
-  root.appendChild(text({ characters: label, fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+  if (v.includes('apple')) {
+    label = 'Continue with Apple';
+    iconName = 'lock';
+    bg = isHover ? '#27272A' : '#000000';
+    fg = '#FFFFFF';
+    stroke = bg;
+  } else if (v.includes('github')) {
+    label = 'Continue with GitHub';
+    iconName = 'code';
+    bg = isHover ? '#333842' : '#24292E';
+    fg = '#FFFFFF';
+    stroke = bg;
+  } else if (v.includes('microsoft')) {
+    label = 'Continue with Microsoft';
+    iconName = 'grid';
+    bg = isHover ? '#E5E7EB' : '#F3F4F6';
+    fg = '#1F2937';
+    stroke = colorShade(ctx.tokens, 'neutral', 300);
+  } else {
+    bg = isHover ? '#F8FAFC' : '#FFFFFF';
+    fg = colorShade(ctx.tokens, 'neutral', 800);
+    stroke = colorShade(ctx.tokens, 'neutral', 300);
+  }
+
+  if (isActive) {
+    bg = colorShade(ctx.tokens, 'neutral', 200);
+  }
+  if (isDisabled) {
+    root.opacity = 0.5;
+  }
+
+  setFill(root, bg);
+  setStroke(root, stroke, 1);
+
+  root.appendChild(buildIcon(16, fg, iconName));
+  root.appendChild(text({ characters: label, fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 13, fill: fg }));
   return root;
 };
 
 const CopyButton: Template = (root, ctx) => {
+  const v = variantKey(ctx);
   const isCopied = ctx.stateName.toLowerCase() === 'copied';
+  const isHover = ctx.stateName.toLowerCase() === 'hover';
+  const isBordered = v.includes('bordered');
+  const isGhost = v.includes('ghost');
+
   root.layoutMode = 'HORIZONTAL';
   root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
   root.itemSpacing = 6;
   pad(root, 6, 12);
   root.cornerRadius = 6;
-  setFill(root, isCopied ? colorShade(ctx.tokens, 'success', 50) : colorShade(ctx.tokens, 'neutral', 100));
-  setStroke(root, isCopied ? colorShade(ctx.tokens, 'success', 300) : colorShade(ctx.tokens, 'neutral', 200), 1);
-  root.appendChild(buildIcon(14, isCopied ? colorShade(ctx.tokens, 'success', 600) : colorShade(ctx.tokens, 'neutral', 700), isCopied ? 'check' : 'copy'));
+
+  let bg = isCopied ? colorShade(ctx.tokens, 'success', 50) : colorShade(ctx.tokens, 'neutral', 100);
+  let stroke = isCopied ? colorShade(ctx.tokens, 'success', 300) : colorShade(ctx.tokens, 'neutral', 200);
+  const fg = isCopied ? colorShade(ctx.tokens, 'success', 700) : colorShade(ctx.tokens, 'neutral', 700);
+
+  if (isGhost) {
+    bg = isHover ? colorShade(ctx.tokens, 'neutral', 100) : 'transparent';
+    stroke = 'transparent';
+  } else if (isBordered) {
+    bg = '#FFFFFF';
+    stroke = colorShade(ctx.tokens, 'neutral', 300);
+  }
+
+  if (bg !== 'transparent') setFill(root, bg);
+  else root.fills = [];
+
+  if (stroke !== 'transparent') setStroke(root, stroke, 1);
+  else root.strokes = [];
+
+  root.appendChild(buildIcon(14, fg, isCopied ? 'check' : 'copy'));
   root.appendChild(text({
     characters: isCopied ? 'Copied!' : 'Copy snippet',
     fontFamily: ctx.config.fontFamily.body,
     weight: 500,
     fontSize: 12,
-    fill: isCopied ? colorShade(ctx.tokens, 'success', 700) : colorShade(ctx.tokens, 'neutral', 700),
+    fill: fg,
   }));
   return root;
 };

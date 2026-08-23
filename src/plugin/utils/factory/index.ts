@@ -503,10 +503,14 @@ export async function generateComponents(
           groupHeader.appendChild(groupLabel);
 
           let subtitle = '';
-          if (section.title === 'Sizes Scale') {
-            subtitle = 'Proportional scale from XS (28px) to XL (56px)';
-          } else if (section.title === 'Sizes') {
-            subtitle = 'Proportional scale across available dimensions';
+          if (section.title === 'Sizes Scale' || section.title === 'Sizes') {
+            if (def.sizes.length > 1) {
+              const first = def.sizes[0]?.name.toUpperCase() ?? '';
+              const last = def.sizes[def.sizes.length - 1]?.name.toUpperCase() ?? '';
+              subtitle = `Proportional scale from ${first} to ${last}`;
+            } else {
+              subtitle = 'Proportional scale across available dimensions';
+            }
           } else if (section.title === 'Icons & Contextual') {
             subtitle = 'Adornments, counter badges & async feedback';
           } else if (section.title === 'Variants') {
