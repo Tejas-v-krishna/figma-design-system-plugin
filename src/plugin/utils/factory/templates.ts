@@ -3949,14 +3949,14 @@ const TagInput: Template = (root, ctx) => {
   else if (isHover) bg = '#E8EAED';
   setFill(root, bg);
 
-  const tags = isFilled ? ['UI', 'UX', 'Design'] : isFocus ? ['UI', 'UX'] : ['Design'];
+  const tags = isFilled ? ['UI', 'UX', 'Dev'] : isFocus ? ['UI', 'UX'] : ['Design'];
 
   tags.forEach((tag, i) => {
     const chip = makeFrame(`chip-${i}`);
     chip.layoutMode = 'HORIZONTAL';
     chip.counterAxisAlignItems = 'CENTER';
     chip.itemSpacing = 3;
-    pad(chip, 2, 6);
+    pad(chip, 3, 6);
     chip.cornerRadius = isPill ? 9999 : 6;
 
     let chipBg = '#FFFFFF';
@@ -3969,7 +3969,7 @@ const TagInput: Template = (root, ctx) => {
 
     setFill(chip, chipBg);
     chip.appendChild(text({ characters: tag, fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: chipText }));
-    chip.appendChild(text({ characters: '×', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: chipText }));
+    chip.appendChild(text({ characters: '×', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 11, fill: chipText }));
     root.appendChild(chip);
   });
 
@@ -3978,7 +3978,7 @@ const TagInput: Template = (root, ctx) => {
     root.appendChild(text({
       characters: placeholderStr,
       fontFamily: ctx.config.fontFamily.body,
-      weight: 400,
+      weight: isFocus ? 500 : 400,
       fontSize: 11,
       fill: isFocus ? '#3B82F6' : '#71717A',
     }));
