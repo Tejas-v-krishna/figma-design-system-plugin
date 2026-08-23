@@ -21,7 +21,11 @@ import globals from 'globals';
  */
 export default tseslint.config(
   {
-    ignores: ['dist/**', 'node_modules/**', '*.config.ts', '*.config.js'],
+    // scripts/__snapshots__ holds generated exporter output kept for diffing,
+    // including Tailwind configs that are CommonJS by design. Linting a fixture
+    // tells you about the exporter's output format, which is the thing the
+    // snapshot exists to record, not a defect to fix.
+    ignores: ['dist/**', 'node_modules/**', '*.config.ts', '*.config.js', 'scripts/__snapshots__/**'],
   },
 
   js.configs.recommended,
