@@ -2888,10 +2888,10 @@ const SplitButton: Template = (root, ctx) => {
 
   const szHeight = Number(ctx.sizeProps.height ?? (ctx.sizeName === 'sm' ? 32 : ctx.sizeName === 'lg' ? 48 : 40));
   const padY = szHeight <= 32 ? 4 : szHeight >= 48 ? 10 : 8;
-  const padMainX = szHeight <= 32 ? 10 : szHeight >= 48 ? 20 : 16;
-  const padDropX = szHeight <= 32 ? 6 : szHeight >= 48 ? 12 : 10;
-  const fontSize = szHeight <= 32 ? 11 : szHeight >= 48 ? 15 : 13;
-  const iconSz = szHeight <= 32 ? 12 : szHeight >= 48 ? 16 : 14;
+  const padMainX = szHeight <= 32 ? 10 : szHeight >= 48 ? 18 : 14;
+  const padDropX = szHeight <= 32 ? 6 : szHeight >= 48 ? 10 : 8;
+  const fontSize = szHeight <= 32 ? 11 : szHeight >= 48 ? 14 : 13;
+  const iconSz = szHeight <= 32 ? 12 : szHeight >= 48 ? 15 : 13;
 
   const isPill = ctx.config.radiusPreset === 'pill';
   const radius = isPill ? 9999 : radiusPx(ctx.tokens, 'md');
@@ -2936,11 +2936,11 @@ const SplitButton: Template = (root, ctx) => {
   mainBtn.counterAxisAlignItems = 'CENTER';
   pad(mainBtn, padY, padMainX);
   mainBtn.fills = [];
-  mainBtn.appendChild(text({ characters: 'Publish Action', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize, fill: textFill }));
+  mainBtn.appendChild(text({ characters: 'Publish', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize, fill: textFill }));
   root.appendChild(mainBtn);
 
-  const sep = line(Math.max(12, szHeight - 16), sepColor, 1);
-  sep.opacity = isSecondary ? 1 : 0.3;
+  const sep = rect('sep', 1, Math.max(14, szHeight - 16), sepColor);
+  sep.opacity = isSecondary ? 1 : 0.4;
   root.appendChild(sep);
 
   const dropTrigger = makeFrame('dropTrigger');
@@ -2961,7 +2961,7 @@ const FloatingActionButton: Template = (root, ctx) => {
   root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
   root.cornerRadius = 9999;
-  setFill(root, colorShade(ctx.tokens, 'primary', 500));
+  setFill(root, '#18181B');
   root.effects = [{
     type: 'DROP_SHADOW',
     color: { r: 0, g: 0, b: 0, a: 0.16 },
