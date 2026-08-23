@@ -110,8 +110,10 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
     name: 'FloatingActionButton',
     category: 'buttons',
     variants: [
-      { name: 'Circular', properties: { variant: 'circular' } },
+      { name: 'Solid', properties: { variant: 'solid' } },
       { name: 'Extended', properties: { variant: 'extended' } },
+      { name: 'Surface', properties: { variant: 'surface' } },
+      { name: 'Tonal', properties: { variant: 'tonal' } },
     ],
     states: [
       { name: 'Default', properties: { state: 'default' } },
@@ -119,10 +121,11 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
       { name: 'Active', properties: { state: 'active' } },
     ],
     sizes: [
+      { name: 'sm', properties: { name: 'sm', dimension: 40 } },
       { name: 'md', properties: { name: 'md', dimension: 48 } },
       { name: 'lg', properties: { name: 'lg', dimension: 56 } },
     ],
-    defaultProps: { variant: 'circular', state: 'default' },
+    defaultProps: { variant: 'solid', state: 'default' },
   },
   {
     name: 'SocialButton',
