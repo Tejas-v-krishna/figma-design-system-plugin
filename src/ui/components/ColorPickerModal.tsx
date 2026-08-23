@@ -82,7 +82,7 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
   color,
   onChange,
   onClose,
-  title: _title,
+  title,
 }) => {
   const [format, setFormat] = useState<'Hex' | 'RGB' | 'HSL' | 'Null'>('RGB');
 
@@ -204,7 +204,20 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
 
   return (
     <div className="dsk-picker-backdrop" onClick={onClose}>
-      <div className="dsk-picker-card" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="dsk-picker-card"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title ?? 'Choose a colour'}
+      >
+        {/* Which colour is being edited. Every call site passes this — a gradient
+            stop names its preset and index, a palette swatch names its role — and
+            it was being destructured into `_title` and dropped. The Gradients
+            panel has 27 identical-looking stops, so an unlabelled picker gave no
+            way to tell which one was open. */}
+        {title && <div className="dsk-picker-title">{title}</div>}
+
         {/* Header Tabs */}
         <div className="dsk-picker-tabs">
           {(['Hex', 'RGB', 'HSL', 'Null'] as const).map((tab) => (

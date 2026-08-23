@@ -1378,6 +1378,20 @@ input[type='range'] { width: 100%; accent-color: var(--accent); }
   position: relative;
 }
 
+/* Names the swatch being edited. The card is 280px and the titles are things
+   like "Monochromatic Silk - Stop 2", so this wraps rather than truncating —
+   a stop number cut off the right edge would defeat the point of the label. */
+.dsk-picker-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  color: #52525b;
+  padding: 0 2px;
+  /* Sits above the tab row, which already carries the card's top spacing. */
+  margin-bottom: -4px;
+}
+
 .dsk-picker-tab {
   flex: 1;
   border: none;
