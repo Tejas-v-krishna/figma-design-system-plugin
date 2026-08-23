@@ -3462,45 +3462,76 @@ const PasswordInput: Template = (root, ctx) => {
 const SearchInput: Template = (root, ctx) => {
   const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
-  const fieldHeight = 44;
-  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 176;
+  const isSizeShowcase = ctx.showcaseType === 'size';
+  const fieldHeight = Number(ctx.sizeProps.height ?? (ctx.sizeName === 'sm' ? 36 : ctx.sizeName === 'lg' ? 52 : 44));
+  const fieldWidth = isSizeShowcase ? 240 : 176;
+  const fontSize = Number(ctx.sizeProps.fontSize ?? (fieldHeight <= 36 ? 12 : fieldHeight >= 50 ? 15 : 13));
+  const padX = fieldHeight <= 36 ? 12 : fieldHeight >= 50 ? 16 : 14;
+  const iconSz = fieldHeight <= 36 ? 13 : fieldHeight >= 50 ? 17 : 15;
 
   root.layoutMode = 'HORIZONTAL';
   root.counterAxisAlignItems = 'CENTER';
   root.primaryAxisAlignItems = 'SPACE_BETWEEN';
   root.resize(fieldWidth, fieldHeight);
-  pad(root, 0, 14);
+  pad(root, 0, padX);
   root.cornerRadius = vKey.includes('pill') ? 9999 : 10;
 
   const isFocus = sKey === 'focus' || sKey === 'focused';
   const isResults = sKey === 'withresults';
+  const isHover = sKey === 'hover';
 
   let bg = '#F1F3F5';
   let textFill = '#71717A';
+  let iconColor = '#71717A';
+
   if (isFocus) {
     bg = '#EEF2FF';
     textFill = '#18181B';
+    iconColor = '#3B82F6';
   } else if (isResults) {
     bg = '#E8F8EE';
+    textFill = '#18181B';
+    iconColor = '#16A34A';
+  } else if (isHover) {
+    bg = '#E8EAED';
     textFill = '#18181B';
   }
 
   setFill(root, bg);
   root.strokes = [];
+  root.effects = [];
 
   const left = hbox('left');
   left.itemSpacing = 8;
-  left.appendChild(buildIcon(14, isFocus ? '#3B82F6' : '#71717A', 'search'));
-  left.appendChild(text({ characters: isFocus ? 'Search query|' : isResults ? 'Found 12 items' : 'Search…', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 13, fill: textFill }));
+  left.appendChild(buildIcon(iconSz, iconColor, 'search'));
+
+  let searchStr = isSizeShowcase ? `Search (${fieldHeight}px)` : 'Search components…';
+  if (isFocus) searchStr = 'Search query|';
+  else if (isResults) searchStr = 'Found 12 items';
+
+  left.appendChild(text({
+    characters: searchStr,
+    fontFamily: ctx.config.fontFamily.body,
+    weight: isFocus || isResults ? 500 : 400,
+    fontSize,
+    fill: textFill,
+  }));
   root.appendChild(left);
 
-  const kbd = makeFrame('kbd');
-  kbd.layoutMode = 'HORIZONTAL';
-  pad(kbd, 2, 6);
-  kbd.cornerRadius = 4;
-  setFill(kbd, '#E4E4E7');
-  kbd.appendChild(text({ characters: '⌘K', fontFamily: ctx.config.fontFamily.mono, weight: 500, fontSize: 10, fill: '#71717A' }));
-  root.appendChild(kbd);
+  // Right trailing element based on variant
+  if (vKey.includes('shortcut')) {
+    const kbd = makeFrame('kbd');
+    kbd.layoutMode = 'HORIZONTAL';
+    pad(kbd, 2, 6);
+    kbd.cornerRadius = 4;
+    setFill(kbd, '#E4E4E7');
+    kbd.appendChild(text({ characters: '⌘K', fontFamily: ctx.config.fontFamily.mono, weight: 500, fontSize: 10, fill: '#71717A' }));
+    root.appendChild(kbd);
+  } else if (vKey.includes('filter')) {
+    root.appendChild(buildIcon(iconSz, isFocus ? '#3B82F6' : '#71717A', 'filter'));
+  } else if (isResults) {
+    root.appendChild(buildIcon(14, '#16A34A', 'check'));
+  }
 
   return root;
 };
