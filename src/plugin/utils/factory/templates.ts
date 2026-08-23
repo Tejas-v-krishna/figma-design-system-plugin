@@ -129,7 +129,7 @@ function pillRadius(ctx: TemplateCtx, step: 'xs' | 'sm' | 'md' | 'lg' = 'md'): n
   return radiusPx(ctx.tokens, step);
 }
 
-const ICONS = {
+export const ICONS = {
   check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
   close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
   chevronDown: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`,
@@ -144,22 +144,19 @@ const ICONS = {
   lock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
   eye: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`,
   upload: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>`,
+  download: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`,
   file: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>`,
   plus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
   minus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
+  filter: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>`,
+  arrowRight: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`,
+  grid: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
+  list: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>`,
 };
 
-type IconKind = keyof typeof ICONS;
+export type IconKind = keyof typeof ICONS;
 
-/**
- * A real vector icon, not a placeholder shape.
- *
- * Every icon slot in these templates used to be a filled circle or square, so
- * a generated close button, a chevron and a warning glyph were the same grey
- * dot. `figma.createNodeFromSvg` is available in the sandbox and produces
- * editable vector nodes, so there is no reason to approximate.
- */
-function buildIcon(size: number, hex: string, kind: IconKind = 'info'): FrameNode {
+export function buildIcon(size: number, hex: string, kind: IconKind = 'info'): FrameNode {
   const f = makeFrame('icon');
   f.resize(size, size);
 
@@ -217,26 +214,52 @@ const Button: Template = (root, ctx) => {
   const t = tone(ctx);
   const m = sizeMetrics(ctx);
   const vKey = variantKey(ctx);
-  const isHover = ctx.stateName.toLowerCase() === 'hover';
-  const isActive = ctx.stateName.toLowerCase() === 'active';
-  const isGhost = vKey === 'ghost';
-  const isOutline = vKey === 'outline' || vKey === 'tertiary';
-  const isInformation = vKey === 'information' || vKey === 'secondary';
+  const sKey = ctx.stateName.toLowerCase();
+  const isHover = sKey === 'hover';
+  const isActive = sKey === 'active';
+  const isFocused = sKey === 'focused' || sKey === 'focus';
+  const isGhost = vKey === 'ghost' || vKey === 'tertiary';
+  const isOutline = vKey === 'outline' || vKey === 'secondary';
+  const isBlack = vKey === 'black' || vKey === 'dark' || Boolean(ctx.variantProps.isBlack);
+  const isInformation = vKey === 'information';
+  const iconPos = String(ctx.variantProps.iconPosition || '');
 
   root.layoutMode = 'HORIZONTAL';
   root.primaryAxisSizingMode = 'AUTO';
   root.counterAxisSizingMode = 'AUTO';
   root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
-  root.itemSpacing = 8;
+  root.itemSpacing = 6;
   pad(root, Math.max(6, Math.round((m.height - m.fontSize) / 2)), m.padX);
-  root.cornerRadius = ctx.config.radiusPreset === 'pill' ? 9999 : ctx.config.radiusPreset === 'sharp' ? 0 : radiusPx(ctx.tokens, 'md');
+  root.cornerRadius = ctx.config.radiusPreset === 'pill' || vKey === 'pill' ? 9999 : ctx.config.radiusPreset === 'sharp' ? 0 : radiusPx(ctx.tokens, 'md');
 
-  if (isGhost) {
+  if (isBlack) {
+    if (isHover) {
+      setFill(root, '#292524');
+    } else if (isActive) {
+      setFill(root, '#0C0A09');
+    } else {
+      setFill(root, '#1C1917');
+    }
+    if (isFocused) {
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0.1, g: 0.1, b: 0.1, a: 0.25 },
+        offset: { x: 0, y: 0 },
+        radius: 4,
+        spread: 2,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    }
+  } else if (isGhost) {
     if (isHover) {
       setFill(root, colorShade(ctx.tokens, 'neutral', 100), colorStyleKey('neutral', 100), ctx.styleMap, ctx.varMap);
     } else {
       root.fills = [];
+    }
+    if (isFocused) {
+      setStroke(root, colorShade(ctx.tokens, 'primary', 500), 1.5);
     }
   } else if (isOutline) {
     if (isHover) {
@@ -244,21 +267,37 @@ const Button: Template = (root, ctx) => {
     } else {
       root.fills = [];
     }
-    setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1, colorStyleKey('neutral', 300), ctx.styleMap, ctx.varMap);
+    setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1.5, colorStyleKey('neutral', 300), ctx.styleMap, ctx.varMap);
+    if (isFocused) {
+      setStroke(root, colorShade(ctx.tokens, 'primary', 500), 2);
+    }
   } else if (isInformation) {
     const secShade = isHover ? 600 : isActive ? 700 : 500;
     setFill(root, colorShade(ctx.tokens, 'information', secShade), colorStyleKey('information', secShade), ctx.styleMap, ctx.varMap);
   } else {
     const baseShade = isHover ? 600 : isActive ? 700 : 500;
     setFill(root, colorShade(ctx.tokens, t, baseShade), colorStyleKey(t, baseShade), ctx.styleMap, ctx.varMap);
+    if (isFocused) {
+      root.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0.23, g: 0.51, b: 0.96, a: 0.3 },
+        offset: { x: 0, y: 0 },
+        radius: 4,
+        spread: 2,
+        visible: true,
+        blendMode: 'NORMAL',
+      }];
+    }
   }
 
-  const textHex = (isGhost || isOutline) ? colorShade(ctx.tokens, 'neutral', 800) : '#FFFFFF';
+  const textHex = (isGhost || isOutline) ? (vKey === 'tertiary' ? colorShade(ctx.tokens, 'primary', 600) : colorShade(ctx.tokens, 'neutral', 800)) : '#FFFFFF';
   root.opacity = disabledOpacity(ctx);
 
-  const loading = ctx.stateName.toLowerCase() === 'loading';
+  const loading = sKey === 'loading';
   if (loading) {
     root.appendChild(buildSpinner(14, textHex));
+  } else if (iconPos === 'left') {
+    root.appendChild(buildIcon(14, textHex, 'plus'));
   }
   
   let btnLabel = 'Button';
@@ -280,6 +319,11 @@ const Button: Template = (root, ctx) => {
     fill: textHex,
   });
   root.appendChild(label);
+
+  if (!loading && iconPos === 'right') {
+    root.appendChild(buildIcon(14, textHex, 'download'));
+  }
+
   return root;
 };
 
