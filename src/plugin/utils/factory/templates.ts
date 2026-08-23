@@ -25,11 +25,11 @@ export interface TemplateCtx {
   styleMap: StyleMap;
   varMap?: VariableMap;
   variantName: string;
-  variantProps: Record<string, any>;
+  variantProps: Record<string, string | number | boolean>;
   stateName: string;
-  stateProps: Record<string, any>;
+  stateProps: Record<string, string | number | boolean>;
   sizeName: string;
-  sizeProps: Record<string, any>;
+  sizeProps: Record<string, string | number | boolean>;
 }
 
 export type Template = (root: ComponentNode, ctx: TemplateCtx) => ComponentNode;
@@ -832,7 +832,7 @@ const FileUpload: Template = (root, ctx) => {
   root.cornerRadius = radiusPx(ctx.tokens, 'md');
   setFill(root, colorShade(ctx.tokens, 'primary', 50));
   setStroke(root, colorShade(ctx.tokens, 'primary', 300), 1.5, colorStyleKey('primary', 300), ctx.styleMap, ctx.varMap);
-  (root as any).dashPattern = [6, 4];
+  root.dashPattern = [6, 4];
   root.appendChild(buildIcon(36, colorShade(ctx.tokens, 'primary', 500)));
   root.appendChild(text({ characters: 'Drag & drop files here', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 14, fill: colorShade(ctx.tokens, 'primary', 700) }));
   root.appendChild(text({ characters: 'or click to browse', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 500) }));
