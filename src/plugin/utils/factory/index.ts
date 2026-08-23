@@ -122,6 +122,24 @@ function buildComponentShowcase(
   const sections: ComponentSection[] = [];
   let totalCount = 0;
 
+  if (def.name === 'Button') {
+    const statesToUse = def.states.filter((s) => ['Default', 'Hover', 'Focus', 'Disabled'].includes(s.name));
+    const states = statesToUse.length > 0 ? statesToUse : def.states;
+
+    for (const v of def.variants) {
+      const rowNodes: ComponentNode[] = [];
+      for (const st of states) {
+        const node = buildOne(def, tokens, config, styleMap, tmpl, v, st, dz, v.name, st.name, undefined, varMap, 'state');
+        rowNodes.push(node);
+      }
+      sections.push({ title: v.name, nodes: rowNodes });
+      totalCount += rowNodes.length;
+    }
+
+    const primary = sections[0]?.nodes[0] ?? buildOne(def, tokens, config, styleMap, tmpl, dv, ds, dz, undefined, undefined, undefined, varMap);
+    return { sections, primary, totalCount };
+  }
+
   // 1. Variants (All declared variants at default size & state)
   const variantNodes: ComponentNode[] = [];
   for (const v of def.variants) {
@@ -324,13 +342,54 @@ export async function generateComponents(
         cardBody.clipsContent = false;
 
         const showcase = buildComponentShowcase(def, tokens, config, styleMap, varMap);
+        const isButtonComp = def.name === 'Button';
+
         for (const [sIdx, section] of showcase.sections.entries()) {
-          if (sIdx > 0) {
+          if (sIdx > 0 && !isButtonComp) {
             const innerDiv = figma.createFrame();
             innerDiv.name = 'SubDivider';
             innerDiv.resize(CW - 56, 1);
             innerDiv.fills = [{ type: 'SOLID', color: hexToRgb('#F1F5F9') }];
             cardBody.appendChild(innerDiv);
+          }
+
+          if (isButtonComp) {
+            // Horizontal row with left label and right state buttons matching the reference image!
+            const rowLine = figma.createFrame();
+            rowLine.name = `Row ${section.title}`;
+            rowLine.layoutMode = 'HORIZONTAL';
+            rowLine.primaryAxisAlignItems = 'MIN';
+            rowLine.counterAxisAlignItems = 'CENTER';
+            rowLine.itemSpacing = 36;
+            rowLine.fills = [];
+            rowLine.clipsContent = false;
+            rowLine.resize(CW - 56, 44);
+
+            const rowLabel = figma.createText();
+            rowLabel.fontName = await ensureFont(config.fontFamily.body, 500);
+            rowLabel.fontSize = 14;
+            rowLabel.characters = section.title;
+            rowLabel.fills = [{ type: 'SOLID', color: hexToRgb('#94A3B8') }];
+            rowLabel.resize(110, 20);
+            rowLabel.textAlignHorizontal = 'RIGHT';
+            rowLine.appendChild(rowLabel);
+
+            const buttonsContainer = figma.createFrame();
+            buttonsContainer.name = 'Buttons';
+            buttonsContainer.layoutMode = 'HORIZONTAL';
+            buttonsContainer.primaryAxisAlignItems = 'MIN';
+            buttonsContainer.counterAxisAlignItems = 'CENTER';
+            buttonsContainer.itemSpacing = 28;
+            buttonsContainer.fills = [];
+            buttonsContainer.clipsContent = false;
+
+            for (const n of section.nodes) {
+              buttonsContainer.appendChild(n);
+            }
+
+            rowLine.appendChild(buttonsContainer);
+            cardBody.appendChild(rowLine);
+            continue;
           }
 
           const groupFrame = figma.createFrame();
