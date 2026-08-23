@@ -180,17 +180,22 @@ export async function generateComponents(
 
   let currentY = 0;
   Object.values(frames).forEach((f) => {
-    // Enable wrapping if possible so components don't overflow horizontally
-    if ('layoutWrap' in f) {
-      (f as any).layoutWrap = 'WRAP';
+    // Wrap so a board with many components grows downward instead of running
+    // off to the right. Guarded on layoutMode, not on `'layoutWrap' in f`:
+    // every FrameNode has the property, so that test was always true, while
+    // Figma rejects the assignment on a frame that has no auto-layout. The
+    // precondition being checked was not the one that throws.
+    if (f.layoutMode !== 'NONE') {
+      f.layoutWrap = 'WRAP';
     }
-    // ensure layout has had time to apply before reading height? In Figma API it's immediate for auto-layout.
+    // Auto-layout height is up to date as soon as a child is appended, so this
+    // reads the real height rather than a stale one.
     f.y = currentY;
     currentY += Math.max(400, f.height) + 120;
-    // Don't force a resize if we're using auto layout wrap, let it hug contents if possible, 
-    // or just set a max width if not hugging.
+    // Only widen a board that is narrower than the page grid; a wrapped board
+    // that already hugs a wider set of contents keeps its own width.
     if (f.width < 1600) {
-        f.resize(1600, Math.max(400, f.height));
+      f.resize(1600, Math.max(400, f.height));
     }
   });
 
@@ -266,11 +271,12 @@ function buildVariantSet(
   const only = combos[0];
   if (combos.length > 1) {
     const setNode = figma.combineAsVariants(combos, parent);
-    // Component sets default to absolute positioning; enable auto-layout so variants don't overlap
+    // combineAsVariants leaves the variants absolutely positioned, all at the
+    // same coordinates — a 24-variant set arrived as one opaque stack. Auto-
+    // layout has to be turned on explicitly, and before layoutWrap, which Figma
+    // rejects while layoutMode is NONE.
     setNode.layoutMode = 'HORIZONTAL';
-    if ('layoutWrap' in setNode) {
-      (setNode as any).layoutWrap = 'WRAP';
-    }
+    setNode.layoutWrap = 'WRAP';
     setNode.itemSpacing = 32;
     setNode.counterAxisSpacing = 32;
     setNode.paddingTop = 32;
