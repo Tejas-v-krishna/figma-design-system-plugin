@@ -65,6 +65,7 @@ export async function buildDesignSystemBentoBoard(
   bentoGrid.itemSpacing = 24;
   bentoGrid.resize(CW, 100);
   bentoGrid.fills = [];
+  bentoGrid.clipsContent = true;
 
   const colWidth = (CW - 24) / 2; // 468px each
 
@@ -75,6 +76,7 @@ export async function buildDesignSystemBentoBoard(
   col1.itemSpacing = 24;
   col1.resize(colWidth, 100);
   col1.fills = [];
+  col1.clipsContent = false; // let cards render at their natural heights
 
   const col2 = makeFrame('Col 2');
   col2.layoutMode = 'VERTICAL';
@@ -83,6 +85,8 @@ export async function buildDesignSystemBentoBoard(
   col2.itemSpacing = 24;
   col2.resize(colWidth, 100);
   col2.fills = [];
+  col2.clipsContent = false; // let cards render at their natural heights
+
 
   // Helper to create a Bento Card
   const createBentoCard = (titleText: string): { card: FrameNode; body: FrameNode } => {
