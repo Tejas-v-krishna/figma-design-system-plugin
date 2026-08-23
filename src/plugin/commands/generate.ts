@@ -112,7 +112,7 @@ async function runGeneration(
     update('creating-pages', 50, 'Generating Components page…');
     const compPage = await openPage('🧩 Components');
 
-    const { count: componentsCreated } = generateComponents(
+    const { count: componentsCreated } = await generateComponents(
       tokens,
       config,
       styleMap,
@@ -191,7 +191,7 @@ async function runGeneration(
   update('creating-pages', 50, 'Pages created');
 
   await figma.setCurrentPageAsync(pages.components);
-  const { count: componentsCreated, byName: componentsByName } = generateComponents(
+  const { count: componentsCreated, byName: componentsByName } = await generateComponents(
     tokens,
     config,
     styleMap,

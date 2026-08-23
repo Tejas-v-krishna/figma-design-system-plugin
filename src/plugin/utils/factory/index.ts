@@ -9,6 +9,7 @@ import { TEMPLATES, Template, TemplateCtx } from './templates';
 import { fallbackTemplate } from './categoryFallback';
 import { makeComponent } from '../primitives';
 import { VariableMap, emptyVariableMap } from '../variables';
+import { yieldToUI } from '../yield';
 
 const CATEGORY_LABELS: Record<string, string> = {
   buttons: 'Buttons',
@@ -108,20 +109,20 @@ function buildSet(
   return { nodes, primary };
 }
 
-export function generateComponents(
+export async function generateComponents(
   tokens: DesignTokens,
   config: GenerationConfig,
   styleMap: StyleMap,
   componentsPage: PageNode,
   onProgress?: (fraction: number) => void,
   varMap: VariableMap = emptyVariableMap()
-): { count: number; byName: Map<string, ComponentNode | ComponentSetNode> } {
+): Promise<{ count: number; byName: Map<string, ComponentNode | ComponentSetNode> }> {
   const selected = COMPONENT_DEFINITIONS.filter((d) => config.componentsToGenerate.includes(d.name));
   const frames: Record<string, FrameNode> = {};
   const byName = new Map<string, ComponentNode | ComponentSetNode>();
   let count = 0;
 
-  for (const def of selected) {
+  for (const [index, def] of selected.entries()) {
     // Looked up and created in one step. Reading it back out of the record
     // afterwards left `frame` typed as possibly missing for the rest of the
     // loop, which is the one thing it definitely is not.
@@ -161,7 +162,20 @@ export function generateComponents(
     if (primary && !byName.has(def.name)) {
       byName.set(def.name, primary);
     }
-    onProgress?.(count / Math.max(1, selected.length));
+    // `count` is a running total of *variants* built, and `selected.length` is a
+    // count of *components*. Dividing one by the other gave a fraction well past
+    // 1 as soon as any component produced more than one variant — the caller
+    // scales it into a percentage, so the bar shot past 100 and the numbers the
+    // user saw were nonsense. It is the component index that is out of a total.
+    onProgress?.((index + 1) / Math.max(1, selected.length));
+
+    // Building a full variant matrix is the longest uninterrupted stretch of work
+    // the plugin does. Without a yield here the whole loop runs as one blocking
+    // task: every progress message sits in the queue until it finishes, so the
+    // bar froze at the starting value and Figma stopped responding for the
+    // duration. Per component rather than per variant — a yield costs a frame,
+    // and one per variant would be slower than not yielding at all.
+    await yieldToUI();
   }
 
   Object.values(frames).forEach((f) => f.resize(1600, Math.max(400, f.height)));
