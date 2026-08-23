@@ -37,14 +37,9 @@ export function buildTokens(config: GenerationConfig): DesignTokens {
     t.group === 'headings' ? { ...t, fontFamily: config.fontFamily.heading } : t
   );
 
-  let borderRadius = generateBorderRadiusTokens();
-  if (config.radiusPreset === 'sharp') {
-    borderRadius = borderRadius.map((r) => (r.name === 'none' ? r : { ...r, px: 0, value: '0px' }));
-  } else if (config.radiusPreset === 'pill') {
-    borderRadius = borderRadius.map((r) =>
-      r.name === 'none' ? r : { ...r, px: 9999, value: '9999px' }
-    );
-  }
+  // Preset handling moved into generateBorderRadiusTokens so the panel can show
+  // the same numbers a build will emit without reimplementing the arithmetic.
+  const borderRadius = generateBorderRadiusTokens(config.radiusPreset);
 
   // Intensity scales the ramp rather than trimming names off it — see
   // SHADOW_INTENSITY in typography-utils. Trimming meant a component asking for

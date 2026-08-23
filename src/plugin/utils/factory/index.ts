@@ -178,7 +178,22 @@ export async function generateComponents(
     await yieldToUI();
   }
 
-  Object.values(frames).forEach((f) => f.resize(1600, Math.max(400, f.height)));
+  let currentY = 0;
+  Object.values(frames).forEach((f) => {
+    // Enable wrapping if possible so components don't overflow horizontally
+    if ('layoutWrap' in f) {
+      (f as any).layoutWrap = 'WRAP';
+    }
+    // ensure layout has had time to apply before reading height? In Figma API it's immediate for auto-layout.
+    f.y = currentY;
+    currentY += Math.max(400, f.height) + 120;
+    // Don't force a resize if we're using auto layout wrap, let it hug contents if possible, 
+    // or just set a max width if not hugging.
+    if (f.width < 1600) {
+        f.resize(1600, Math.max(400, f.height));
+    }
+  });
+
   return { count, byName };
 }
 
@@ -250,7 +265,19 @@ function buildVariantSet(
   let primary: ComponentNode | ComponentSetNode | undefined;
   const only = combos[0];
   if (combos.length > 1) {
-    primary = figma.combineAsVariants(combos, parent);
+    const setNode = figma.combineAsVariants(combos, parent);
+    // Component sets default to absolute positioning; enable auto-layout so variants don't overlap
+    setNode.layoutMode = 'HORIZONTAL';
+    if ('layoutWrap' in setNode) {
+      (setNode as any).layoutWrap = 'WRAP';
+    }
+    setNode.itemSpacing = 32;
+    setNode.counterAxisSpacing = 32;
+    setNode.paddingTop = 32;
+    setNode.paddingRight = 32;
+    setNode.paddingBottom = 32;
+    setNode.paddingLeft = 32;
+    primary = setNode;
   } else if (only) {
     parent.appendChild(only);
     primary = only;

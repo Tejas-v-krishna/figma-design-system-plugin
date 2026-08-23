@@ -1,33 +1,24 @@
 :root {
-  --bg: #eaeaea;
-  --panel: #ffffff;
-  --panel-2: #f4f4f6;
-  --panel-3: #e8e8ec;
-  --border: rgba(0, 0, 0, 0.05);
-  --border-strong: rgba(0, 0, 0, 0.12);
-  --text: #09090b;
-  --text-dim: #666666;
-  /* Kept in step with theme.css's --on-paper-faint, which overrides this at
-     runtime. Both clear 4.5:1 on their own panel colour; #999999 did not. */
-  --text-faint: #676d77;
-  --accent: #09090b;
-  --accent-hover: #1c1c1e;
-  --accent-glow: rgba(0, 0, 0, 0.1);
-  --danger: #09090b;
-  --ok: #09090b;
+  --bg: #09090b;
+  --panel: #121214;
+  --panel-2: #18181b;
+  --panel-3: #27272a;
+  --border: #27272a;
+  --border-strong: #3f3f46;
+  --text: #fafafa;
+  --text-dim: #a1a1aa;
+  --text-faint: #71717a;
+  --accent: #ffffff;
+  --accent-hover: #f4f4f5;
+  --accent-glow: rgba(255, 255, 255, 0.1);
+  --danger: #ef4444;
+  --ok: #10b981;
   --radius: 14px;
   --radius-lg: 22px;
 
-  /* Text and icon colours for the panel's dark islands — the component cards,
-     the code block and its header. Those surfaces stay dark on a light theme, so
-     they cannot use --text/--text-dim, and they cannot use --accent either:
-     --accent is near-black here, which is how the Copy Code button ended up
-     black on black. theme.css declares the same three, but they are repeated
-     here so this stylesheet is legible on its own — a missing variable resolves
-     to `inherit` for `color`, and the failure mode is invisible text. */
-  --on-ink: #f4f4f2;
-  --on-ink-dim: #8b929c;
-  --brand-chrome: #5b8ef7;
+  --on-ink: #000000;
+  --on-ink-dim: #555555;
+  --brand-chrome: #3b82f6;
 
   /* This iframe cannot load webfonts. vite.config.ts builds its own HTML shell
      with no <link> tags, and manifest.json declares

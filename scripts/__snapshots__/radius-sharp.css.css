@@ -112,7 +112,7 @@
   --radius-lg: 0px;
   --radius-xl: 0px;
   --radius-2xl: 0px;
-  --radius-full: 0px;
+  --radius-full: 9999px;
   /* Stroke */
   --stroke-0: 1px;
   --stroke-1: 2px;

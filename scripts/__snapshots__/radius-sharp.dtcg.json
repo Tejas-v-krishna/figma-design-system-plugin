@@ -446,7 +446,7 @@
     },
     "full": {
       "$type": "borderRadius",
-      "$value": "0px"
+      "$value": "9999px"
     }
   },
   "strokeWidth": {

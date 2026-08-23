@@ -10,58 +10,46 @@
 
 :root {
   /* ---- Instrument: the chrome. Achromatic on purpose — see DESIGN.md. ---- */
-  --ink: #14161a;
-  --graphite: #1e2126;
-  --graphite-hi: #262a31;
-  --rule: #2e333b;
-  --rule-soft: #21252b;
+  --ink: #ffffff;
+  --graphite: #f3f3f3;
+  --graphite-hi: #e5e5e5;
+  --rule: #333333;
+  --rule-soft: #222222;
 
   /* ---- Specimen: the sheet ---- */
-  --paper: #fbfbf9;
-  --paper-sunk: #f3f3f0;
-  --wire: #e3e3df;
-  --wire-soft: #ededea;
+  --paper: #0f1115;
+  --paper-sunk: #16181d;
+  --wire: #2a2d36;
+  --wire-soft: #1f2228;
 
   /* ---- Text ---- */
-  --on-ink: #f4f4f2;
-  --on-ink-dim: #8b929c;
-  --on-ink-faint: #5c636d;
-  --on-paper: #16181c;
-  --on-paper-dim: #5f646c;
-  /* 4.69:1 on --paper-sunk, 5.03:1 on --paper. This tier is used for 9px–13px
-     text (ramp step labels, field hints, sheet meta, spec notes), all of which
-     needs 4.5:1 — the old #9298a1 measured 2.61:1 and 2.80:1, so every one of
-     them failed. The tier still reads as subordinate because those elements
-     already carry it by size, uppercase and letter-spacing rather than by
-     colour; there is no value that is both legible on near-white paper and
-     visibly fainter than --on-paper-dim, so the hierarchy has to come from
-     somewhere other than the grey. Its three other uses are :hover border
-     colours, which only get clearer. */
-  --on-paper-faint: #676d77;
+  --on-ink: #111111;
+  --on-ink-dim: #555555;
+  --on-ink-faint: #888888;
+  --on-paper: #ffffff;
+  --on-paper-dim: #a1a1a6;
+  --on-paper-faint: #6e6e73;
 
   /* ---- Brand. Overwritten at runtime from the user's primary colour.
           These are only the pre-hydration values. ---- */
   --brand: #2563eb;
   --brand-chrome: #5b8ef7;
   --brand-ink: #ffffff;
-  --brand-wash: rgba(37, 99, 235, 0.1);
+  --brand-wash: rgba(37, 99, 235, 0.2);
 
-  /* ---- Signal. Every value here is picked to clear 4.5:1 against its own wash
-          on this light surface, because these are the colours the plugin uses to
-          tell the user something went wrong. ---- */
-  --signal-ok: #1a7f5a;
-  --signal-warn: #8a5a0d;
-  --signal-warn-wash: #fdf3e3;
-  --signal-warn-line: #e8c98f;
-  --signal-bad: #b3261e;
-  --signal-bad-wash: #fdecea;
-  --signal-bad-line: #f0b4ae;
+  /* ---- Signal ---- */
+  --signal-ok: #2cc98f;
+  --signal-warn: #f5a623;
+  --signal-warn-wash: #332400;
+  --signal-warn-line: #664800;
+  --signal-bad: #ff453a;
+  --signal-bad-wash: #330000;
+  --signal-bad-line: #660000;
 
-  /* ---- Geometry. --radius-user is overwritten from the chosen radius
-          preset: the panel's own corners demonstrate your token. ---- */
+  /* ---- Geometry ---- */
   --radius-user: 8px;
-  --radius-chip: 3px;
-  --radius-sheet: 10px;
+  --radius-chip: 6px;
+  --radius-sheet: 12px;
 
   --rail-w: 184px;
 

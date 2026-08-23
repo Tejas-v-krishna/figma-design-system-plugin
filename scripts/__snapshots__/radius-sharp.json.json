@@ -501,8 +501,8 @@
     },
     {
       "name": "full",
-      "value": "0px",
-      "px": 0
+      "value": "9999px",
+      "px": 9999
     }
   ],
   "strokes": [

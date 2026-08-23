@@ -86,20 +86,37 @@ function disabledOpacity(ctx: TemplateCtx): number {
   return ctx.stateName.toLowerCase() === 'disabled' ? 0.45 : 1;
 }
 
-function buildIcon(size: number, hex: string, kind: 'circle' | 'square' | 'ring' = 'circle'): FrameNode {
+const ICONS = {
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
+  close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+  chevronDown: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`,
+  user: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
+  image: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`,
+  info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`,
+  warning: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
+  search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>`,
+  star: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
+};
+
+function buildIcon(size: number, hex: string, kind: keyof typeof ICONS | 'circle' | 'square' | 'ring' = 'info'): FrameNode {
   const f = makeFrame('icon');
-  if (kind === 'ring') {
-    const e = ellipse('ring', size, hex);
-    e.strokes = [{ type: 'SOLID', color: { r: 0.4, g: 0.4, b: 0.4 } }];
-    e.strokeWeight = size * 0.12;
-    e.fills = [];
-    f.appendChild(e);
-  } else if (kind === 'square') {
-    const r = rect('icon-shape', size, size, hex);
-    f.appendChild(r);
-  } else {
-    const e = ellipse('icon-shape', size, hex);
-    f.appendChild(e);
+  f.resize(size, size);
+  
+  if (kind === 'ring' || kind === 'circle' || kind === 'square') {
+    kind = 'info'; // Default fallback for old shapes
+  }
+  
+  const svgString = ICONS[kind as keyof typeof ICONS] || ICONS.info;
+  const svgStrWithColor = svgString.replace('currentColor', hex);
+  
+  try {
+    const node = figma.createNodeFromSvg(svgStrWithColor);
+    node.resize(size, size);
+    f.appendChild(node);
+  } catch(e) {
+    // Fallback if SVG fails
+    const fallback = ellipse('icon-shape', size, hex);
+    f.appendChild(fallback);
   }
   return f;
 }
@@ -170,7 +187,10 @@ const IconButton: Template = (root, ctx) => {
   setFill(root, outlined ? '#FFFFFF' : colorShade(ctx.tokens, t, baseShade), colorStyleKey(t, baseShade), ctx.styleMap, ctx.varMap);
   if (outlined) setStroke(root, colorShade(ctx.tokens, t, 300), 1, colorStyleKey(t, 300), ctx.styleMap, ctx.varMap);
   root.opacity = disabledOpacity(ctx);
-  root.appendChild(buildIcon(m.height * 0.45, outlined ? colorShade(ctx.tokens, t, 600) : '#FFFFFF'));
+  let iconType: keyof typeof ICONS = 'search';
+  if (t === 'error') iconType = 'close';
+  if (t === 'success') iconType = 'check';
+  root.appendChild(buildIcon(m.height * 0.45, outlined ? colorShade(ctx.tokens, t, 600) : '#FFFFFF', iconType));
   return root;
 };
 
@@ -241,7 +261,7 @@ const Textarea: Template = (root, ctx) => {
 const Select: Template = (root, ctx) => {
   const { frame, input } = buildField(ctx);
   input.appendChild(text({ characters: 'Select an option', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 14, fill: colorShade(ctx.tokens, 'neutral', 400) }));
-  input.appendChild(buildIcon(14, colorShade(ctx.tokens, 'neutral', 500), 'square'));
+  input.appendChild(buildIcon(16, colorShade(ctx.tokens, 'neutral', 500), 'chevronDown'));
   root.appendChild(frame);
   return root;
 };
@@ -375,7 +395,10 @@ function populateAlert(root: ComponentNode, ctx: TemplateCtx, toneName: ColorNam
   setFill(root, colorShade(ctx.tokens, toneName, 50), colorStyleKey(toneName, 50), ctx.styleMap, ctx.varMap);
   setStroke(root, colorShade(ctx.tokens, toneName, 200), 1, colorStyleKey(toneName, 200), ctx.styleMap, ctx.varMap);
   root.resize(360, 60);
-  root.appendChild(buildIcon(20, colorShade(ctx.tokens, toneName, 500)));
+  let iconType: keyof typeof ICONS = 'info';
+  if (toneName === 'error' || toneName === 'warning') iconType = 'warning';
+  if (toneName === 'success') iconType = 'check';
+  root.appendChild(buildIcon(20, colorShade(ctx.tokens, toneName, 500), iconType));
   const tf = vbox('text');
   tf.itemSpacing = 2;
   tf.appendChild(text({ characters: titleCase(toneName), fontFamily: ctx.config.fontFamily.heading, weight: 600, fontSize: 14, fill: colorShade(ctx.tokens, toneName, 700) }));
@@ -397,7 +420,10 @@ const Toast: Template = (root, ctx) => {
   setFill(root, '#1E293B');
   setEffect(root, shadow(ctx.tokens, 'lg'), effectStyleKey('lg'), ctx.styleMap, ctx.varMap);
   root.resize(320, 56);
-  root.appendChild(buildIcon(18, colorShade(ctx.tokens, t, 400)));
+  let iconType: keyof typeof ICONS = 'info';
+  if (t === 'error' || t === 'warning') iconType = 'warning';
+  if (t === 'success') iconType = 'check';
+  root.appendChild(buildIcon(20, colorShade(ctx.tokens, t, 400), iconType));
   root.appendChild(text({ characters: 'Operation completed', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 14, fill: '#F8FAFC' }));
   return root;
 };
@@ -522,7 +548,7 @@ const EmptyState: Template = (root, ctx) => {
   pad(root, 32);
   setFill(root, colorShade(ctx.tokens, 'neutral', 50));
   root.cornerRadius = radiusPx(ctx.tokens, 'lg');
-  root.appendChild(buildIcon(48, colorShade(ctx.tokens, 'neutral', 300), 'square'));
+  root.appendChild(buildIcon(48, colorShade(ctx.tokens, 'neutral', 300), 'search'));
   root.appendChild(text({ characters: 'No results found', fontFamily: ctx.config.fontFamily.heading, weight: 600, fontSize: 16, fill: colorShade(ctx.tokens, 'neutral', 800) }));
   root.appendChild(text({ characters: 'Try adjusting your search or filters.', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 500) }));
   return root;
@@ -659,7 +685,8 @@ const List: Template = (root, ctx) => {
     item.itemSpacing = 10;
     pad(item, 12, 14);
     if (i < arr.length - 1) setStroke(item, colorShade(ctx.tokens, 'neutral', 100), 1, colorStyleKey('neutral', 100), ctx.styleMap, ctx.varMap);
-    item.appendChild(buildIcon(16, colorShade(ctx.tokens, 'neutral', 500)));
+    const iconType = label === 'Starred' ? 'star' : label === 'Inbox' ? 'info' : 'search';
+    item.appendChild(buildIcon(16, colorShade(ctx.tokens, 'neutral', 500), iconType));
     item.appendChild(text({ characters: label, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 14, fill: colorShade(ctx.tokens, 'neutral', 800) }));
     root.appendChild(item);
   });
@@ -779,7 +806,7 @@ const Image: Template = (root, ctx) => {
   root.resize(160, 120);
   root.cornerRadius = radiusPx(ctx.tokens, 'md');
   setFill(root, colorShade(ctx.tokens, 'neutral', 200));
-  const ic = buildIcon(40, colorShade(ctx.tokens, 'neutral', 400), 'square');
+  const ic = buildIcon(40, colorShade(ctx.tokens, 'neutral', 400), 'image');
   root.appendChild(ic);
   return root;
 };

@@ -7,6 +7,7 @@ import {
   StrokeToken,
   TypographyGroup,
   EffectsIntensity,
+  RadiusPreset,
 } from './types';
 
 export interface TypographyScaleEntry {
@@ -205,12 +206,25 @@ export function generateShadowTokens(intensity: EffectsIntensity = 'medium'): Sh
   });
 }
 
-export function generateBorderRadiusTokens(): BorderRadiusToken[] {
-  return BORDER_RADIUS_SCALE.map((r) => ({
-    name: r.name,
-    value: r.value,
-    px: r.px,
-  }));
+/**
+ * The radius scale as the chosen preset leaves it.
+ *
+ * Lives here rather than inside buildTokens because the panel needs the same
+ * answer: its Radius list has to show the values a build will actually produce,
+ * and a second copy of this arithmetic in the UI is a second thing to get wrong.
+ *
+ * `none` and `full` are fixed points. A preset that rewrote `none` would leave
+ * the system with no way to say "no corner", and one that rewrote `full` would
+ * take away the pill the templates ask for by name.
+ */
+export function generateBorderRadiusTokens(preset: RadiusPreset = 'rounded'): BorderRadiusToken[] {
+  return BORDER_RADIUS_SCALE.map((r) => {
+    if (preset === 'rounded' || r.name === 'none' || r.name === 'full') {
+      return { name: r.name, value: r.value, px: r.px };
+    }
+    const px = preset === 'sharp' ? 0 : 9999;
+    return { name: r.name, value: `${px}px`, px };
+  });
 }
 
 export function generateStrokeTokens(): StrokeToken[] {
