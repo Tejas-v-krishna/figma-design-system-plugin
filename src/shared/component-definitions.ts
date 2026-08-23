@@ -216,6 +216,7 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
       { name: 'Default', properties: { variant: 'default' } },
       { name: 'Pill', properties: { variant: 'pill' } },
       { name: 'WithShortcut', properties: { variant: 'withshortcut' } },
+      { name: 'WithFilter', properties: { variant: 'withfilter' } },
     ],
     states: [
       { name: 'Default', properties: { state: 'default' } },
@@ -224,9 +225,9 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
       { name: 'WithResults', properties: { state: 'withresults' } },
     ],
     sizes: [
-      { name: 'sm', properties: { name: 'sm', height: 32 } },
-      { name: 'md', properties: { name: 'md', height: 40 } },
-      { name: 'lg', properties: { name: 'lg', height: 48 } },
+      { name: 'sm', properties: { name: 'sm', height: 36 } },
+      { name: 'md', properties: { name: 'md', height: 44 } },
+      { name: 'lg', properties: { name: 'lg', height: 52 } },
     ],
     defaultProps: { variant: 'default', state: 'default' },
   },
