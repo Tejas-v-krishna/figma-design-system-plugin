@@ -25,13 +25,16 @@ export function useFocusOnOpen<T extends HTMLElement>(active: boolean) {
 
   useEffect(() => {
     if (!active) return;
-    prevFocus.current = document.activeElement as HTMLElement | null;
+    // instanceof rather than a cast: document.activeElement is typed as Element,
+    // which has no focus() at all, and the cast that used to be here was what
+    // forced the defensive `?.focus?.()` on the restore below.
+    prevFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const node = ref.current;
     // Defer to the next frame so the node is mounted/visible.
     const id = requestAnimationFrame(() => node?.focus());
     return () => {
       cancelAnimationFrame(id);
-      prevFocus.current?.focus?.();
+      prevFocus.current?.focus();
     };
   }, [active]);
 
