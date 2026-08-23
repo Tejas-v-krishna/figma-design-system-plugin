@@ -22,6 +22,7 @@ export async function buildButtonMatrixBoard(
   board.layoutMode = 'VERTICAL';
   board.primaryAxisSizingMode = 'AUTO';
   board.counterAxisSizingMode = 'FIXED';
+  board.clipsContent = false;
   board.resize(CW + 96, 100);
   board.itemSpacing = 28;
   pad(board, 48, 48);
@@ -35,7 +36,6 @@ export async function buildButtonMatrixBoard(
   header.primaryAxisSizingMode = 'AUTO';
   header.counterAxisSizingMode = 'AUTO';
   header.itemSpacing = 8;
-  header.resize(CW, 40);
   header.fills = [];
 
   const numTxt = figma.createText();
@@ -59,14 +59,15 @@ export async function buildButtonMatrixBoard(
   matrixBox.layoutMode = 'VERTICAL';
   matrixBox.primaryAxisSizingMode = 'AUTO';
   matrixBox.counterAxisSizingMode = 'FIXED';
+  matrixBox.clipsContent = false;
   matrixBox.resize(CW, 100);
-  matrixBox.itemSpacing = 20;
-  pad(matrixBox, 28, 28);
+  matrixBox.itemSpacing = 10;
+  pad(matrixBox, 32, 32);
   matrixBox.cornerRadius = 20;
   matrixBox.fills = [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }];
-  matrixBox.strokes = [{ type: 'SOLID', color: hexToRgb('#E2E8F0') }];
-  matrixBox.strokeWeight = 1;
-  matrixBox.dashPattern = [4, 4];
+  matrixBox.strokes = [{ type: 'SOLID', color: hexToRgb('#CBD5E1') }];
+  matrixBox.strokeWeight = 1.5;
+  matrixBox.dashPattern = [6, 6];
 
   // Top Column Headers: Default | Hover | Focused | Active | Disabled
   const headerRow = makeFrame('Header Row');
@@ -75,17 +76,17 @@ export async function buildButtonMatrixBoard(
   headerRow.primaryAxisSizingMode = 'FIXED';
   headerRow.counterAxisSizingMode = 'AUTO';
   headerRow.itemSpacing = 16;
-  headerRow.resize(CW - 56, 32);
+  headerRow.resize(CW - 64, 32);
   headerRow.fills = [];
 
   // Space for left row label column
   const spacer = makeFrame('Spacer');
-  spacer.resize(160, 20);
+  spacer.resize(150, 20);
   spacer.fills = [];
   headerRow.appendChild(spacer);
 
   const states = ['Default', 'Hover', 'Focused', 'Active', 'Disabled'];
-  const colW = (CW - 56 - 160 - (states.length - 1) * 16) / states.length; // ~130px each
+  const colW = (CW - 64 - 150 - (states.length - 1) * 16) / states.length; // ~135px each
 
   for (const st of states) {
     const stLbl = text({
@@ -122,16 +123,21 @@ export async function buildButtonMatrixBoard(
     sizeName: string,
     iconPos?: 'left' | 'right' | 'none',
     isBlack?: boolean,
-    isIconOnly?: boolean
+    isIconOnly?: boolean,
+    isFirstInGroup?: boolean
   ): FrameNode => {
-    const row = makeFrame(`Row - ${groupLabel} - ${rowLabel}`);
+    const row = makeFrame(`Row - ${groupLabel || 'item'} - ${rowLabel}`);
     row.layoutMode = 'HORIZONTAL';
     row.counterAxisAlignItems = 'CENTER';
     row.primaryAxisSizingMode = 'FIXED';
     row.counterAxisSizingMode = 'AUTO';
     row.itemSpacing = 16;
-    row.resize(CW - 56, 44);
+    row.resize(CW - 64, isIconOnly ? (sizeName === 'sm' ? 36 : 44) : (sizeName === 'sm' ? 36 : 44));
     row.fills = [];
+
+    if (isFirstInGroup) {
+      row.paddingTop = 12;
+    }
 
     // Left label column
     const labelBox = makeFrame('Label Box');
@@ -139,7 +145,7 @@ export async function buildButtonMatrixBoard(
     labelBox.primaryAxisSizingMode = 'AUTO';
     labelBox.counterAxisSizingMode = 'AUTO';
     labelBox.itemSpacing = 2;
-    labelBox.resize(160, 40);
+    labelBox.resize(150, 36);
     labelBox.fills = [];
 
     if (groupLabel) {
@@ -147,8 +153,8 @@ export async function buildButtonMatrixBoard(
         characters: groupLabel,
         fontFamily: fontFam,
         weight: 700,
-        fontSize: 12,
-        fill: colorShade(tokens, 'primary', 600),
+        fontSize: 13,
+        fill: isBlack ? '#18181B' : colorShade(tokens, 'primary', 600),
       }));
     }
     labelBox.appendChild(text({
@@ -168,7 +174,7 @@ export async function buildButtonMatrixBoard(
       cell.counterAxisAlignItems = 'CENTER';
       cell.primaryAxisSizingMode = 'FIXED';
       cell.counterAxisSizingMode = 'AUTO';
-      cell.resize(colW, 44);
+      cell.resize(colW, sizeName === 'sm' ? 36 : 44);
       cell.fills = [];
 
       const node = figma.createComponent();
@@ -191,13 +197,14 @@ export async function buildButtonMatrixBoard(
         variantProps: {
           iconPosition: iconPos ?? 'none',
           isBlack: Boolean(isBlack),
+          isPill: true,
         },
         stateName: st,
         stateProps: {},
         sizeName,
         sizeProps: {
-          height: sizeName === 'sm' ? 32 : 44,
-          fontSize: sizeName === 'sm' ? 12 : 14,
+          height: sizeName === 'sm' ? 32 : 40,
+          fontSize: sizeName === 'sm' ? 12 : 13,
         },
       };
 
@@ -215,42 +222,47 @@ export async function buildButtonMatrixBoard(
   };
 
   // Group 1: Primary Large
-  matrixBox.appendChild(makeMatrixRow('Primary Large', 'Large', 'primary', 'lg', 'none'));
+  matrixBox.appendChild(makeMatrixRow('Primary Large', 'Large', 'primary', 'lg', 'none', false, false, true));
   matrixBox.appendChild(makeMatrixRow('', 'icon right', 'primary', 'lg', 'right'));
   matrixBox.appendChild(makeMatrixRow('', 'icon left', 'primary', 'lg', 'left'));
 
   // Group 2: Primary Small
-  matrixBox.appendChild(makeMatrixRow('Primary Small', 'Small', 'primary', 'sm', 'none'));
+  matrixBox.appendChild(makeMatrixRow('Primary Small', 'Small', 'primary', 'sm', 'none', false, false, true));
   matrixBox.appendChild(makeMatrixRow('', 'icon right', 'primary', 'sm', 'right'));
   matrixBox.appendChild(makeMatrixRow('', 'icon left', 'primary', 'sm', 'left'));
 
   // Group 3: Secondary Large (Outline)
-  matrixBox.appendChild(makeMatrixRow('Secondary Large', 'Large', 'outline', 'lg', 'none'));
+  matrixBox.appendChild(makeMatrixRow('Secondary Large', 'Large', 'outline', 'lg', 'none', false, false, true));
   matrixBox.appendChild(makeMatrixRow('', 'icon right', 'outline', 'lg', 'right'));
   matrixBox.appendChild(makeMatrixRow('', 'icon left', 'outline', 'lg', 'left'));
 
   // Group 4: Secondary Small (Outline)
-  matrixBox.appendChild(makeMatrixRow('Secondary Small', 'Small', 'outline', 'sm', 'none'));
+  matrixBox.appendChild(makeMatrixRow('Secondary Small', 'Small', 'outline', 'sm', 'none', false, false, true));
   matrixBox.appendChild(makeMatrixRow('', 'icon right', 'outline', 'sm', 'right'));
   matrixBox.appendChild(makeMatrixRow('', 'icon left', 'outline', 'sm', 'left'));
 
   // Group 5: Tertiary Large (Ghost/Text)
-  matrixBox.appendChild(makeMatrixRow('Tertiary Large', 'Large', 'tertiary', 'lg', 'none'));
+  matrixBox.appendChild(makeMatrixRow('Tertiary Large', 'Large', 'tertiary', 'lg', 'none', false, false, true));
   matrixBox.appendChild(makeMatrixRow('', 'icon right', 'tertiary', 'lg', 'right'));
   matrixBox.appendChild(makeMatrixRow('', 'icon left', 'tertiary', 'lg', 'left'));
 
-  // Group 6: Black Large
-  matrixBox.appendChild(makeMatrixRow('Black Large', 'Large', 'black', 'lg', 'none', true));
+  // Group 6: Tertiary Small (Ghost/Text)
+  matrixBox.appendChild(makeMatrixRow('Tertiary Small', 'Small', 'tertiary', 'sm', 'none', false, false, true));
+  matrixBox.appendChild(makeMatrixRow('', 'icon right', 'tertiary', 'sm', 'right'));
+  matrixBox.appendChild(makeMatrixRow('', 'icon left', 'tertiary', 'sm', 'left'));
+
+  // Group 7: Black Large
+  matrixBox.appendChild(makeMatrixRow('Black Large', 'Large', 'black', 'lg', 'none', true, false, true));
   matrixBox.appendChild(makeMatrixRow('', 'icon right', 'black', 'lg', 'right', true));
   matrixBox.appendChild(makeMatrixRow('', 'icon left', 'black', 'lg', 'left', true));
 
-  // Group 7: Black Small
-  matrixBox.appendChild(makeMatrixRow('Black Small', 'Small', 'black', 'sm', 'none', true));
+  // Group 8: Black Small
+  matrixBox.appendChild(makeMatrixRow('Black Small', 'Small', 'black', 'sm', 'none', true, false, true));
   matrixBox.appendChild(makeMatrixRow('', 'icon right', 'black', 'sm', 'right', true));
   matrixBox.appendChild(makeMatrixRow('', 'icon left', 'black', 'sm', 'left', true));
 
-  // Group 8: Black Icon Only
-  matrixBox.appendChild(makeMatrixRow('Black Icon Only', 'Large', 'black', 'lg', 'none', true, true));
+  // Group 9: Black Icon Only
+  matrixBox.appendChild(makeMatrixRow('Black Icon Only', 'Large', 'black', 'lg', 'none', true, true, true));
   matrixBox.appendChild(makeMatrixRow('', 'Small', 'black', 'sm', 'none', true, true));
 
   board.appendChild(matrixBox);
