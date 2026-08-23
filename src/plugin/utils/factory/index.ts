@@ -347,6 +347,8 @@ export async function generateComponents(
           const groupFrame = figma.createFrame();
           groupFrame.name = section.title;
           groupFrame.layoutMode = 'VERTICAL';
+          groupFrame.primaryAxisSizingMode = 'AUTO';
+          groupFrame.counterAxisSizingMode = 'FIXED';
           groupFrame.resize(CW - 56, 50);
           groupFrame.itemSpacing = 14;
           groupFrame.fills = [];
