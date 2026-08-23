@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
 // UI build: bundles the React UI entry (src/ui/index.tsx) into a single
