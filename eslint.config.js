@@ -92,5 +92,22 @@ export default tseslint.config(
       eqeqeq: ['error', 'always', { null: 'ignore' }],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
     },
+  },
+
+  // ---- Validation scripts: stdout is the product
+  //
+  // no-console exists because neither of the plugin's runtimes has a console a
+  // user will ever look at — a console.log in src/ is a debug statement someone
+  // forgot to delete. These files are Node CLIs run by `npm run check:*`, where
+  // printing the results is the entire point, so the rule is off here rather
+  // than disabled line by line at every assertion.
+  {
+    files: ['scripts/**/*.ts'],
+    languageOptions: {
+      globals: { ...globals.node },
+    },
+    rules: {
+      'no-console': 'off',
+    },
   }
 );
