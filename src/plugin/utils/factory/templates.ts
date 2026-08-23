@@ -3840,60 +3840,150 @@ const PinInput: Template = (root, ctx) => {
 };
 
 const RichTextEditor: Template = (root, ctx) => {
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 230;
+  const fieldHeight = 110;
+
   root.layoutMode = 'VERTICAL';
-  root.primaryAxisSizingMode = 'AUTO';
+  root.primaryAxisSizingMode = 'FIXED';
   root.counterAxisSizingMode = 'FIXED';
-  root.resize(340, 140);
+  root.primaryAxisAlignItems = 'MIN';
+  root.counterAxisAlignItems = 'MIN';
+  root.resize(fieldWidth, fieldHeight);
   root.cornerRadius = 10;
-  setFill(root, '#FFFFFF');
-  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
   root.clipsContent = true;
+  root.strokes = [];
+  root.effects = [];
 
-  const bar = makeFrame('toolbar');
-  bar.layoutMode = 'HORIZONTAL';
-  bar.counterAxisAlignItems = 'CENTER';
-  bar.itemSpacing = 8;
-  bar.resize(340, 36);
-  pad(bar, 6, 12);
-  setFill(bar, colorShade(ctx.tokens, 'neutral', 50));
-  setStroke(bar, colorShade(ctx.tokens, 'neutral', 200), 1);
-  bar.appendChild(text({ characters: 'B', fontFamily: ctx.config.fontFamily.body, weight: 700, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 700) }));
-  bar.appendChild(text({ characters: 'I', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 700) }));
-  bar.appendChild(buildIcon(12, colorShade(ctx.tokens, 'neutral', 700), 'list'));
-  bar.appendChild(buildIcon(12, colorShade(ctx.tokens, 'neutral', 700), 'image'));
-  root.appendChild(bar);
+  const isFocus = sKey === 'focus' || sKey === 'focused';
+  const isFormatted = sKey === 'formatted';
+  const isFloating = vKey.includes('floating');
 
-  const body = makeFrame('body');
-  pad(body, 12, 12);
-  body.appendChild(text({ characters: 'Start drafting your rich document here…', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 400) }));
-  root.appendChild(body);
+  const bg = isFocus ? '#EEF2FF' : '#F1F3F5';
+  setFill(root, bg);
+
+  if (!isFloating) {
+    // Toolbar on top
+    const bar = makeFrame('toolbar');
+    bar.layoutMode = 'HORIZONTAL';
+    bar.counterAxisAlignItems = 'CENTER';
+    bar.itemSpacing = 8;
+    bar.resize(fieldWidth, 28);
+    pad(bar, 0, 10);
+    setFill(bar, isFocus ? '#E0E7FF' : '#E8EAED');
+
+    bar.appendChild(text({ characters: 'B', fontFamily: ctx.config.fontFamily.body, weight: 700, fontSize: 11, fill: isFocus ? '#1D4ED8' : '#18181B' }));
+    bar.appendChild(text({ characters: 'I', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 11, fill: '#71717A' }));
+    bar.appendChild(buildIcon(11, '#71717A', 'list'));
+    bar.appendChild(buildIcon(11, '#71717A', 'image'));
+    root.appendChild(bar);
+
+    const body = makeFrame('body');
+    body.layoutMode = 'VERTICAL';
+    body.itemSpacing = 4;
+    pad(body, 8, 10);
+
+    if (isFormatted) {
+      body.appendChild(text({ characters: 'Project Overview', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 12, fill: '#18181B' }));
+      body.appendChild(text({ characters: '• Design system tokens & components', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: '#71717A' }));
+    } else {
+      const bodyStr = isFocus ? 'Designing a modern interface system|' : 'Start drafting your story…';
+      body.appendChild(text({ characters: bodyStr, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: isFocus ? '#18181B' : '#71717A' }));
+    }
+    root.appendChild(body);
+  } else {
+    // Floating bubble toolbar variant
+    const body = makeFrame('body');
+    body.layoutMode = 'VERTICAL';
+    body.itemSpacing = 8;
+    body.resize(fieldWidth, fieldHeight);
+    pad(body, 10, 10);
+
+    const bodyStr = isFormatted ? 'Crafting accessible UI components' : isFocus ? 'Active cursor in paragraph|' : 'Highlight text to format…';
+    body.appendChild(text({ characters: bodyStr, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: isFocus || isFormatted ? '#18181B' : '#71717A' }));
+
+    // Floating bubble pill inside
+    const bubble = makeFrame('bubble');
+    bubble.layoutMode = 'HORIZONTAL';
+    bubble.counterAxisAlignItems = 'CENTER';
+    bubble.itemSpacing = 8;
+    pad(bubble, 3, 8);
+    bubble.cornerRadius = 6;
+    setFill(bubble, '#18181B');
+    bubble.appendChild(text({ characters: 'B', fontFamily: ctx.config.fontFamily.body, weight: 700, fontSize: 10, fill: '#FFFFFF' }));
+    bubble.appendChild(text({ characters: 'I', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: '#A1A1AA' }));
+    bubble.appendChild(text({ characters: 'Link', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: '#A1A1AA' }));
+    body.appendChild(bubble);
+
+    root.appendChild(body);
+  }
+
   return root;
 };
 
 const TagInput: Template = (root, ctx) => {
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 176;
+  const fieldHeight = 44;
+
   root.layoutMode = 'HORIZONTAL';
   root.counterAxisAlignItems = 'CENTER';
-  root.itemSpacing = 6;
-  root.resize(300, 44);
-  pad(root, 6, 10);
-  root.cornerRadius = 8;
-  setFill(root, '#FFFFFF');
-  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+  root.itemSpacing = 4;
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 0, 8);
+  root.cornerRadius = 10;
+  root.clipsContent = true;
+  root.strokes = [];
+  root.effects = [];
 
-  ['Design', 'System'].forEach((tag) => {
-    const chip = makeFrame('chip');
+  const isFocus = sKey === 'focus' || sKey === 'focused';
+  const isFilled = sKey === 'filled';
+  const isHover = sKey === 'hover';
+  const isPill = vKey.includes('pill');
+  const isColored = vKey.includes('colored');
+
+  let bg = '#F1F3F5';
+  if (isFocus) bg = '#EEF2FF';
+  else if (isHover) bg = '#E8EAED';
+  setFill(root, bg);
+
+  const tags = isFilled ? ['UI', 'UX', 'Design'] : isFocus ? ['UI', 'UX'] : ['Design'];
+
+  tags.forEach((tag, i) => {
+    const chip = makeFrame(`chip-${i}`);
     chip.layoutMode = 'HORIZONTAL';
     chip.counterAxisAlignItems = 'CENTER';
-    chip.itemSpacing = 4;
-    pad(chip, 3, 8);
-    chip.cornerRadius = 9999;
-    setFill(chip, colorShade(ctx.tokens, 'primary', 50));
-    chip.appendChild(text({ characters: tag, fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 11, fill: colorShade(ctx.tokens, 'primary', 700) }));
-    chip.appendChild(buildIcon(10, colorShade(ctx.tokens, 'primary', 700), 'close'));
+    chip.itemSpacing = 3;
+    pad(chip, 2, 6);
+    chip.cornerRadius = isPill ? 9999 : 6;
+
+    let chipBg = '#FFFFFF';
+    let chipText = '#18181B';
+    if (isColored) {
+      if (i === 0) { chipBg = '#E0F2FE'; chipText = '#0369A1'; }
+      else if (i === 1) { chipBg = '#F3E8FF'; chipText = '#7E22CE'; }
+      else { chipBg = '#DCFCE7'; chipText = '#15803D'; }
+    }
+
+    setFill(chip, chipBg);
+    chip.appendChild(text({ characters: tag, fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: chipText }));
+    chip.appendChild(text({ characters: '×', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: chipText }));
     root.appendChild(chip);
   });
 
-  root.appendChild(text({ characters: 'Add tag…', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 400) }));
+  if (!isFilled) {
+    const placeholderStr = isFocus ? '|' : 'Tag…';
+    root.appendChild(text({
+      characters: placeholderStr,
+      fontFamily: ctx.config.fontFamily.body,
+      weight: 400,
+      fontSize: 11,
+      fill: isFocus ? '#3B82F6' : '#71717A',
+    }));
+  }
+
   return root;
 };
 
