@@ -371,6 +371,9 @@ const FULL_RUN_PAGES = {
   playground: '🎮 Playground',
 } as const satisfies Record<keyof Pages, string>;
 
+/** Exported so the overwrite check can ask which of them already exist. */
+export const FULL_RUN_PAGE_NAMES: readonly string[] = Object.values(FULL_RUN_PAGES);
+
 /**
  * Find or create each of the five pages a full run uses.
  *
