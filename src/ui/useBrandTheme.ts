@@ -75,7 +75,10 @@ export function useBrandTheme(config: GenerationConfig): void {
       }
     }
 
-    root.style.setProperty('--radius-user', RADIUS_BY_PRESET[radius] ?? '8px');
+    // No fallback: the map is keyed by the RadiusPreset union, so every value
+    // the type admits has an entry, and sanitizeConfig guarantees a stored
+    // config can't smuggle in a fourth preset.
+    root.style.setProperty('--radius-user', RADIUS_BY_PRESET[radius]);
 
     // Quoted so a family with spaces stays one token, with the UI stack behind
     // it: the panel can't load webfonts, so a face the host OS lacks has to fall
