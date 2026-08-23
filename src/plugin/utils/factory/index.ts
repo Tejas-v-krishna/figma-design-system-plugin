@@ -272,24 +272,33 @@ export async function generateComponents(
         sec.counterAxisSizingMode = 'FIXED';
         sec.resize(CW, 100);
         sec.itemSpacing = 0;
-        sec.cornerRadius = 16;
+        sec.cornerRadius = 24;
         sec.fills = [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }];
-        sec.strokes = [{ type: 'SOLID', color: hexToRgb('#E2E8F0') }];
+        sec.strokes = [{ type: 'SOLID', color: hexToRgb('#E4E4E7') }];
         sec.strokeWeight = 1;
         sec.clipsContent = true;
         sec.effects = [
           {
             type: 'DROP_SHADOW',
-            color: { r: 0.05, g: 0.09, b: 0.16, a: 0.04 },
-            offset: { x: 0, y: 2 },
-            radius: 8,
+            color: { r: 0.05, g: 0.07, b: 0.1, a: 0.03 },
+            offset: { x: 0, y: 1 },
+            radius: 3,
             spread: 0,
+            visible: true,
+            blendMode: 'NORMAL',
+          },
+          {
+            type: 'DROP_SHADOW',
+            color: { r: 0.05, g: 0.07, b: 0.1, a: 0.05 },
+            offset: { x: 0, y: 12 },
+            radius: 32,
+            spread: -6,
             visible: true,
             blendMode: 'NORMAL',
           },
         ];
 
-        // 1. Integrated Header inside the card with auto-sizing badge
+        // 1. Studio Header inside the card with pill category and micro spec chips
         const cardHead = figma.createFrame();
         cardHead.name = 'Card Header';
         cardHead.layoutMode = 'HORIZONTAL';
@@ -297,13 +306,13 @@ export async function generateComponents(
         cardHead.counterAxisSizingMode = 'AUTO';
         cardHead.primaryAxisAlignItems = 'SPACE_BETWEEN';
         cardHead.counterAxisAlignItems = 'CENTER';
-        cardHead.resize(CW, 56);
-        cardHead.paddingTop = 14;
-        cardHead.paddingBottom = 14;
-        cardHead.paddingLeft = 24;
-        cardHead.paddingRight = 24;
-        cardHead.fills = [{ type: 'SOLID', color: hexToRgb('#F8FAFC') }];
-        cardHead.strokes = [{ type: 'SOLID', color: hexToRgb('#E2E8F0') }];
+        cardHead.resize(CW, 68);
+        cardHead.paddingTop = 18;
+        cardHead.paddingBottom = 18;
+        cardHead.paddingLeft = 36;
+        cardHead.paddingRight = 36;
+        cardHead.fills = [{ type: 'SOLID', color: hexToRgb('#FAFAFA') }];
+        cardHead.strokes = [{ type: 'SOLID', color: hexToRgb('#F4F4F5') }];
         cardHead.strokeWeight = 1;
         cardHead.strokeAlign = 'INSIDE';
 
@@ -311,7 +320,7 @@ export async function generateComponents(
         titleLeft.name = 'Title & Badge';
         titleLeft.layoutMode = 'HORIZONTAL';
         titleLeft.counterAxisAlignItems = 'CENTER';
-        titleLeft.itemSpacing = 10;
+        titleLeft.itemSpacing = 14;
         titleLeft.fills = [];
 
         const catBadge = figma.createFrame();
@@ -319,41 +328,73 @@ export async function generateComponents(
         catBadge.layoutMode = 'HORIZONTAL';
         catBadge.primaryAxisSizingMode = 'AUTO';
         catBadge.counterAxisSizingMode = 'AUTO';
-        catBadge.paddingTop = 3;
-        catBadge.paddingBottom = 3;
-        catBadge.paddingLeft = 8;
-        catBadge.paddingRight = 8;
-        catBadge.cornerRadius = 6;
-        catBadge.fills = [{ type: 'SOLID', color: hexToRgb('#EFF6FF') }];
-        catBadge.strokes = [{ type: 'SOLID', color: hexToRgb('#DBEAFE') }];
+        catBadge.paddingTop = 4;
+        catBadge.paddingBottom = 4;
+        catBadge.paddingLeft = 10;
+        catBadge.paddingRight = 10;
+        catBadge.cornerRadius = 9999;
+        catBadge.fills = [{ type: 'SOLID', color: hexToRgb('#F4F4F5') }];
+        catBadge.strokes = [{ type: 'SOLID', color: hexToRgb('#E4E4E7') }];
         catBadge.strokeWeight = 1;
 
         const catTxt = figma.createText();
-        catTxt.fontName = await ensureFont(config.fontFamily.mono, 600);
+        catTxt.fontName = await ensureFont(config.fontFamily.body, 600);
         catTxt.fontSize = 11;
         catTxt.characters = (CATEGORY_LABELS[def.category] ?? def.category).toUpperCase();
-        catTxt.fills = [{ type: 'SOLID', color: hexToRgb('#2563EB') }];
+        catTxt.fills = [{ type: 'SOLID', color: hexToRgb('#52525B') }];
         catBadge.appendChild(catTxt);
         titleLeft.appendChild(catBadge);
 
         const compTitle = figma.createText();
         compTitle.fontName = await ensureFont(config.fontFamily.heading, 700);
-        compTitle.fontSize = 18;
+        compTitle.fontSize = 20;
         compTitle.letterSpacing = { value: -1, unit: 'PERCENT' };
         compTitle.characters = def.name;
-        compTitle.fills = [{ type: 'SOLID', color: hexToRgb('#0F172A') }];
+        compTitle.fills = [{ type: 'SOLID', color: hexToRgb('#18181B') }];
         titleLeft.appendChild(compTitle);
 
         cardHead.appendChild(titleLeft);
 
-        // Meta tags on the right
-        const metaTxt = figma.createText();
-        metaTxt.fontName = await ensureFont(config.fontFamily.body, 500);
-        metaTxt.fontSize = 12;
-        metaTxt.characters = `${def.variants.length} Variants  •  ${def.sizes.length || 1} Sizes  •  ${def.states.length || 1} States`;
-        metaTxt.fills = [{ type: 'SOLID', color: hexToRgb('#64748B') }];
-        cardHead.appendChild(metaTxt);
+        // Spec chips on the right
+        const metaRight = figma.createFrame();
+        metaRight.name = 'Spec Badges';
+        metaRight.layoutMode = 'HORIZONTAL';
+        metaRight.counterAxisAlignItems = 'CENTER';
+        metaRight.itemSpacing = 8;
+        metaRight.fills = [];
 
+        const specLabels = [
+          `${def.variants.length} Variants`,
+          `${def.sizes.length || 1} Sizes`,
+          `${def.states.length || 1} States`,
+        ];
+
+        for (const sText of specLabels) {
+          const chip = figma.createFrame();
+          chip.name = 'SpecChip';
+          chip.layoutMode = 'HORIZONTAL';
+          chip.primaryAxisSizingMode = 'AUTO';
+          chip.counterAxisSizingMode = 'AUTO';
+          chip.counterAxisAlignItems = 'CENTER';
+          chip.cornerRadius = 9999;
+          chip.paddingTop = 4;
+          chip.paddingBottom = 4;
+          chip.paddingLeft = 10;
+          chip.paddingRight = 10;
+          chip.fills = [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }];
+          chip.strokes = [{ type: 'SOLID', color: hexToRgb('#E4E4E7') }];
+          chip.strokeWeight = 1;
+
+          const chipText = figma.createText();
+          chipText.fontName = await ensureFont(config.fontFamily.body, 500);
+          chipText.fontSize = 11;
+          chipText.characters = sText;
+          chipText.fills = [{ type: 'SOLID', color: hexToRgb('#71717A') }];
+          chip.appendChild(chipText);
+          metaRight.appendChild(chip);
+        }
+
+        cardHead.appendChild(metaRight);
         sec.appendChild(cardHead);
 
         // 2. Card Content with Sections
@@ -363,11 +404,11 @@ export async function generateComponents(
         cardBody.primaryAxisSizingMode = 'AUTO';
         cardBody.counterAxisSizingMode = 'FIXED';
         cardBody.resize(CW, 100);
-        cardBody.itemSpacing = 28;
-        cardBody.paddingTop = 36;
-        cardBody.paddingBottom = 36;
-        cardBody.paddingLeft = 36;
-        cardBody.paddingRight = 36;
+        cardBody.itemSpacing = 32;
+        cardBody.paddingTop = 40;
+        cardBody.paddingBottom = 44;
+        cardBody.paddingLeft = 40;
+        cardBody.paddingRight = 40;
         cardBody.fills = [{ type: 'SOLID', color: hexToRgb('#FFFFFF') }];
         cardBody.clipsContent = false;
 
@@ -380,8 +421,8 @@ export async function generateComponents(
           if (sIdx > 0 && !isButtonMatrixRow) {
             const innerDiv = figma.createFrame();
             innerDiv.name = 'SubDivider';
-            innerDiv.resize(CW - 56, 1);
-            innerDiv.fills = [{ type: 'SOLID', color: hexToRgb('#F1F5F9') }];
+            innerDiv.resize(CW - 80, 1);
+            innerDiv.fills = [{ type: 'SOLID', color: hexToRgb('#F4F4F5') }];
             cardBody.appendChild(innerDiv);
           }
 
@@ -395,14 +436,14 @@ export async function generateComponents(
             rowLine.itemSpacing = 36;
             rowLine.fills = [];
             rowLine.clipsContent = false;
-            rowLine.resize(CW - 56, 44);
+            rowLine.resize(CW - 80, 44);
 
             const rowLabel = figma.createText();
-            rowLabel.fontName = await ensureFont(config.fontFamily.body, 500);
-            rowLabel.fontSize = 14;
+            rowLabel.fontName = await ensureFont(config.fontFamily.body, 600);
+            rowLabel.fontSize = 13;
             rowLabel.characters = section.title;
-            rowLabel.fills = [{ type: 'SOLID', color: hexToRgb('#94A3B8') }];
-            rowLabel.resize(110, 20);
+            rowLabel.fills = [{ type: 'SOLID', color: hexToRgb('#3F3F46') }];
+            rowLabel.resize(100, 20);
             rowLabel.textAlignHorizontal = 'RIGHT';
             rowLine.appendChild(rowLabel);
 
@@ -429,24 +470,56 @@ export async function generateComponents(
           groupFrame.layoutMode = 'VERTICAL';
           groupFrame.primaryAxisSizingMode = 'AUTO';
           groupFrame.counterAxisSizingMode = 'FIXED';
-          groupFrame.resize(CW - 56, 50);
-          groupFrame.itemSpacing = 14;
+          groupFrame.resize(CW - 80, 50);
+          groupFrame.itemSpacing = 20;
           groupFrame.fills = [];
           groupFrame.clipsContent = false;
 
+          const groupHeader = figma.createFrame();
+          groupHeader.name = 'GroupHeader';
+          groupHeader.layoutMode = 'HORIZONTAL';
+          groupHeader.counterAxisAlignItems = 'CENTER';
+          groupHeader.itemSpacing = 10;
+          groupHeader.fills = [];
+
+          const accentPill = figma.createFrame();
+          accentPill.name = 'Accent';
+          accentPill.resize(3, 14);
+          accentPill.cornerRadius = 9999;
+          accentPill.fills = [{ type: 'SOLID', color: hexToRgb('#18181B') }];
+          groupHeader.appendChild(accentPill);
+
           const groupLabel = figma.createText();
-          groupLabel.fontName = await ensureFont(config.fontFamily.mono, 600);
-          groupLabel.fontSize = 11;
+          groupLabel.fontName = await ensureFont(config.fontFamily.body, 700);
+          groupLabel.fontSize = 12;
           groupLabel.letterSpacing = { value: 6, unit: 'PERCENT' };
           groupLabel.characters = section.title.toUpperCase();
-          groupLabel.fills = [{ type: 'SOLID', color: hexToRgb('#94A3B8') }];
-          groupFrame.appendChild(groupLabel);
+          groupLabel.fills = [{ type: 'SOLID', color: hexToRgb('#18181B') }];
+          groupHeader.appendChild(groupLabel);
+
+          let subtitle = '';
+          if (section.title === 'Sizes Scale') {
+            subtitle = '—  Proportional scale from XS (28px) to XL (56px)';
+          } else if (section.title === 'Icons & Contextual') {
+            subtitle = '—  Adornments, counter badges & async feedback';
+          }
+
+          if (subtitle) {
+            const subLabel = figma.createText();
+            subLabel.fontName = await ensureFont(config.fontFamily.body, 400);
+            subLabel.fontSize = 12;
+            subLabel.characters = subtitle;
+            subLabel.fills = [{ type: 'SOLID', color: hexToRgb('#A1A1AA') }];
+            groupHeader.appendChild(subLabel);
+          }
+
+          groupFrame.appendChild(groupHeader);
 
           const rowFrame = figma.createFrame();
           rowFrame.name = 'Row';
           rowFrame.layoutMode = 'HORIZONTAL';
           rowFrame.layoutWrap = 'WRAP';
-          rowFrame.resize(CW - 56, 40);
+          rowFrame.resize(CW - 80, 40);
           rowFrame.itemSpacing = 24;
           rowFrame.counterAxisSpacing = 20;
           rowFrame.counterAxisAlignItems = 'MAX';
@@ -473,9 +546,9 @@ export async function generateComponents(
 
             const propLabel = figma.createText();
             propLabel.fontName = await ensureFont(config.fontFamily.body, 500);
-            propLabel.fontSize = 11;
+            propLabel.fontSize = 12;
             propLabel.characters = rawLabel;
-            propLabel.fills = [{ type: 'SOLID', color: hexToRgb('#64748B') }];
+            propLabel.fills = [{ type: 'SOLID', color: hexToRgb('#71717A') }];
             cell.appendChild(propLabel);
 
             rowFrame.appendChild(cell);
