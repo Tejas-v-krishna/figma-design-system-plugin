@@ -3537,69 +3537,234 @@ const SearchInput: Template = (root, ctx) => {
 };
 
 const NumberInput: Template = (root, ctx) => {
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const fieldHeight = 44;
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 176;
+
   root.layoutMode = 'HORIZONTAL';
   root.counterAxisAlignItems = 'CENTER';
   root.primaryAxisAlignItems = 'SPACE_BETWEEN';
-  root.resize(160, 40);
-  pad(root, 4, 12);
-  root.cornerRadius = 8;
-  setFill(root, '#FFFFFF');
-  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 0, 10);
+  root.cornerRadius = 10;
 
-  root.appendChild(text({ characters: '42', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 14, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+  const isFocus = sKey === 'focus' || sKey === 'focused';
+  const isHover = sKey === 'hover';
+  const isDisabled = sKey === 'disabled';
 
-  const btns = vbox('btns');
-  btns.itemSpacing = 2;
-  const up = makeFrame('up');
-  up.resize(20, 14);
-  up.appendChild(buildIcon(10, colorShade(ctx.tokens, 'neutral', 600), 'chevronUp'));
-  btns.appendChild(up);
+  let bg = '#F1F3F5';
+  let textFill = '#18181B';
+  let iconColor = '#71717A';
 
-  const down = makeFrame('down');
-  down.resize(20, 14);
-  down.appendChild(buildIcon(10, colorShade(ctx.tokens, 'neutral', 600), 'chevronDown'));
-  btns.appendChild(down);
+  if (isDisabled) {
+    bg = '#F8FAFC';
+    textFill = '#A1A1AA';
+    iconColor = '#D4D4D8';
+    root.opacity = 0.6;
+  } else if (isFocus) {
+    bg = '#EEF2FF';
+    textFill = '#18181B';
+    iconColor = '#3B82F6';
+  } else if (isHover) {
+    bg = '#E8EAED';
+    textFill = '#18181B';
+    iconColor = '#18181B';
+  }
 
-  root.appendChild(btns);
+  setFill(root, bg);
+  root.strokes = [];
+  root.effects = [];
+
+  const valStr = isFocus ? '42|' : '42';
+
+  if (vKey.includes('sides')) {
+    // Steppers on both sides: [-] [  42  ] [+]
+    const minusBtn = makeFrame('minusBtn');
+    minusBtn.layoutMode = 'HORIZONTAL';
+    minusBtn.primaryAxisAlignItems = 'CENTER';
+    minusBtn.counterAxisAlignItems = 'CENTER';
+    minusBtn.resize(28, 28);
+    minusBtn.cornerRadius = 6;
+    setFill(minusBtn, '#FFFFFF');
+    minusBtn.appendChild(buildIcon(12, iconColor, 'minus'));
+    root.appendChild(minusBtn);
+
+    root.appendChild(text({
+      characters: valStr,
+      fontFamily: ctx.config.fontFamily.body,
+      weight: 500,
+      fontSize: 14,
+      fill: textFill,
+    }));
+
+    const plusBtn = makeFrame('plusBtn');
+    plusBtn.layoutMode = 'HORIZONTAL';
+    plusBtn.primaryAxisAlignItems = 'CENTER';
+    plusBtn.counterAxisAlignItems = 'CENTER';
+    plusBtn.resize(28, 28);
+    plusBtn.cornerRadius = 6;
+    setFill(plusBtn, '#FFFFFF');
+    plusBtn.appendChild(buildIcon(12, iconColor, 'plus'));
+    root.appendChild(plusBtn);
+  } else if (vKey.includes('right')) {
+    // Steppers on Right: [ 42        [-] [+] ]
+    root.appendChild(text({
+      characters: valStr,
+      fontFamily: ctx.config.fontFamily.body,
+      weight: 500,
+      fontSize: 14,
+      fill: textFill,
+    }));
+
+    const stepperGroup = hbox('stepperGroup');
+    stepperGroup.itemSpacing = 4;
+
+    const minusBtn = makeFrame('minusBtn');
+    minusBtn.layoutMode = 'HORIZONTAL';
+    minusBtn.primaryAxisAlignItems = 'CENTER';
+    minusBtn.counterAxisAlignItems = 'CENTER';
+    minusBtn.resize(26, 26);
+    minusBtn.cornerRadius = 6;
+    setFill(minusBtn, '#FFFFFF');
+    minusBtn.appendChild(buildIcon(12, iconColor, 'minus'));
+    stepperGroup.appendChild(minusBtn);
+
+    const plusBtn = makeFrame('plusBtn');
+    plusBtn.layoutMode = 'HORIZONTAL';
+    plusBtn.primaryAxisAlignItems = 'CENTER';
+    plusBtn.counterAxisAlignItems = 'CENTER';
+    plusBtn.resize(26, 26);
+    plusBtn.cornerRadius = 6;
+    setFill(plusBtn, '#FFFFFF');
+    plusBtn.appendChild(buildIcon(12, iconColor, 'plus'));
+    stepperGroup.appendChild(plusBtn);
+
+    root.appendChild(stepperGroup);
+  } else {
+    // Standard: [ 42              ^ v ]
+    root.appendChild(text({
+      characters: valStr,
+      fontFamily: ctx.config.fontFamily.body,
+      weight: 500,
+      fontSize: 14,
+      fill: textFill,
+    }));
+
+    const btns = vbox('btns');
+    btns.itemSpacing = 2;
+    btns.counterAxisAlignItems = 'CENTER';
+
+    const up = makeFrame('up');
+    up.resize(16, 12);
+    up.appendChild(buildIcon(10, iconColor, 'chevronUp'));
+    btns.appendChild(up);
+
+    const down = makeFrame('down');
+    down.resize(16, 12);
+    down.appendChild(buildIcon(10, iconColor, 'chevronDown'));
+    btns.appendChild(down);
+
+    root.appendChild(btns);
+  }
+
   return root;
 };
 
 const CurrencyInput: Template = (root, ctx) => {
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const fieldHeight = 44;
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 176;
+
   root.layoutMode = 'HORIZONTAL';
   root.counterAxisAlignItems = 'CENTER';
   root.itemSpacing = 8;
-  root.resize(200, 40);
-  pad(root, 8, 12);
-  root.cornerRadius = 8;
-  setFill(root, '#FFFFFF');
-  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 0, 14);
+  root.cornerRadius = 10;
 
-  const sym = variantKey(ctx).includes('eur') ? '€' : variantKey(ctx).includes('gbp') ? '£' : variantKey(ctx).includes('inr') ? '₹' : '$';
-  root.appendChild(text({ characters: sym, fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 14, fill: colorShade(ctx.tokens, 'neutral', 400) }));
-  root.appendChild(text({ characters: '1,450.00', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 14, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+  const isFocus = sKey === 'focus' || sKey === 'focused';
+  const isHover = sKey === 'hover';
+  const isDisabled = sKey === 'disabled';
+
+  let bg = '#F1F3F5';
+  let textFill = '#18181B';
+  let symColor = '#71717A';
+
+  if (isDisabled) {
+    bg = '#F8FAFC';
+    textFill = '#A1A1AA';
+    symColor = '#A1A1AA';
+    root.opacity = 0.6;
+  } else if (isFocus) {
+    bg = '#EEF2FF';
+    textFill = '#18181B';
+    symColor = '#3B82F6';
+  } else if (isHover) {
+    bg = '#E8EAED';
+    textFill = '#18181B';
+  }
+
+  setFill(root, bg);
+  root.strokes = [];
+  root.effects = [];
+
+  const sym = vKey.includes('eur') ? '€' : vKey.includes('gbp') ? '£' : vKey.includes('inr') ? '₹' : '$';
+  root.appendChild(text({ characters: sym, fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 14, fill: symColor }));
+  root.appendChild(text({ characters: isFocus ? '1,450.00|' : '1,450.00', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 13, fill: textFill }));
   return root;
 };
 
 const PhoneInput: Template = (root, ctx) => {
+  const sKey = ctx.stateName.toLowerCase();
+  const fieldHeight = 44;
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 176;
+
   root.layoutMode = 'HORIZONTAL';
   root.counterAxisAlignItems = 'CENTER';
   root.itemSpacing = 8;
-  root.resize(240, 40);
-  pad(root, 6, 12);
-  root.cornerRadius = 8;
-  setFill(root, '#FFFFFF');
-  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 0, 12);
+  root.cornerRadius = 10;
+
+  const isFocus = sKey === 'focus' || sKey === 'focused';
+  const isHover = sKey === 'hover';
+  const isDisabled = sKey === 'disabled';
+
+  let bg = '#F1F3F5';
+  let textFill = '#18181B';
+  let chevronColor = '#71717A';
+
+  if (isDisabled) {
+    bg = '#F8FAFC';
+    textFill = '#A1A1AA';
+    chevronColor = '#A1A1AA';
+    root.opacity = 0.6;
+  } else if (isFocus) {
+    bg = '#EEF2FF';
+    textFill = '#18181B';
+    chevronColor = '#3B82F6';
+  } else if (isHover) {
+    bg = '#E8EAED';
+    textFill = '#18181B';
+  }
+
+  setFill(root, bg);
+  root.strokes = [];
+  root.effects = [];
 
   const flagBox = hbox('flag');
   flagBox.itemSpacing = 4;
-  flagBox.appendChild(text({ characters: '🇺🇸 +1', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 700) }));
-  flagBox.appendChild(buildIcon(10, colorShade(ctx.tokens, 'neutral', 500), 'chevronDown'));
+  flagBox.counterAxisAlignItems = 'CENTER';
+  flagBox.appendChild(text({ characters: '🇺🇸 +1', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: '#18181B' }));
+  flagBox.appendChild(buildIcon(10, chevronColor, 'chevronDown'));
   root.appendChild(flagBox);
 
-  const sep = line(20, colorShade(ctx.tokens, 'neutral', 300), 1);
+  const sep = line(16, '#E4E4E7', 1);
   root.appendChild(sep);
 
-  root.appendChild(text({ characters: '(555) 019-2834', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+  root.appendChild(text({ characters: isFocus ? '(555) 019-|' : '(555) 019-2834', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: textFill }));
   return root;
 };
 
