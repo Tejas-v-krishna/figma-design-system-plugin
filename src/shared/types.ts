@@ -188,20 +188,16 @@ export interface ComponentDefinition {
   variants: ComponentVariant[];
   states: ComponentState[];
   sizes: ComponentSize[];
-  defaultProps: Record<string, any>;
+  /** Same value domain as a variant's properties — templates read these with String()/Number(). */
+  defaultProps: Record<string, string | number | boolean>;
 }
 
 // ---- Plugin <-> UI messaging ----
-
-export interface PluginMessage {
-  type: string;
-  payload?: any;
-}
-
-export interface UIMessage {
-  type: string;
-  payload?: any;
-}
+//
+// The two sides each declare their own message shape (main.ts for the sandbox,
+// ui/plugin.ts for the iframe), because they narrow differently: the sandbox
+// validates an untrusted payload, the UI dispatches on a known set of replies.
+// The two `payload?: any` interfaces that used to live here had no importers.
 
 export type GenerationStep =
   | 'idle'
