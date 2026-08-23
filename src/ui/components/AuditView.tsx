@@ -1,10 +1,12 @@
 import React from 'react';
 import { useStore } from '../store';
-import { Radar, RefreshCw } from 'lucide-react';
+import { Radar, RefreshCw, AlertTriangle } from 'lucide-react';
 
 export const AuditView: React.FC = () => {
   const result = useStore((s) => s.scanResult);
   const busy = useStore((s) => s.scanBusy);
+  const progress = useStore((s) => s.scanProgress);
+  const message = useStore((s) => s.scanMessage);
   const requestScan = useStore((s) => s.requestScan);
 
   return (
@@ -22,6 +24,21 @@ export const AuditView: React.FC = () => {
         component instances are in use, how many local styles exist, and how much
         colour is applied directly instead of through a style.
       </p>
+
+      {/* A scan walks every node on every page, which is seconds on a large
+          file. The button's spinner alone left it looking hung, so this reports
+          the sandbox's own progress — including which page it is on. */}
+      {busy && (
+        <div className="dsk-audit-progress">
+          <div className="dsk-audit-progress-head">
+            <span>{message || 'Scanning…'}</span>
+            <span className="dsk-audit-progress-pct">{progress}%</span>
+          </div>
+          <div className="progress-track">
+            <div className="progress-fill" style={{ width: `${progress}%` }} />
+          </div>
+        </div>
+      )}
 
       {!result && !busy && (
         <div className="dsk-audit-empty">
@@ -44,6 +61,25 @@ export const AuditView: React.FC = () => {
             <Stat v={result.textStyles} label="Text styles" />
             <Stat v={result.effectStyles} label="Effect styles" />
           </div>
+
+          {/* The scan has always counted these and never shown them, despite the
+              description above promising it. */}
+          <div className="dsk-token-group-bar">Unbound colour</div>
+          {result.unboundFills === 0 ? (
+            <div className="dsk-audit-note">
+              Every solid fill in this file comes from a colour style. Nothing to fix.
+            </div>
+          ) : (
+            <div className="dsk-audit-flag">
+              <AlertTriangle size={16} />
+              <div>
+                <strong>{result.unboundFills.toLocaleString()} solid fills</strong> are
+                painted directly instead of through a colour style. Rebinding them is
+                what makes a palette change propagate — right now those layers would
+                keep their old colour.
+              </div>
+            </div>
+          )}
 
           <div className="dsk-token-group-bar">Most used components</div>
           {result.components.length === 0 ? (
