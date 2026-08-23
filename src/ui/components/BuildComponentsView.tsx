@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useStore } from '../store';
+import { useStore, isGenerateBusy } from '../store';
 import { COMPONENT_DEFINITIONS } from '../../shared/component-definitions';
 import { countComponentsFor } from '../../shared/variant-count';
-import { Search, SearchX, CheckSquare, XSquare, CheckCircle } from 'lucide-react';
+import { Search, SearchX, CheckSquare, XSquare, CheckCircle, Hammer } from 'lucide-react';
 
 const CATEGORIES = [
   { id: 'all', label: 'All' },
@@ -81,6 +81,8 @@ export const BuildComponentsView: React.FC = () => {
   const config = useStore((s) => s.config);
   const toggleComponent = useStore((s) => s.toggleComponent);
   const selectAll = useStore((s) => s.selectAll);
+  const startGeneration = useStore((s) => s.startGeneration);
+  const generateBusy = useStore(isGenerateBusy);
 
   const selectedSet = new Set(config.componentsToGenerate);
   const allSelected = selectedSet.size === COMPONENT_DEFINITIONS.length;
@@ -96,15 +98,16 @@ export const BuildComponentsView: React.FC = () => {
   const getVariantCount = (comp: typeof COMPONENT_DEFINITIONS[0]) =>
     countComponentsFor(comp, config.options);
 
-  const totalVariants = COMPONENT_DEFINITIONS.filter((c) => selectedSet.has(c.name)).reduce(
+  const effectiveSelected = selectedSet.size === 0 ? COMPONENT_DEFINITIONS : COMPONENT_DEFINITIONS.filter((c) => selectedSet.has(c.name));
+  const totalVariants = effectiveSelected.reduce(
     (sum, c) => sum + getVariantCount(c),
     0
   );
 
   return (
     <div className="dsk-build-components-container">
-      <div className="dsk-components-top-bar">
-        <div className="dsk-search-wrapper">
+      <div className="dsk-components-top-bar" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div className="dsk-search-wrapper" style={{ flex: 1 }}>
           <Search size={16} className="dsk-search-icon" />
           <input
             type="text"
@@ -120,7 +123,17 @@ export const BuildComponentsView: React.FC = () => {
           title={allSelected ? 'Deselect every component' : 'Select every component'}
         >
           {allSelected ? <XSquare size={15} /> : <CheckSquare size={15} />}
-          {allSelected ? 'Clear all' : `Select all ${COMPONENT_DEFINITIONS.length}`}
+          {allSelected ? 'Clear' : `All (${COMPONENT_DEFINITIONS.length})`}
+        </button>
+        <button
+          className="dsk-primary-btn"
+          style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', fontSize: 12, fontWeight: 600 }}
+          onClick={() => startGeneration('components')}
+          disabled={generateBusy}
+          title="Build components on canvas"
+        >
+          <Hammer size={14} />
+          Build Components ({selectedSet.size === 0 ? COMPONENT_DEFINITIONS.length : selectedSet.size})
         </button>
       </div>
 
@@ -150,7 +163,7 @@ export const BuildComponentsView: React.FC = () => {
 
       <div className="dsk-components-count">
         {selectedSet.size === 0
-          ? 'Select at least one component to build.'
+          ? `All ${COMPONENT_DEFINITIONS.length} components selected by default · ${totalVariants} variants`
           : `${selectedSet.size} of ${COMPONENT_DEFINITIONS.length} selected · ${totalVariants} variants`}
         {search && ` · ${filteredComponents.length} match “${search}”`}
       </div>

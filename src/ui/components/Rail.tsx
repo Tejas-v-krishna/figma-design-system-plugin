@@ -31,11 +31,6 @@ export const Rail: React.FC<{ counts: TokenCounts }> = ({ counts }) => {
 
   const active = destination(current);
 
-  // Components is the one destination whose Build has a precondition beyond
-  // "not already busy": an empty selection generates an empty page and reports
-  // success. The reason is stated in the sheet, since a disabled button in the
-  // rail can't explain itself.
-  const nothingSelected = current === 'components' && config.componentsToGenerate.length === 0;
 
   const item = (d: Destination) => {
     const count = d.count?.(counts);
@@ -95,7 +90,7 @@ export const Rail: React.FC<{ counts: TokenCounts }> = ({ counts }) => {
             type="button"
             className="dsk-build-btn"
             onClick={() => startGeneration()}
-            disabled={generateBusy || nothingSelected}
+            disabled={generateBusy}
           >
             {checkingExisting ? (
               <>
