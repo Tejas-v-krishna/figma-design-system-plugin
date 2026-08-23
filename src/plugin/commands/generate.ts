@@ -955,7 +955,7 @@ async function buildColorSystemBoard(
       `Primary · ${primName}`,
       primShades,
       [100, 300, 500, 700, 900],
-      'This is the leading brand color used everywhere — shapes, socials, physical products, and prints. It is a base color for most interactive components and the primary product color.',
+      'This is the leading brand color used everywhere: shapes, socials, physical products, and prints. It is a base color for most interactive components and the primary product color.',
       [
         { lbl: '900–700', rule: 'Only for headlines or tiny texts when high contrast is required.' },
         { lbl: '500', rule: 'Main color used mostly for interactive components, texts and products.' },
@@ -1308,7 +1308,7 @@ async function createDocumentationPage(page: PageNode, config: GenerationConfig)
   await add('Components are organized by category and linked to the generated color, text, and effect styles.', 13, 400);
   if (config.options.createVariables) {
     await add(
-      `Color tokens are also published as a 3-tier Figma Variables system — Primitives → Semantic → Components — in "${config.brandName} / Primitives", "${config.brandName} / Semantic", and "${config.brandName} / Components"${config.options.includeDarkMode ? ' (Light + Dark modes).' : '.'}`,
+      `Color tokens are also published as a 3-tier Figma Variables system (Primitives → Semantic → Components) in "${config.brandName} / Primitives", "${config.brandName} / Semantic", and "${config.brandName} / Components"${config.options.includeDarkMode ? ' (Light + Dark modes).' : '.'}`,
       13,
       400
     );
@@ -1862,7 +1862,7 @@ async function buildGradientsBoard(
     [
       {
         label: 'Monochromatic',
-        desc: 'A single hue moving through lightness — the safest choice for large surfaces and backgrounds.',
+        desc: 'A single hue moving through lightness, the safest choice for large surfaces and backgrounds.',
       },
       {
         label: 'Analogous',

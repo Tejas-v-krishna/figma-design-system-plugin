@@ -146,7 +146,7 @@ figma.ui.onmessage = (msg: PluginMessage) => {
     figma.ui.postMessage({
       type: 'PLUGIN_ERROR',
       payload: {
-        message: `Something went wrong while ${action}: ${message}. Nothing else was changed — try again, and check Plugins › Development › Open console for details.`,
+        message: `Something went wrong while ${action}: ${message}. Nothing else was changed. Try again, and check Plugins › Development › Open console for details.`,
       },
     });
   });
@@ -237,7 +237,7 @@ async function handleGenerateColorExtensions(payload: unknown) {
       type: 'GENERATION_COMPLETE',
       payload: {
         success: false,
-        message: 'Pick a colour first — that request had no valid hex value in it.',
+        message: 'Pick a colour first. That request had no valid hex value in it.',
       },
     });
     return;
