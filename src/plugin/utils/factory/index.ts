@@ -162,12 +162,16 @@ export async function generateComponents(
   }
 
   const generatedBoards: FrameNode[] = [];
+  let currentY = 0;
 
   // 1. Always generate the Design System Bento Master Board (Image 5)
   try {
     const bentoBoard = await buildDesignSystemBentoBoard(tokens, config, styleMap, varMap);
+    bentoBoard.x = 0;
+    bentoBoard.y = currentY;
     componentsPage.appendChild(bentoBoard);
     generatedBoards.push(bentoBoard);
+    currentY += Math.max(bentoBoard.height, 1050) + 80;
   } catch (err) {
     console.error('[design-system-kit] Bento board failed to generate:', err);
   }
@@ -176,8 +180,11 @@ export async function generateComponents(
   if (config.componentsToGenerate.includes('Button')) {
     try {
       const buttonBoard = await buildButtonMatrixBoard(tokens, config, styleMap, varMap);
+      buttonBoard.x = 0;
+      buttonBoard.y = currentY;
       componentsPage.appendChild(buttonBoard);
       generatedBoards.push(buttonBoard);
+      currentY += Math.max(buttonBoard.height, 1150) + 80;
     } catch (err) {
       console.error('[design-system-kit] Button matrix failed to generate:', err);
     }
@@ -187,8 +194,11 @@ export async function generateComponents(
   if (config.componentsToGenerate.includes('Input') || config.componentsToGenerate.includes('Textarea')) {
     try {
       const inputBoard = await buildInputMatrixBoard(tokens, config, styleMap, varMap);
+      inputBoard.x = 0;
+      inputBoard.y = currentY;
       componentsPage.appendChild(inputBoard);
       generatedBoards.push(inputBoard);
+      currentY += Math.max(inputBoard.height, 550) + 80;
     } catch (err) {
       console.error('[design-system-kit] Input matrix failed to generate:', err);
     }
@@ -200,16 +210,22 @@ export async function generateComponents(
   const MATRIX_HANDLED = new Set(['Button', 'IconButton', 'ButtonGroup', 'Input', 'Textarea', 'Select']);
   const nonMatrixComponents = selected.filter((d) => !MATRIX_HANDLED.has(d.name));
 
+  let lastCategoryFrame: FrameNode | null = null;
+
   for (const [index, def] of nonMatrixComponents.entries()) {
     let frame = frames[def.category];
     if (!frame) {
+      if (lastCategoryFrame) {
+        currentY += Math.max(lastCategoryFrame.height, 300) + 80;
+      }
       const catLabel = CATEGORY_LABELS[def.category] ?? def.category;
       frame = boardShell(`${catLabel} Library`);
       frame.x = 0;
-      frame.y = 0;
+      frame.y = currentY;
       componentsPage.appendChild(frame);
       frames[def.category] = frame;
       generatedBoards.push(frame);
+      lastCategoryFrame = frame;
 
       const hero = await createBlackHeroBox(
         'Components',
@@ -402,12 +418,13 @@ export async function generateComponents(
     await yieldToUI();
   }
 
-  // Layout all generated boards neatly on the canvas
-  let currentY = 0;
+  // Final reflow pass over all generated boards neatly on the canvas with generous spacing.
+  let finalY = 0;
   generatedBoards.forEach((f) => {
     f.x = 0;
-    f.y = currentY;
-    currentY += f.height + 80;
+    f.y = finalY;
+    const h = Math.max(f.height, 200);
+    finalY += h + 100;
   });
 
   return { count, byName };

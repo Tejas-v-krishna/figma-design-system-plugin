@@ -187,7 +187,7 @@ export async function buildButtonMatrixBoard(
   board.layoutMode = 'VERTICAL';
   board.primaryAxisSizingMode = 'AUTO';
   board.counterAxisSizingMode = 'FIXED';
-  board.clipsContent = false;
+  board.clipsContent = false;  // outer board doesn't clip — content is contained within matrixBox
   board.resize(BOARD_W, 200);
   board.itemSpacing = 24;
   board.paddingTop    = BOARD_PAD;
