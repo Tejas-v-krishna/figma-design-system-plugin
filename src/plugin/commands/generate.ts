@@ -231,7 +231,6 @@ async function runGeneration(
 
     update('creating-pages', 50, 'Generating Components page…');
     const compPage = await openPage(FULL_RUN_PAGES.components);
-    figma.currentPage = compPage;
 
     for (const child of [...compPage.children]) {
       child.remove();
