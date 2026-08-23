@@ -84,7 +84,7 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
   onClose,
   title,
 }) => {
-  const [format, setFormat] = useState<'Hex' | 'RGB' | 'HSL' | 'Null'>('RGB');
+  const [format, setFormat] = useState<'Hex' | 'RGB' | 'HSL'>('Hex');
 
   // Convert initial color to RGB / HSV
   const initialRgb = hexToRgb(color || '#2563EB');
@@ -220,7 +220,7 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
 
         {/* Header Tabs */}
         <div className="dsk-picker-tabs">
-          {(['Hex', 'RGB', 'HSL', 'Null'] as const).map((tab) => (
+          {(['Hex', 'RGB', 'HSL'] as const).map((tab) => (
             <button
               key={tab}
               className={`dsk-picker-tab ${format === tab ? 'active' : ''}`}
@@ -348,12 +348,6 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
               <label>H <input type="number" value={currentHsl.h} min={0} max={360} readOnly /></label>
               <label>S <input type="number" value={currentHsl.s} min={0} max={100} readOnly /></label>
               <label>L <input type="number" value={currentHsl.l} min={0} max={100} readOnly /></label>
-            </div>
-          )}
-
-          {format === 'Null' && (
-            <div className="dsk-input-group">
-              <span className="dsk-input-label">Transparent</span>
             </div>
           )}
 
