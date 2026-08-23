@@ -14,6 +14,18 @@ export const CodeExportView: React.FC = () => {
   const [copied, setCopied] = React.useState(false);
   const [notice, setNotice] = React.useState<string | null>(null);
 
+  // The "Copied" checkmark resets on a timer, and that timer outlives the view
+  // if the user switches tabs inside the two seconds. Holding it in a ref lets
+  // the unmount cleanup cancel it, and lets a second copy restart the two
+  // seconds instead of inheriting the first one's remaining time.
+  const copyResetTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  React.useEffect(
+    () => () => {
+      if (copyResetTimer.current !== null) clearTimeout(copyResetTimer.current);
+    },
+    []
+  );
+
   const formats: { key: ExportFormat; label: string }[] = [
     { key: 'json', label: 'Design Tokens JSON' },
     { key: 'css', label: 'CSS Variables' },
@@ -34,7 +46,8 @@ export const CodeExportView: React.FC = () => {
     void copyText(exportResult).then((ok) => {
       setCopied(ok);
       setNotice(ok ? null : 'Copy was blocked. Select the code and press Ctrl+C.');
-      if (ok) setTimeout(() => setCopied(false), 2000);
+      if (copyResetTimer.current !== null) clearTimeout(copyResetTimer.current);
+      if (ok) copyResetTimer.current = setTimeout(() => setCopied(false), 2000);
     });
   };
 

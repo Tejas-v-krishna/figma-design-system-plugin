@@ -50,7 +50,7 @@ export default function App() {
           break;
         case 'COLOR_SELECTED':
           if (msg.payload.hex) {
-            st.setSelectedColor(msg.payload.hex, msg.payload.name);
+            st.setSelectedColor(msg.payload.hex, msg.payload.name ?? undefined);
           }
           break;
         case 'PERSISTED_CONFIG':

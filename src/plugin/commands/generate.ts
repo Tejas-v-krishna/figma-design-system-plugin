@@ -187,7 +187,7 @@ async function runGeneration(
     config.componentsToGenerate = COMPONENT_DEFINITIONS.map((c) => c.name);
   }
 
-  const pages = createPages();
+  const { pages, created: pagesCreated } = resolvePages();
   update('creating-pages', 50, 'Pages created');
 
   await figma.setCurrentPageAsync(pages.components);
@@ -232,7 +232,11 @@ async function runGeneration(
       stylesCreated,
       variablesCreated,
       componentsCreated,
-      pagesCreated: 5,
+      // The count of pages actually added, not a hardcoded 5. On a repeat run
+      // every page already exists and is reused, so this is legitimately 0 —
+      // which is the honest answer, and the one that tells the user their pages
+      // were updated in place rather than duplicated.
+      pagesCreated,
     },
   };
 }
@@ -316,28 +320,48 @@ interface Pages {
   playground: PageNode;
 }
 
-function createPages(): Pages {
-  const tokensPage = figma.createPage();
-  tokensPage.name = '🎨 Tokens';
+/** The five pages a full generation lays out, in document order. */
+const FULL_RUN_PAGES = {
+  tokens: '🎨 Tokens',
+  components: '🧩 Components',
+  patterns: '📐 Patterns',
+  docs: '📚 Documentation',
+  playground: '🎮 Playground',
+} as const satisfies Record<keyof Pages, string>;
 
-  const componentsPage = figma.createPage();
-  componentsPage.name = '🧩 Components';
-
-  const patternsPage = figma.createPage();
-  patternsPage.name = '📐 Patterns';
-
-  const docsPage = figma.createPage();
-  docsPage.name = '📚 Documentation';
-
-  const playgroundPage = figma.createPage();
-  playgroundPage.name = '🎮 Playground';
+/**
+ * Find or create each of the five pages a full run uses.
+ *
+ * These were five unconditional `figma.createPage()` calls, so a second full
+ * generate produced a second '🎨 Tokens', a third produced a third, and so on —
+ * ten pages after two runs. Every other page in this file already goes through
+ * `openPage`, which finds by name first; this was the one place that didn't.
+ *
+ * Deliberately does not call setCurrentPageAsync the way openPage does: five
+ * pages resolved in a row would navigate the user five times before any content
+ * existed on them.
+ */
+function resolvePages(): { pages: Pages; created: number } {
+  const byName = new Map(figma.root.children.map((p) => [p.name, p]));
+  let created = 0;
+  const resolve = (name: string): PageNode => {
+    const existing = byName.get(name);
+    if (existing) return existing;
+    const page = figma.createPage();
+    page.name = name;
+    created++;
+    return page;
+  };
 
   return {
-    tokens: tokensPage,
-    components: componentsPage,
-    patterns: patternsPage,
-    docs: docsPage,
-    playground: playgroundPage,
+    pages: {
+      tokens: resolve(FULL_RUN_PAGES.tokens),
+      components: resolve(FULL_RUN_PAGES.components),
+      patterns: resolve(FULL_RUN_PAGES.patterns),
+      docs: resolve(FULL_RUN_PAGES.docs),
+      playground: resolve(FULL_RUN_PAGES.playground),
+    },
+    created,
   };
 }
 

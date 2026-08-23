@@ -46,7 +46,10 @@ export type PluginIncoming =
       payload: { success: boolean; tokens?: string | null; message?: string; format?: string };
     }
   | { type: 'AVAILABLE_FONTS'; payload: string[] }
-  | { type: 'COLOR_SELECTED'; payload: { hex?: string; name?: string } }
+  // `name` is genuinely nullable here, not merely optional: the sandbox sends
+  // `node.name || null` so an unnamed node has an explicit null rather than a
+  // missing key.
+  | { type: 'COLOR_SELECTED'; payload: { hex?: string; name?: string | null } }
   | { type: 'PERSISTED_CONFIG'; payload: Partial<GenerationConfig>; warnings?: string[] }
   | { type: 'PLUGIN_ERROR'; payload: { message: string } };
 
