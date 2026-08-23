@@ -83,6 +83,12 @@ interface UIState {
   optionsOpen: boolean;
   importOpen: boolean;
   lastError: string | null;
+  /**
+   * Non-fatal notices worth showing once: config fields the sandbox had to
+   * repair on load, mainly. Separate from lastError because nothing failed —
+   * the run succeeded with a substitution the user should know about.
+   */
+  warnings: string[];
 
   // Custom token overrides, editable per row in the token panels
   radiusList: RadiusItem[];
@@ -107,6 +113,9 @@ interface UIState {
   scanResult: UsageReport | null;
   scanError: string | null;
   scanBusy: boolean;
+  /** 0–100 while a scan runs. A large file takes seconds, so this is not decorative. */
+  scanProgress: number;
+  scanMessage: string;
 
   setView: (v: View) => void;
   setTokenCategory: (c: TokenCategory) => void;
@@ -115,6 +124,11 @@ interface UIState {
   setOptionsOpen: (b: boolean) => void;
   setImportOpen: (b: boolean) => void;
   clearError: () => void;
+  /** Surface a sandbox-side crash the UI had no other way to learn about. */
+  reportPluginError: (message: string) => void;
+  setWarnings: (warnings: string[]) => void;
+  clearWarnings: () => void;
+  setScanProgress: (progress: number, message: string) => void;
 
   updateRadiusItem: (id: string, value: number) => void;
   addRadiusItem: () => void;
@@ -159,6 +173,7 @@ export const useStore = create<UIState>((set, get) => ({
   optionsOpen: false,
   importOpen: false,
   lastError: null,
+  warnings: [],
 
   radiusList: [
     { id: 'none', label: 'none', value: 0 },
@@ -207,6 +222,8 @@ export const useStore = create<UIState>((set, get) => ({
   scanResult: null,
   scanError: null,
   scanBusy: false,
+  scanProgress: 0,
+  scanMessage: '',
 
   setView: (v) => set({ view: v, lastError: null }),
   setTokenCategory: (c) => set({ tokenCategory: c }),
@@ -228,6 +245,25 @@ export const useStore = create<UIState>((set, get) => ({
   // Dismissing the banner has to clear the feature-level errors too, otherwise
   // the next exportComplete/scanComplete would leave stale state behind.
   clearError: () => set({ lastError: null, exportError: null, scanError: null }),
+
+  // A crash inside the sandbox used to reach a `switch` in App with no case for
+  // it, so the panel sat on whatever it was showing — spinner included — with no
+  // indication anything had gone wrong. Clearing the overlay matters as much as
+  // showing the text: an error while an overlay is up would otherwise trap the
+  // user behind a progress bar that has stopped moving.
+  reportPluginError: (message) =>
+    set({
+      lastError: message,
+      overlay: 'none',
+      exportBusy: false,
+      scanBusy: false,
+      progress: 0,
+    }),
+
+  setWarnings: (warnings) => set({ warnings }),
+  clearWarnings: () => set({ warnings: [] }),
+  setScanProgress: (progress, message) => set({ scanProgress: progress, scanMessage: message }),
+
 
   updateRadiusItem: (id, value) =>
     set((s) => ({
@@ -371,9 +407,16 @@ export const useStore = create<UIState>((set, get) => ({
 
   setAvailableFonts: (fonts) => set({ availableFonts: fonts }),
 
-  startGeneration: (target?: any) => {
+  // `target` is typed by the interface as `string | undefined`. The
+  // implementation used to re-declare it as `any` and then test
+  // `typeof target === 'string'`, which looked like a guard against a click
+  // handler passing a MouseEvent — but no call site does that; they all pass a
+  // category name or nothing. So the check tested a case that could not occur,
+  // and the `any` disabled type checking on the one argument that matters.
+  startGeneration: (target) => {
     set({ overlay: 'generating', progress: 0, progressMessage: 'Starting…', statusMessage: '', lastError: null });
-    const targetMode = typeof target === 'string' ? target : (get().view === 'build-components' ? 'components' : get().tokenCategory);
+    const targetMode =
+      target ?? (get().view === 'build-components' ? 'components' : get().tokenCategory);
     postToPlugin({ type: 'GENERATE_DESIGN_SYSTEM', payload: { ...get().config, target: targetMode } });
   },
   requestExport: (format) => {
@@ -384,7 +427,7 @@ export const useStore = create<UIState>((set, get) => ({
     postToPlugin({ type: 'EXPORT_TOKENS', payload: { format, config: get().config } });
   },
   requestScan: () => {
-    set({ scanBusy: true, scanResult: null, scanError: null });
+    set({ scanBusy: true, scanResult: null, scanError: null, scanProgress: 0, scanMessage: 'Starting scan…' });
     postToPlugin({ type: 'SCAN_USAGE' });
   },
 }));
