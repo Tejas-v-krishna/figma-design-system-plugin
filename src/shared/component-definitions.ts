@@ -9,19 +9,17 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
     variants: [
       { name: 'Primary', properties: { variant: 'primary' } },
       { name: 'Secondary', properties: { variant: 'secondary' } },
-      { name: 'Tertiary', properties: { variant: 'tertiary' } },
       { name: 'Ghost', properties: { variant: 'ghost' } },
       { name: 'Destructive', properties: { variant: 'destructive' } },
-      { name: 'Obsidian', properties: { variant: 'obsidian' } },
+      { name: 'Brand', properties: { variant: 'brand' } },
+      { name: 'Tertiary', properties: { variant: 'tertiary' } },
       { name: 'Link', properties: { variant: 'link' } },
     ],
     states: [
       { name: 'Default', properties: { state: 'default' } },
       { name: 'Hover', properties: { state: 'hover' } },
-      { name: 'Active', properties: { state: 'active' } },
       { name: 'Focus', properties: { state: 'focus' } },
       { name: 'Disabled', properties: { state: 'disabled' } },
-      { name: 'Loading', properties: { state: 'loading' } },
     ],
     sizes: [
       { name: 'sm', properties: { name: 'sm', height: 32, paddingX: 12, fontSize: 12 } },
