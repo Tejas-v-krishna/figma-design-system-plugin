@@ -910,7 +910,7 @@ const Textarea: Template = (root, ctx) => {
   const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
   const isSizeShowcase = ctx.showcaseType === 'size';
-  const fieldHeight = Number(ctx.sizeProps.minHeight ?? ctx.sizeProps.height ?? (ctx.sizeName === 'sm' ? 60 : ctx.sizeName === 'lg' ? 96 : 76));
+  const fieldHeight = Number(ctx.sizeProps.height ?? ctx.sizeProps.minHeight ?? (ctx.sizeName === 'sm' ? 60 : ctx.sizeName === 'lg' ? 96 : 76));
   const fieldWidth = isSizeShowcase ? 240 : 176;
   const fontSize = Number(ctx.sizeProps.fontSize ?? (fieldHeight <= 60 ? 11 : fieldHeight >= 90 ? 13 : 12));
 
@@ -955,7 +955,7 @@ const Textarea: Template = (root, ctx) => {
     setStroke(root, '#EF4444', 1);
   }
 
-  let msgStr = isSizeShowcase ? `Textarea (${fieldHeight}px)` : 'Write a description or message…';
+  let msgStr = isSizeShowcase ? `Sample (${fieldHeight}px)` : 'Write a description or message…';
   if (isFocus) msgStr = 'Here is my thoughtful feedback so far…|';
   else if (isError) msgStr = 'Exceeded maximum 500 characters limit…';
 

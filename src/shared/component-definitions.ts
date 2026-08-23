@@ -323,9 +323,9 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
       { name: 'Error', properties: { state: 'error' } },
     ],
     sizes: [
-      { name: 'sm', properties: { name: 'sm', minHeight: 60 } },
-      { name: 'md', properties: { name: 'md', minHeight: 76 } },
-      { name: 'lg', properties: { name: 'lg', minHeight: 96 } },
+      { name: 'sm', properties: { name: 'sm', height: 60, minHeight: 60 } },
+      { name: 'md', properties: { name: 'md', height: 76, minHeight: 76 } },
+      { name: 'lg', properties: { name: 'lg', height: 96, minHeight: 96 } },
     ],
     defaultProps: { variant: 'default', state: 'default' },
   },
