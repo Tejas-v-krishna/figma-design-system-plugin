@@ -3990,39 +3990,175 @@ const TagInput: Template = (root, ctx) => {
 };
 
 const CheckboxGroup: Template = (root, ctx) => {
-  root.layoutMode = 'VERTICAL';
-  root.primaryAxisSizingMode = 'AUTO';
-  root.counterAxisSizingMode = 'AUTO';
-  root.itemSpacing = 8;
-  ['Push notifications', 'Email summaries', 'SMS alerts'].forEach((item, i) => {
-    const row = hbox('cbRow');
-    row.itemSpacing = 8;
-    const cb = makeFrame('cb');
-    cb.resize(18, 18);
-    cb.cornerRadius = 4;
-    const isChecked = i < 2;
-    setFill(cb, isChecked ? colorShade(ctx.tokens, 'primary', 500) : '#FFFFFF');
-    setStroke(cb, isChecked ? colorShade(ctx.tokens, 'primary', 500) : colorShade(ctx.tokens, 'neutral', 400), 1.5);
-    if (isChecked) cb.appendChild(buildIcon(12, '#FFFFFF', 'check'));
-    row.appendChild(cb);
-    row.appendChild(text({ characters: item, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 800) }));
-    root.appendChild(row);
-  });
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const isDisabled = sKey === 'disabled';
+
+  const textFill = isDisabled ? '#A1A1AA' : '#18181B';
+  const descFill = isDisabled ? '#D4D4D8' : '#71717A';
+  const activeColor = isDisabled ? '#94A3B8' : '#3B82F6';
+
+  if (isDisabled) {
+    root.opacity = 0.6;
+  }
+
+  if (vKey.includes('horizontal')) {
+    // Horizontal row
+    root.layoutMode = 'HORIZONTAL';
+    root.counterAxisAlignItems = 'CENTER';
+    root.primaryAxisAlignItems = 'MIN';
+    root.primaryAxisSizingMode = 'AUTO';
+    root.counterAxisSizingMode = 'AUTO';
+    root.itemSpacing = 14;
+    root.fills = [];
+    root.strokes = [];
+
+    const items = ['Push notifications', 'Email summaries', 'SMS alerts'];
+    items.forEach((item, i) => {
+      const isChecked = i < 2;
+      const row = hbox(`cb-${i}`);
+      row.counterAxisAlignItems = 'CENTER';
+      row.itemSpacing = 6;
+
+      const cb = makeFrame('cb');
+      cb.layoutMode = 'HORIZONTAL';
+      cb.primaryAxisAlignItems = 'CENTER';
+      cb.counterAxisAlignItems = 'CENTER';
+      cb.resize(16, 16);
+      cb.cornerRadius = 4;
+      if (isChecked) {
+        setFill(cb, activeColor);
+        cb.appendChild(buildIcon(10, '#FFFFFF', 'check'));
+      } else {
+        setFill(cb, '#FFFFFF');
+        setStroke(cb, '#D4D4D8', 1.5);
+      }
+      row.appendChild(cb);
+      row.appendChild(text({ characters: item, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: textFill }));
+      root.appendChild(row);
+    });
+  } else if (vKey.includes('card') || vKey.includes('grid')) {
+    // CardGrid tiles
+    root.layoutMode = 'HORIZONTAL';
+    root.counterAxisAlignItems = 'CENTER';
+    root.primaryAxisAlignItems = 'MIN';
+    root.primaryAxisSizingMode = 'AUTO';
+    root.counterAxisSizingMode = 'AUTO';
+    root.itemSpacing = 10;
+    root.fills = [];
+    root.strokes = [];
+
+    const cards = [
+      { title: 'Push Alerts', desc: 'Real-time updates', checked: true },
+      { title: 'Email Digest', desc: 'Weekly summary', checked: false },
+    ];
+
+    cards.forEach((c, i) => {
+      const card = makeFrame(`card-${i}`);
+      card.layoutMode = 'HORIZONTAL';
+      card.counterAxisAlignItems = 'CENTER';
+      card.itemSpacing = 8;
+      card.resize(140, 52);
+      pad(card, 0, 10);
+      card.cornerRadius = 8;
+      setFill(card, c.checked ? (isDisabled ? '#F1F5F9' : '#EEF2FF') : '#F8FAFC');
+      setStroke(card, c.checked ? (isDisabled ? '#CBD5E1' : '#BFDBFE') : '#E4E4E7', 1);
+
+      const cb = makeFrame('cb');
+      cb.layoutMode = 'HORIZONTAL';
+      cb.primaryAxisAlignItems = 'CENTER';
+      cb.counterAxisAlignItems = 'CENTER';
+      cb.resize(16, 16);
+      cb.cornerRadius = 4;
+      if (c.checked) {
+        setFill(cb, activeColor);
+        cb.appendChild(buildIcon(10, '#FFFFFF', 'check'));
+      } else {
+        setFill(cb, '#FFFFFF');
+        setStroke(cb, '#D4D4D8', 1.5);
+      }
+      card.appendChild(cb);
+
+      const col = vbox('col');
+      col.itemSpacing = 2;
+      col.appendChild(text({ characters: c.title, fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 11, fill: textFill }));
+      col.appendChild(text({ characters: c.desc, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 9, fill: descFill }));
+      card.appendChild(col);
+
+      root.appendChild(card);
+    });
+  } else {
+    // Vertical stack (Default)
+    root.layoutMode = 'VERTICAL';
+    root.primaryAxisAlignItems = 'MIN';
+    root.counterAxisAlignItems = 'MIN';
+    root.primaryAxisSizingMode = 'AUTO';
+    root.counterAxisSizingMode = 'AUTO';
+    root.itemSpacing = 8;
+    root.fills = [];
+    root.strokes = [];
+
+    const items = ['Push notifications', 'Email summaries', 'SMS alerts'];
+    items.forEach((item, i) => {
+      const isChecked = i < 2;
+      const row = hbox(`cb-${i}`);
+      row.counterAxisAlignItems = 'CENTER';
+      row.itemSpacing = 8;
+
+      const cb = makeFrame('cb');
+      cb.layoutMode = 'HORIZONTAL';
+      cb.primaryAxisAlignItems = 'CENTER';
+      cb.counterAxisAlignItems = 'CENTER';
+      cb.resize(16, 16);
+      cb.cornerRadius = 4;
+      if (isChecked) {
+        setFill(cb, activeColor);
+        cb.appendChild(buildIcon(10, '#FFFFFF', 'check'));
+      } else {
+        setFill(cb, '#FFFFFF');
+        setStroke(cb, '#D4D4D8', 1.5);
+      }
+      row.appendChild(cb);
+      row.appendChild(text({ characters: item, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: textFill }));
+      root.appendChild(row);
+    });
+  }
+
   return root;
 };
 
 const RadioCard: Template = (root, ctx) => {
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const isSelected = sKey === 'selected' || sKey === 'checked';
+  const isDisabled = sKey === 'disabled';
+
+  const fieldWidth = ctx.showcaseType === 'size' ? 260 : 230;
+  const fieldHeight = 64;
+
   root.layoutMode = 'HORIZONTAL';
   root.counterAxisAlignItems = 'CENTER';
   root.primaryAxisAlignItems = 'SPACE_BETWEEN';
-  root.resize(320, 72);
-  pad(root, 14, 16);
-  root.cornerRadius = 12;
-  setFill(root, '#FFFFFF');
-  setStroke(root, colorShade(ctx.tokens, 'primary', 500), 2);
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 10, 14);
+  root.cornerRadius = 10;
+  root.clipsContent = true;
+
+  const bg = isSelected ? (isDisabled ? '#F1F5F9' : '#EEF2FF') : '#F8FAFC';
+  const borderColor = isSelected ? (isDisabled ? '#CBD5E1' : '#3B82F6') : '#E4E4E7';
+  const textFill = isDisabled ? '#A1A1AA' : '#18181B';
+  const descFill = isDisabled ? '#D4D4D8' : '#71717A';
+  const radioColor = isDisabled ? '#94A3B8' : '#3B82F6';
+
+  setFill(root, bg);
+  setStroke(root, borderColor, isSelected ? 1.5 : 1);
+  if (isDisabled) root.opacity = 0.6;
 
   const left = hbox('left');
-  left.itemSpacing = 12;
+  left.counterAxisAlignItems = 'CENTER';
+  left.itemSpacing = 10;
+
+  // Radio circle
   const radio = makeFrame('radio');
   radio.layoutMode = 'HORIZONTAL';
   radio.primaryAxisAlignItems = 'CENTER';
@@ -4030,19 +4166,35 @@ const RadioCard: Template = (root, ctx) => {
   radio.resize(18, 18);
   radio.cornerRadius = 9999;
   setFill(radio, '#FFFFFF');
-  setStroke(radio, colorShade(ctx.tokens, 'primary', 500), 2);
-  const dot = ellipse('dot', 8, colorShade(ctx.tokens, 'primary', 500));
-  radio.appendChild(dot);
+  setStroke(radio, isSelected ? radioColor : '#D4D4D8', isSelected ? 2 : 1.5);
+  if (isSelected) {
+    radio.appendChild(ellipse('dot', 8, radioColor));
+  }
   left.appendChild(radio);
+
+  if (vKey.includes('icon')) {
+    const iconFrame = makeFrame('iconFrame');
+    iconFrame.layoutMode = 'HORIZONTAL';
+    iconFrame.primaryAxisAlignItems = 'CENTER';
+    iconFrame.counterAxisAlignItems = 'CENTER';
+    iconFrame.resize(24, 24);
+    iconFrame.cornerRadius = 6;
+    setFill(iconFrame, isSelected ? '#DBEAFE' : '#E2E8F0');
+    iconFrame.appendChild(buildIcon(12, isSelected ? '#1D4ED8' : '#64748B', 'star'));
+    left.appendChild(iconFrame);
+  }
 
   const copy = vbox('copy');
   copy.itemSpacing = 2;
-  copy.appendChild(text({ characters: 'Pro Annual Plan', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 900) }));
-  copy.appendChild(text({ characters: 'Billed yearly at $192 / year', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 500) }));
+  copy.appendChild(text({ characters: 'Pro Annual Plan', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 12, fill: textFill }));
+  copy.appendChild(text({ characters: '$192 / billed annually', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 10, fill: descFill }));
   left.appendChild(copy);
   root.appendChild(left);
 
-  root.appendChild(text({ characters: '$16/mo', fontFamily: ctx.config.fontFamily.body, weight: 700, fontSize: 14, fill: colorShade(ctx.tokens, 'primary', 600) }));
+  if (vKey.includes('price')) {
+    root.appendChild(text({ characters: '$16/mo', fontFamily: ctx.config.fontFamily.body, weight: 700, fontSize: 13, fill: isSelected ? '#2563EB' : textFill }));
+  }
+
   return root;
 };
 
