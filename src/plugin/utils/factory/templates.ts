@@ -2375,299 +2375,193 @@ const FileUpload: Template = (root, ctx) => {
 const DatePicker: Template = (root, ctx) => {
   const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
+  const fieldHeight = 40;
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 230;
 
-  root.layoutMode = 'VERTICAL';
-  root.primaryAxisSizingMode = 'AUTO';
-  root.counterAxisSizingMode = 'AUTO';
-  root.itemSpacing = 6;
-  root.fills = [];
+  root.layoutMode = 'HORIZONTAL';
+  root.primaryAxisSizingMode = 'FIXED';
+  root.counterAxisSizingMode = 'FIXED';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.counterAxisAlignItems = 'CENTER';
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 0, 12);
+  root.cornerRadius = 10;
+  root.clipsContent = true;
+  root.strokes = [];
+  root.effects = [];
 
-  let fallbackLabel = 'Date Picker';
-  if (vKey === 'range') fallbackLabel = 'Date Range';
-  else if (vKey === 'multiple') fallbackLabel = 'Multiple Dates';
+  const isOpen = sKey === 'open';
+  const isDisabled = sKey === 'disabled';
 
-  const labelText = specimenLabel(ctx, fallbackLabel);
-  const lbl = text({
-    characters: labelText,
-    fontFamily: ctx.config.fontFamily.body,
-    weight: 500,
-    fontSize: 13,
-    fill: colorShade(ctx.tokens, 'neutral', 700),
-  });
-  root.appendChild(lbl);
+  const bg = isDisabled ? '#F8FAFC' : isOpen ? '#EEF2FF' : '#F1F3F5';
+  setFill(root, bg);
 
-  const cal = makeFrame('cal');
-  cal.layoutMode = 'VERTICAL';
-  cal.primaryAxisSizingMode = 'AUTO';
-  cal.counterAxisSizingMode = 'AUTO';
-  cal.itemSpacing = 8;
-  pad(cal, 14);
-  cal.cornerRadius = containerRadius(ctx, 'lg', 16);
-  cal.clipsContent = true;  // clip so content never bleeds outside the card
-  setFill(cal, '#FFFFFF');
-  setStroke(cal, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
-  setEffect(cal, shadow(ctx.tokens, 'md'), effectStyleKey('md'), ctx.styleMap, ctx.varMap);
-  if (sKey === 'disabled') root.opacity = 0.5;
-
-  // Month navigation header
-  const header = makeFrame('header');
-  header.layoutMode = 'HORIZONTAL';
-  header.primaryAxisSizingMode = 'FIXED';
-  header.counterAxisSizingMode = 'AUTO';
-  header.primaryAxisAlignItems = 'SPACE_BETWEEN';
-  header.counterAxisAlignItems = 'CENTER';
-  header.resize(252, 28);
-  header.fills = [];
-  header.appendChild(buildIcon(16, colorShade(ctx.tokens, 'neutral', 500), 'chevronDown'));
-  header.appendChild(text({ characters: 'October 2026', fontFamily: ctx.config.fontFamily.heading, weight: 600, fontSize: 14, fill: colorShade(ctx.tokens, 'neutral', 900) }));
-  header.appendChild(buildIcon(16, colorShade(ctx.tokens, 'neutral', 500), 'chevronDown'));
-  cal.appendChild(header);
-
-  // Day of week headers
-  const daysHeader = makeFrame('days-header');
-  daysHeader.layoutMode = 'HORIZONTAL';
-  daysHeader.primaryAxisSizingMode = 'AUTO';
-  daysHeader.counterAxisSizingMode = 'AUTO';
-  daysHeader.itemSpacing = 4;
-  ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].forEach((day) => {
-    const dh = text({ characters: day, fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 400), align: 'CENTER' });
-    dh.resize(32, 20);
-    daysHeader.appendChild(dh);
-  });
-  cal.appendChild(daysHeader);
-
-  // Weekly calendar grid — 5 rows × 7 cols = max 35 days
-  let dayNum = 1;
-  const isRange = vKey === 'range';
-  const isMultiple = vKey === 'multiple';
-
-  for (let r = 0; r < 5; r++) {
-    const weekRow = makeFrame(`week-${r + 1}`);
-    weekRow.layoutMode = 'HORIZONTAL';
-    weekRow.primaryAxisSizingMode = 'AUTO';
-    weekRow.counterAxisSizingMode = 'AUTO';
-    weekRow.itemSpacing = 4;
-
-    for (let c = 0; c < 7; c++) {
-      const cell = makeFrame(`day-${dayNum}`);
-      cell.layoutMode = 'HORIZONTAL';
-      cell.primaryAxisSizingMode = 'FIXED';
-      cell.counterAxisSizingMode = 'FIXED';
-      cell.primaryAxisAlignItems = 'CENTER';
-      cell.counterAxisAlignItems = 'CENTER';
-      cell.resize(32, 32);
-      cell.cornerRadius = 8;
-      cell.clipsContent = true;
-
-      let isSelected = false;
-      let inRange = false;
-
-      if (isRange) {
-        if (dayNum === 12 || dayNum === 16) isSelected = true;
-        else if (dayNum > 12 && dayNum < 16) inRange = true;
-      } else if (isMultiple) {
-        if (dayNum === 6 || dayNum === 14 || dayNum === 22) isSelected = true;
-      } else {
-        if (dayNum === 14) isSelected = true;
-      }
-
-      if (isSelected) {
-        setFill(cell, colorShade(ctx.tokens, 'primary', 500), colorStyleKey('primary', 500), ctx.styleMap, ctx.varMap);
-      } else if (inRange) {
-        setFill(cell, colorShade(ctx.tokens, 'primary', 100));
-      }
-
-      if (dayNum <= 31) {
-        const dayTxt = text({
-          characters: String(dayNum),
-          fontFamily: ctx.config.fontFamily.body,
-          weight: isSelected ? 600 : inRange ? 500 : 400,
-          fontSize: 12,
-          fill: isSelected ? '#FFFFFF' : inRange ? colorShade(ctx.tokens, 'primary', 800) : colorShade(ctx.tokens, 'neutral', 800),
-          align: 'CENTER',
-        });
-        cell.appendChild(dayTxt);
-      }
-      weekRow.appendChild(cell);
-      dayNum++;
-    }
-    cal.appendChild(weekRow);
+  if (isDisabled) {
+    root.opacity = 0.6;
   }
 
-  root.appendChild(cal);
+  const textFill = isDisabled ? '#A1A1AA' : '#18181B';
+  const iconColor = isDisabled ? '#CBD5E1' : isOpen ? '#3B82F6' : '#71717A';
+
+  const leftBox = makeFrame('left');
+  leftBox.layoutMode = 'HORIZONTAL';
+  leftBox.primaryAxisAlignItems = 'MIN';
+  leftBox.counterAxisAlignItems = 'CENTER';
+  leftBox.itemSpacing = 8;
+  leftBox.fills = [];
+
+  leftBox.appendChild(buildIcon(14, iconColor, 'calendar'));
+
+  let dateVal = 'Oct 24, 2026';
+  if (vKey.includes('time')) {
+    dateVal = 'Oct 24, 2026 10:30 AM';
+  } else if (vKey.includes('month')) {
+    dateVal = 'October 2026';
+  } else if (vKey.includes('year')) {
+    dateVal = '2026';
+  }
+
+  leftBox.appendChild(text({
+    characters: dateVal,
+    fontFamily: ctx.config.fontFamily.body,
+    weight: isOpen ? 500 : 400,
+    fontSize: 12,
+    fill: textFill,
+  }));
+
+  root.appendChild(leftBox);
+  root.appendChild(buildIcon(13, iconColor, 'chevronDown'));
+
   return root;
 };
 
 const TimePicker: Template = (root, ctx) => {
   const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
+  const fieldHeight = 40;
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 230;
 
-  root.layoutMode = 'VERTICAL';
-  root.primaryAxisSizingMode = 'AUTO';
-  root.counterAxisSizingMode = 'AUTO';
-  root.itemSpacing = 6;
-  root.fills = [];
+  root.layoutMode = 'HORIZONTAL';
+  root.primaryAxisSizingMode = 'FIXED';
+  root.counterAxisSizingMode = 'FIXED';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.counterAxisAlignItems = 'CENTER';
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 0, 12);
+  root.cornerRadius = 10;
+  root.clipsContent = true;
+  root.strokes = [];
+  root.effects = [];
 
-  let fallbackLabel = '12-Hour Time';
-  if (vKey === '24h' || vKey === 'time24h') fallbackLabel = '24-Hour Time';
-  else if (vKey === 'with-seconds' || vKey === 'withseconds') fallbackLabel = 'Time with Seconds';
+  const isOpen = sKey === 'open';
+  const isDisabled = sKey === 'disabled';
 
-  const labelText = specimenLabel(ctx, fallbackLabel);
-  const lbl = text({
-    characters: labelText,
+  const bg = isDisabled ? '#F8FAFC' : isOpen ? '#EEF2FF' : '#F1F3F5';
+  setFill(root, bg);
+
+  if (isDisabled) {
+    root.opacity = 0.6;
+  }
+
+  const textFill = isDisabled ? '#A1A1AA' : '#18181B';
+  const iconColor = isDisabled ? '#CBD5E1' : isOpen ? '#3B82F6' : '#71717A';
+
+  const leftBox = makeFrame('left');
+  leftBox.layoutMode = 'HORIZONTAL';
+  leftBox.primaryAxisAlignItems = 'MIN';
+  leftBox.counterAxisAlignItems = 'CENTER';
+  leftBox.itemSpacing = 8;
+  leftBox.fills = [];
+
+  leftBox.appendChild(buildIcon(14, iconColor, 'clock'));
+
+  let timeVal = '10:30 AM';
+  if (vKey.includes('second')) {
+    timeVal = '10:30:45 AM';
+  } else if (vKey.includes('24') || vKey.includes('military')) {
+    timeVal = '14:30';
+  } else if (vKey.includes('step')) {
+    timeVal = '10:15 AM (+15m)';
+  }
+
+  leftBox.appendChild(text({
+    characters: timeVal,
     fontFamily: ctx.config.fontFamily.body,
-    weight: 500,
-    fontSize: 13,
-    fill: colorShade(ctx.tokens, 'neutral', 700),
-  });
-  root.appendChild(lbl);
+    weight: isOpen ? 500 : 400,
+    fontSize: 12,
+    fill: textFill,
+  }));
 
-  const picker = makeFrame('picker');
-  picker.layoutMode = 'HORIZONTAL';
-  picker.primaryAxisSizingMode = 'AUTO';
-  picker.counterAxisSizingMode = 'AUTO';
-  picker.counterAxisAlignItems = 'CENTER';
-  picker.itemSpacing = 6;
-  pad(picker, 10, 14);
-  picker.cornerRadius = containerRadius(ctx, 'md', 12);
-  setFill(picker, '#FFFFFF');
-  setStroke(picker, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
-  if (sKey === 'disabled') root.opacity = 0.5;
+  root.appendChild(leftBox);
+  root.appendChild(buildIcon(13, iconColor, 'chevronDown'));
 
-  const is24h = vKey === '24h' || vKey === 'time24h';
-  const withSec = vKey === 'with-seconds' || vKey === 'withseconds';
-
-  const hh = makeFrame('hh');
-  pad(hh, 8, 10);
-  hh.cornerRadius = containerRadius(ctx, 'sm', 6);
-  setFill(hh, colorShade(ctx.tokens, 'neutral', 100));
-  hh.appendChild(text({ characters: is24h ? '14' : '09', fontFamily: ctx.config.fontFamily.mono, weight: 600, fontSize: 18, fill: colorShade(ctx.tokens, 'neutral', 900) }));
-  picker.appendChild(hh);
-
-  picker.appendChild(text({ characters: ':', fontFamily: ctx.config.fontFamily.mono, weight: 600, fontSize: 18, fill: colorShade(ctx.tokens, 'neutral', 900) }));
-
-  const mm = makeFrame('mm');
-  pad(mm, 8, 10);
-  mm.cornerRadius = containerRadius(ctx, 'sm', 6);
-  setFill(mm, colorShade(ctx.tokens, 'neutral', 100));
-  mm.appendChild(text({ characters: '30', fontFamily: ctx.config.fontFamily.mono, weight: 600, fontSize: 18, fill: colorShade(ctx.tokens, 'neutral', 900) }));
-  picker.appendChild(mm);
-
-  if (withSec) {
-    picker.appendChild(text({ characters: ':', fontFamily: ctx.config.fontFamily.mono, weight: 600, fontSize: 18, fill: colorShade(ctx.tokens, 'neutral', 900) }));
-    const ss = makeFrame('ss');
-    pad(ss, 8, 10);
-    ss.cornerRadius = containerRadius(ctx, 'sm', 6);
-    setFill(ss, colorShade(ctx.tokens, 'neutral', 100));
-    ss.appendChild(text({ characters: '45', fontFamily: ctx.config.fontFamily.mono, weight: 600, fontSize: 18, fill: colorShade(ctx.tokens, 'neutral', 900) }));
-    picker.appendChild(ss);
-  }
-
-  if (!is24h) {
-    const ampm = makeFrame('ampm');
-    pad(ampm, 6, 8);
-    ampm.cornerRadius = 6;
-    setFill(ampm, colorShade(ctx.tokens, 'primary', 100));
-    ampm.appendChild(text({ characters: 'AM', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 12, fill: colorShade(ctx.tokens, 'primary', 700) }));
-    picker.appendChild(ampm);
-  }
-
-  root.appendChild(picker);
   return root;
 };
 
 const ColorPicker: Template = (root, ctx) => {
   const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
+  const fieldHeight = 40;
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 230;
 
-  root.layoutMode = 'VERTICAL';
-  root.primaryAxisSizingMode = 'AUTO';
-  root.counterAxisSizingMode = 'AUTO';
-  root.itemSpacing = 6;
-  root.fills = [];
+  root.layoutMode = 'HORIZONTAL';
+  root.primaryAxisSizingMode = 'FIXED';
+  root.counterAxisSizingMode = 'FIXED';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.counterAxisAlignItems = 'CENTER';
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 0, 12);
+  root.cornerRadius = 10;
+  root.clipsContent = true;
+  root.strokes = [];
+  root.effects = [];
 
-  let fallbackLabel = 'Color Palette';
-  if (vKey === 'swatches') fallbackLabel = 'Color Swatches';
+  const isOpen = sKey === 'open';
+  const isDisabled = sKey === 'disabled';
 
-  const labelText = specimenLabel(ctx, fallbackLabel);
-  const lbl = text({
-    characters: labelText,
-    fontFamily: ctx.config.fontFamily.body,
-    weight: 500,
-    fontSize: 13,
-    fill: colorShade(ctx.tokens, 'neutral', 700),
-  });
-  root.appendChild(lbl);
+  const bg = isDisabled ? '#F8FAFC' : isOpen ? '#EEF2FF' : '#F1F3F5';
+  setFill(root, bg);
 
-  const container = makeFrame('container');
-  container.layoutMode = 'VERTICAL';
-  container.itemSpacing = 10;
-  pad(container, 14);
-  container.cornerRadius = containerRadius(ctx, 'lg', 14);
-  setFill(container, '#FFFFFF');
-  setStroke(container, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
-  setEffect(container, shadow(ctx.tokens, 'md'), effectStyleKey('md'), ctx.styleMap, ctx.varMap);
-  if (sKey === 'disabled') root.opacity = 0.5;
-
-  if (vKey === 'swatches') {
-    const paletteGrid = vbox('paletteGrid');
-    paletteGrid.itemSpacing = 8;
-    const swatchColors = [
-      ['#EF4444', '#F97316', '#F59E0B', '#10B981'],
-      ['#06B6D4', '#3B82F6', '#6366F1', '#8B5CF6'],
-      ['#EC4899', '#64748B', '#0F172A', '#FFFFFF'],
-    ];
-    swatchColors.forEach((row) => {
-      const r = hbox('row');
-      r.itemSpacing = 8;
-      row.forEach((col) => {
-        const sw = ellipse('sw', 24, col);
-        setStroke(sw, colorShade(ctx.tokens, 'neutral', 200), 1);
-        r.appendChild(sw);
-      });
-      paletteGrid.appendChild(r);
-    });
-    container.appendChild(paletteGrid);
-    root.appendChild(container);
-    return root;
+  if (isDisabled) {
+    root.opacity = 0.6;
   }
 
-  // Saturation preview
-  const sat = makeFrame('saturation');
-  sat.resize(200, 90);
-  sat.cornerRadius = 8;
-  setFill(sat, colorShade(ctx.tokens, 'primary', 500));
-  sat.primaryAxisAlignItems = 'MAX';
-  sat.counterAxisAlignItems = 'MIN';
-  pad(sat, 8);
-  const ringHandle = ellipse('ringHandle', 14, '#FFFFFF');
-  setStroke(ringHandle, colorShade(ctx.tokens, 'neutral', 900), 2);
-  sat.appendChild(ringHandle);
-  container.appendChild(sat);
+  const textFill = isDisabled ? '#A1A1AA' : '#18181B';
+  const iconColor = isDisabled ? '#CBD5E1' : isOpen ? '#3B82F6' : '#71717A';
 
-  // Hex input & Opacity
-  const hexRow = hbox('hexRow');
-  hexRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
-  hexRow.counterAxisAlignItems = 'CENTER';
-  hexRow.resize(200, 28);
-  pad(hexRow, 4, 8);
-  hexRow.cornerRadius = 6;
-  setFill(hexRow, colorShade(ctx.tokens, 'neutral', 100));
-  hexRow.appendChild(text({ characters: '#3B82F6', fontFamily: ctx.config.fontFamily.mono, weight: 600, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 900) }));
-  hexRow.appendChild(text({ characters: '100%', fontFamily: ctx.config.fontFamily.mono, weight: 500, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 500) }));
-  container.appendChild(hexRow);
+  const leftBox = makeFrame('left');
+  leftBox.layoutMode = 'HORIZONTAL';
+  leftBox.primaryAxisAlignItems = 'MIN';
+  leftBox.counterAxisAlignItems = 'CENTER';
+  leftBox.itemSpacing = 8;
+  leftBox.fills = [];
 
-  // Swatches row
-  const swatches = hbox('swatches');
-  swatches.itemSpacing = 8;
-  ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#0F172A'].forEach((c, i) => {
-    const s = ellipse(`sw-${i}`, 18, c);
-    setStroke(s, '#FFFFFF', 1.5);
-    swatches.appendChild(s);
-  });
-  container.appendChild(swatches);
+  // Color preview swatch
+  const swatch = makeFrame('swatch');
+  swatch.resize(18, 18);
+  swatch.cornerRadius = 4;
+  setFill(swatch, isDisabled ? '#CBD5E1' : '#3B82F6');
+  setStroke(swatch, '#D4D4D8', 1);
+  leftBox.appendChild(swatch);
 
-  root.appendChild(container);
+  let valStr = '#3B82F6';
+  if (vKey.includes('gradient')) {
+    valStr = 'linear-gradient(…';
+  } else if (vKey.includes('compact') || vKey.includes('hex')) {
+    valStr = '#18181B';
+  }
+
+  leftBox.appendChild(text({
+    characters: valStr,
+    fontFamily: ctx.config.fontFamily.mono,
+    weight: 500,
+    fontSize: 12,
+    fill: textFill,
+  }));
+
+  root.appendChild(leftBox);
+  root.appendChild(text({ characters: '100%', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 11, fill: iconColor }));
+
   return root;
 };
 
@@ -4407,7 +4301,6 @@ const MultiSelect: Template = (root, ctx) => {
       leftBox.appendChild(chip);
     });
   }
-
   root.appendChild(leftBox);
 
   const chevron = text({
@@ -4423,85 +4316,140 @@ const MultiSelect: Template = (root, ctx) => {
 };
 
 const Cascader: Template = (root, ctx) => {
+  const sKey = ctx.stateName.toLowerCase();
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 230;
+  const fieldHeight = 40;
+
   root.layoutMode = 'HORIZONTAL';
-  root.counterAxisAlignItems = 'CENTER';
+  root.primaryAxisSizingMode = 'FIXED';
+  root.counterAxisSizingMode = 'FIXED';
   root.primaryAxisAlignItems = 'SPACE_BETWEEN';
-  root.resize(240, 40);
-  pad(root, 8, 12);
-  root.cornerRadius = 8;
-  setFill(root, '#FFFFFF');
-  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
-  root.appendChild(text({ characters: 'North America / USA / California', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 800) }));
-  root.appendChild(buildIcon(12, colorShade(ctx.tokens, 'neutral', 500), 'arrowRight'));
+  root.counterAxisAlignItems = 'CENTER';
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 0, 12);
+  root.cornerRadius = 10;
+  root.clipsContent = true;
+  root.strokes = [];
+  root.effects = [];
+
+  const isOpen = sKey === 'open';
+  const bg = isOpen ? '#EEF2FF' : '#F1F3F5';
+  setFill(root, bg);
+
+  const leftBox = makeFrame('left');
+  leftBox.layoutMode = 'HORIZONTAL';
+  leftBox.primaryAxisAlignItems = 'MIN';
+  leftBox.counterAxisAlignItems = 'CENTER';
+  leftBox.itemSpacing = 6;
+  leftBox.fills = [];
+
+  leftBox.appendChild(text({ characters: 'USA / California / SF', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: '#18181B' }));
+  root.appendChild(leftBox);
+  root.appendChild(buildIcon(13, isOpen ? '#3B82F6' : '#71717A', 'chevronDown'));
   return root;
 };
 
 const Autocomplete: Template = (root, ctx) => {
-  root.layoutMode = 'VERTICAL';
-  root.primaryAxisSizingMode = 'AUTO';
+  const sKey = ctx.stateName.toLowerCase();
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 230;
+  const fieldHeight = 40;
+
+  root.layoutMode = 'HORIZONTAL';
+  root.primaryAxisSizingMode = 'FIXED';
   root.counterAxisSizingMode = 'FIXED';
-  root.resize(240, 100);
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.counterAxisAlignItems = 'CENTER';
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 0, 12);
+  root.cornerRadius = 10;
+  root.clipsContent = true;
+  root.strokes = [];
+  root.effects = [];
 
-  const inp = makeFrame('inp');
-  inp.layoutMode = 'HORIZONTAL';
-  inp.counterAxisAlignItems = 'CENTER';
-  inp.resize(240, 40);
-  pad(inp, 8, 12);
-  inp.cornerRadius = 8;
-  setFill(inp, '#FFFFFF');
-  setStroke(inp, colorShade(ctx.tokens, 'primary', 500), 2);
-  inp.appendChild(text({ characters: 'San Fra', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 900) }));
-  root.appendChild(inp);
+  const isFocus = sKey === 'focus' || sKey === 'open';
+  const bg = isFocus ? '#EEF2FF' : '#F1F3F5';
+  setFill(root, bg);
 
-  const pop = makeFrame('pop');
-  pop.layoutMode = 'VERTICAL';
-  pop.itemSpacing = 2;
-  pop.resize(240, 60);
-  pad(pop, 4, 4);
-  pop.cornerRadius = 8;
-  setFill(pop, '#FFFFFF');
-  setStroke(pop, colorShade(ctx.tokens, 'neutral', 200), 1);
-  pop.effects = [{ type: 'DROP_SHADOW', color: { r: 0, g: 0, b: 0, a: 0.1 }, offset: { x: 0, y: 4 }, radius: 10, spread: 0, visible: true, blendMode: 'NORMAL' }];
-  
-  const item1 = hbox('item1');
-  pad(item1, 6, 8); item1.cornerRadius = 4; setFill(item1, colorShade(ctx.tokens, 'primary', 50));
-  item1.appendChild(text({ characters: 'San Francisco, CA', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 12, fill: colorShade(ctx.tokens, 'primary', 700) }));
-  pop.appendChild(item1);
+  const leftBox = makeFrame('left');
+  leftBox.layoutMode = 'HORIZONTAL';
+  leftBox.primaryAxisAlignItems = 'MIN';
+  leftBox.counterAxisAlignItems = 'CENTER';
+  leftBox.itemSpacing = 6;
+  leftBox.fills = [];
 
-  const item2 = hbox('item2');
-  pad(item2, 6, 8); item2.cornerRadius = 4; item2.fills = [];
-  item2.appendChild(text({ characters: 'San Fernando, CA', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 700) }));
-  pop.appendChild(item2);
-
-  root.appendChild(pop);
+  leftBox.appendChild(buildIcon(13, '#71717A', 'search'));
+  leftBox.appendChild(text({ characters: isFocus ? 'San Fran|' : 'San Francisco, CA', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: isFocus ? '#18181B' : '#71717A' }));
+  root.appendChild(leftBox);
   return root;
 };
 
 const TreeSelect: Template = (root, ctx) => {
+  const sKey = ctx.stateName.toLowerCase();
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 230;
+  const fieldHeight = 40;
+
   root.layoutMode = 'HORIZONTAL';
-  root.counterAxisAlignItems = 'CENTER';
+  root.primaryAxisSizingMode = 'FIXED';
+  root.counterAxisSizingMode = 'FIXED';
   root.primaryAxisAlignItems = 'SPACE_BETWEEN';
-  root.resize(240, 40);
-  pad(root, 8, 12);
-  root.cornerRadius = 8;
-  setFill(root, '#FFFFFF');
-  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
-  root.appendChild(text({ characters: 'src / components / Button', fontFamily: ctx.config.fontFamily.mono, weight: 400, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 700) }));
-  root.appendChild(buildIcon(12, colorShade(ctx.tokens, 'neutral', 500), 'chevronDown'));
+  root.counterAxisAlignItems = 'CENTER';
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 0, 12);
+  root.cornerRadius = 10;
+  root.clipsContent = true;
+  root.strokes = [];
+  root.effects = [];
+
+  const isOpen = sKey === 'open';
+  const bg = isOpen ? '#EEF2FF' : '#F1F3F5';
+  setFill(root, bg);
+
+  const leftBox = makeFrame('left');
+  leftBox.layoutMode = 'HORIZONTAL';
+  leftBox.primaryAxisAlignItems = 'MIN';
+  leftBox.counterAxisAlignItems = 'CENTER';
+  leftBox.itemSpacing = 6;
+  leftBox.fills = [];
+
+  leftBox.appendChild(buildIcon(13, '#71717A', 'folder'));
+  leftBox.appendChild(text({ characters: 'src / components', fontFamily: ctx.config.fontFamily.mono, weight: 400, fontSize: 11, fill: '#18181B' }));
+  root.appendChild(leftBox);
+  root.appendChild(buildIcon(13, isOpen ? '#3B82F6' : '#71717A', 'chevronDown'));
   return root;
 };
 
 const DateRangePicker: Template = (root, ctx) => {
+  const sKey = ctx.stateName.toLowerCase();
+  const fieldWidth = ctx.showcaseType === 'size' ? 260 : 230;
+  const fieldHeight = 40;
+
   root.layoutMode = 'HORIZONTAL';
+  root.primaryAxisSizingMode = 'FIXED';
+  root.counterAxisSizingMode = 'FIXED';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
   root.counterAxisAlignItems = 'CENTER';
-  root.itemSpacing = 8;
-  root.resize(260, 40);
-  pad(root, 8, 12);
-  root.cornerRadius = 8;
-  setFill(root, '#FFFFFF');
-  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
-  root.appendChild(buildIcon(14, colorShade(ctx.tokens, 'neutral', 400), 'calendar'));
-  root.appendChild(text({ characters: 'Oct 12, 2026 – Oct 24, 2026', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 0, 12);
+  root.cornerRadius = 10;
+  root.clipsContent = true;
+  root.strokes = [];
+  root.effects = [];
+
+  const isOpen = sKey === 'open';
+  const bg = isOpen ? '#EEF2FF' : '#F1F3F5';
+  setFill(root, bg);
+
+  const leftBox = makeFrame('left');
+  leftBox.layoutMode = 'HORIZONTAL';
+  leftBox.primaryAxisAlignItems = 'MIN';
+  leftBox.counterAxisAlignItems = 'CENTER';
+  leftBox.itemSpacing = 8;
+  leftBox.fills = [];
+
+  leftBox.appendChild(buildIcon(14, isOpen ? '#3B82F6' : '#71717A', 'calendar'));
+  leftBox.appendChild(text({ characters: 'Oct 12 – Oct 24, 2026', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: '#18181B' }));
+  root.appendChild(leftBox);
+  root.appendChild(buildIcon(13, isOpen ? '#3B82F6' : '#71717A', 'chevronDown'));
   return root;
 };
 
