@@ -91,7 +91,7 @@ function variantKey(ctx: TemplateCtx): string {
   return String(ctx.variantProps.variant ?? ctx.variantProps.type ?? ctx.variantName).toLowerCase();
 }
 
-function tone(ctx: TemplateCtx): ColorName {
+export function tone(ctx: TemplateCtx): ColorName {
   const v = variantKey(ctx);
   if (['danger', 'error'].includes(v)) return 'error';
   if (['success'].includes(v)) return 'success';
@@ -1409,87 +1409,305 @@ const CardFooter: Template = (root, ctx) => {
   return root;
 };
 
-function populateAlert(root: ComponentNode, ctx: TemplateCtx, toneName: ColorName): void {
-  root.layoutMode = 'HORIZONTAL';
-  root.itemSpacing = 12;
-  pad(root, 14, 16);
-  root.cornerRadius = containerRadius(ctx, 'md', 12);
-  setFill(root, colorShade(ctx.tokens, toneName, 50), colorStyleKey(toneName, 50), ctx.styleMap, ctx.varMap);
-  setStroke(root, colorShade(ctx.tokens, toneName, 300), 1, colorStyleKey(toneName, 300), ctx.styleMap, ctx.varMap);
-  root.resize(360, 64);
-  let iconType: IconKind = 'info';
-  if (toneName === 'error' || toneName === 'warning') iconType = 'warning';
-  if (toneName === 'success') iconType = 'check';
-  root.appendChild(buildIcon(20, colorShade(ctx.tokens, toneName, 500), iconType));
-  const tf = vbox('text');
-  tf.itemSpacing = 2;
-  const alertTitle = specimenLabel(ctx, `${titleCase(toneName)} Notification`);
-  tf.appendChild(text({ characters: alertTitle, fontFamily: ctx.config.fontFamily.heading, weight: 600, fontSize: 13, fill: colorShade(ctx.tokens, toneName, 900) }));
-  tf.appendChild(text({ characters: `This is an important ${toneName} message for your workflow.`, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: colorShade(ctx.tokens, toneName, 700) }));
-  root.appendChild(tf);
-}
-
 const Alert: Template = (root, ctx) => {
-  populateAlert(root, ctx, tone(ctx));
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 230;
+
+  root.layoutMode = 'HORIZONTAL';
+  root.counterAxisAlignItems = 'CENTER';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.primaryAxisSizingMode = 'FIXED';
+  root.counterAxisSizingMode = 'AUTO';
+  root.resize(fieldWidth, 44);
+  pad(root, 8, 12);
+  root.cornerRadius = 10;
+  root.clipsContent = true;
+  root.strokes = [];
+  root.effects = [];
+
+  let titleStr = 'Info';
+  let bg = '#EFF6FF';
+  let border = '#BFDBFE';
+  let textTitleColor = '#1E40AF';
+  let iconColor = '#2563EB';
+  let iconKind: IconKind = 'info';
+
+  if (vKey === 'success') {
+    iconKind = 'check';
+    titleStr = 'Success';
+    bg = '#ECFDF5';
+    border = '#A7F3D0';
+    textTitleColor = '#065F46';
+    iconColor = '#059669';
+  } else if (vKey === 'warning') {
+    iconKind = 'warning';
+    titleStr = 'Warning';
+    bg = '#FFFBEB';
+    border = '#FDE68A';
+    textTitleColor = '#92400E';
+    iconColor = '#D97706';
+  } else if (vKey === 'error') {
+    iconKind = 'warning';
+    titleStr = 'Error';
+    bg = '#FEF2F2';
+    border = '#FECACA';
+    textTitleColor = '#991B1B';
+    iconColor = '#DC2626';
+  } else if (vKey === 'neutral') {
+    iconKind = 'info';
+    titleStr = 'Notice';
+    bg = '#F1F3F5';
+    border = '#E4E4E7';
+    textTitleColor = '#18181B';
+    iconColor = '#71717A';
+  }
+
+  setFill(root, bg);
+  setStroke(root, border, 1);
+
+  const left = hbox('left');
+  left.counterAxisAlignItems = 'CENTER';
+  left.primaryAxisAlignItems = 'MIN';
+  left.itemSpacing = 8;
+  left.fills = [];
+
+  left.appendChild(buildIcon(14, iconColor, iconKind));
+
+  const textCol = vbox('textCol');
+  textCol.itemSpacing = 1;
+  textCol.fills = [];
+
+  const mainText = `${titleStr} alert message`;
+  textCol.appendChild(text({ characters: mainText, fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 11, fill: textTitleColor }));
+  left.appendChild(textCol);
+  root.appendChild(left);
+
+  if (sKey === 'withclosebutton') {
+    root.appendChild(buildIcon(12, iconColor, 'close'));
+  } else if (sKey === 'withaction') {
+    root.appendChild(text({ characters: 'Action', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 11, fill: iconColor }));
+  }
+
   return root;
 };
 
 const Toast: Template = (root, ctx) => {
-  const t = tone(ctx);
-  root.layoutMode = 'HORIZONTAL';
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const fieldWidth = ctx.showcaseType === 'size' ? 260 : 230;
+
+  root.layoutMode = 'VERTICAL';
   root.primaryAxisAlignItems = 'SPACE_BETWEEN';
   root.counterAxisAlignItems = 'CENTER';
-  root.itemSpacing = 12;
-  pad(root, 12, 16);
-  root.cornerRadius = containerRadius(ctx, 'md', 12);
-  setFill(root, '#0F172A');
-  setEffect(root, shadow(ctx.tokens, 'lg'), effectStyleKey('lg'), ctx.styleMap, ctx.varMap);
-  root.resize(340, 56);
+  root.primaryAxisSizingMode = 'FIXED';
+  root.counterAxisSizingMode = 'FIXED';
+  root.resize(fieldWidth, 46);
+  pad(root, 8, 12);
+  root.cornerRadius = 10;
+  root.clipsContent = true;
+  root.strokes = [];
+  root.effects = [{ type: 'DROP_SHADOW', color: { r: 0, g: 0, b: 0, a: 0.15 }, offset: { x: 0, y: 4 }, radius: 12, spread: 0, visible: true, blendMode: 'NORMAL' }];
+  setFill(root, '#18181B');
+
+  let iconColor = '#38BDF8';
+  let iconKind: IconKind = 'info';
+
+  if (vKey === 'success') {
+    iconColor = '#4ADE80';
+    iconKind = 'check';
+  } else if (vKey === 'warning') {
+    iconColor = '#FBBF24';
+    iconKind = 'warning';
+  } else if (vKey === 'error') {
+    iconColor = '#F87171';
+    iconKind = 'warning';
+  }
+
+  const contentRow = hbox('contentRow');
+  contentRow.resize(fieldWidth - 24, 28);
+  contentRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  contentRow.counterAxisAlignItems = 'CENTER';
+  contentRow.fills = [];
 
   const left = hbox('left');
-  left.itemSpacing = 10;
+  left.itemSpacing = 8;
   left.counterAxisAlignItems = 'CENTER';
-  let iconType: IconKind = 'info';
-  if (t === 'error' || t === 'warning') iconType = 'warning';
-  if (t === 'success') iconType = 'check';
-  left.appendChild(buildIcon(18, colorShade(ctx.tokens, t, 400), iconType));
-  left.appendChild(text({ characters: 'Changes saved successfully', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 13, fill: '#F8FAFC' }));
-  root.appendChild(left);
+  left.primaryAxisAlignItems = 'MIN';
+  left.fills = [];
 
-  root.appendChild(text({ characters: 'Undo', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 12, fill: '#60A5FA' }));
+  left.appendChild(buildIcon(14, iconColor, iconKind));
+  left.appendChild(text({ characters: 'Changes saved', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: '#FFFFFF' }));
+  contentRow.appendChild(left);
+
+  contentRow.appendChild(text({ characters: 'Undo', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 11, fill: '#60A5FA' }));
+  root.appendChild(contentRow);
+
+  if (sKey.includes('progress')) {
+    const pBar = makeFrame('pBar');
+    pBar.resize(fieldWidth, 2);
+    pBar.fills = [];
+    const fill = rect('fill', Math.round(fieldWidth * 0.65), 2, iconColor);
+    pBar.appendChild(fill);
+    root.appendChild(pBar);
+  }
+
   return root;
 };
 
 const Badge: Template = (root, ctx) => {
-  const t = tone(ctx);
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const szKey = String(ctx.sizeName || ctx.sizeProps.name || 'md').toLowerCase();
+  const height = szKey === 'sm' ? 20 : szKey === 'lg' ? 28 : 24;
+  const fontSize = szKey === 'sm' ? 10 : szKey === 'lg' ? 12 : 11;
+  const dotSize = szKey === 'sm' ? 5 : szKey === 'lg' ? 7 : 6;
+  const padX = szKey === 'sm' ? 6 : szKey === 'lg' ? 10 : 8;
+
   root.layoutMode = 'HORIZONTAL';
   root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
   root.itemSpacing = 5;
-  pad(root, 3, 8);
-  root.cornerRadius = pillRadius(ctx, 'sm');
-  setFill(root, colorShade(ctx.tokens, t, 100), colorStyleKey(t, 100), ctx.styleMap, ctx.varMap);
-  const dot = ellipse('dot', 5, colorShade(ctx.tokens, t, 600));
-  root.appendChild(dot);
-  const badgeLabel = specimenLabel(ctx, titleCase(t));
-  root.appendChild(text({ characters: badgeLabel, fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 11, fill: colorShade(ctx.tokens, t, 800) }));
+  pad(root, 2, padX);
+  root.cornerRadius = 9999;
+  root.resize(0, height);
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'FIXED';
+  root.strokes = [];
+  root.effects = [];
+
+  // Palette by state
+  let solidBg = '#3B82F6';
+  let softBg = '#EFF6FF';
+  let softText = '#1D4ED8';
+  let borderStroke = '#3B82F6';
+  let dotColor = '#3B82F6';
+  let labelText = 'Primary';
+
+  if (sKey === 'success') {
+    solidBg = '#10B981';
+    softBg = '#ECFDF5';
+    softText = '#047857';
+    borderStroke = '#10B981';
+    dotColor = '#10B981';
+    labelText = 'Success';
+  } else if (sKey === 'warning') {
+    solidBg = '#F59E0B';
+    softBg = '#FFFBEB';
+    softText = '#B45309';
+    borderStroke = '#F59E0B';
+    dotColor = '#F59E0B';
+    labelText = 'Warning';
+  } else if (sKey === 'error') {
+    solidBg = '#EF4444';
+    softBg = '#FEF2F2';
+    softText = '#B91C1C';
+    borderStroke = '#EF4444';
+    dotColor = '#EF4444';
+    labelText = 'Error';
+  } else if (sKey === 'neutral') {
+    solidBg = '#18181B';
+    softBg = '#F1F3F5';
+    softText = '#27272A';
+    borderStroke = '#D4D4D8';
+    dotColor = '#71717A';
+    labelText = 'Neutral';
+  }
+
+  if (vKey === 'solid') {
+    setFill(root, solidBg);
+    const dot = ellipse('dot', dotSize, '#FFFFFF');
+    root.appendChild(dot);
+    root.appendChild(text({ characters: labelText, fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize, fill: '#FFFFFF' }));
+  } else if (vKey === 'outline') {
+    setFill(root, '#FFFFFF');
+    setStroke(root, borderStroke, 1.2);
+    const dot = ellipse('dot', dotSize, dotColor);
+    root.appendChild(dot);
+    root.appendChild(text({ characters: labelText, fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize, fill: softText }));
+  } else if (vKey === 'dot') {
+    setFill(root, softBg);
+    const dot = ellipse('dot', dotSize, dotColor);
+    root.appendChild(dot);
+    root.appendChild(text({ characters: labelText, fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize, fill: softText }));
+  } else {
+    // Soft (Default)
+    setFill(root, softBg);
+    const dot = ellipse('dot', dotSize, dotColor);
+    root.appendChild(dot);
+    root.appendChild(text({ characters: labelText, fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize, fill: softText }));
+  }
+
   return root;
 };
 
 const Tag: Template = (root, ctx) => {
-  const t = tone(ctx);
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const szKey = String(ctx.sizeName || ctx.sizeProps.name || 'md').toLowerCase();
+  const height = szKey === 'sm' ? 24 : 30;
+  const fontSize = szKey === 'sm' ? 11 : 12;
+  const padX = szKey === 'sm' ? 8 : 10;
+
   root.layoutMode = 'HORIZONTAL';
   root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
   root.itemSpacing = 6;
-  pad(root, 4, 10);
-  root.cornerRadius = pillRadius(ctx, 'sm');
-  setFill(root, colorShade(ctx.tokens, t, 100), colorStyleKey(t, 100), ctx.styleMap, ctx.varMap);
-  const tagLabel = specimenLabel(ctx, titleCase(t));
-  root.appendChild(text({ characters: tagLabel, fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: colorShade(ctx.tokens, t, 800) }));
-  if (variantKey(ctx).includes('removable')) {
-    root.appendChild(buildIcon(12, colorShade(ctx.tokens, t, 600), 'close'));
+  pad(root, 2, padX);
+  root.resize(0, height);
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'FIXED';
+  root.strokes = [];
+  root.effects = [];
+
+  const isPill = vKey === 'pill';
+  const hasAvatar = vKey === 'withavatar' || vKey.includes('avatar');
+  const isRemovable = vKey === 'removable';
+
+  root.cornerRadius = isPill ? 9999 : 6;
+
+  const isHover = sKey === 'hover';
+  const isSelected = sKey === 'selected';
+  const isDisabled = sKey === 'disabled';
+
+  const bg = isDisabled ? '#F8FAFC' : isSelected ? '#EEF2FF' : isHover ? '#E8EAED' : '#F1F3F5';
+  const textFill = isDisabled ? '#A1A1AA' : isSelected ? '#2563EB' : '#18181B';
+  const closeColor = isDisabled ? '#CBD5E1' : isSelected ? '#3B82F6' : '#71717A';
+
+  setFill(root, bg);
+
+  if (isSelected) {
+    setStroke(root, '#BFDBFE', 1);
   }
+
+  if (isDisabled) {
+    root.opacity = 0.6;
+  }
+
+  if (hasAvatar) {
+    const av = makeFrame('av');
+    av.layoutMode = 'HORIZONTAL';
+    av.primaryAxisAlignItems = 'CENTER';
+    av.counterAxisAlignItems = 'CENTER';
+    av.resize(height - 8, height - 8);
+    av.cornerRadius = 9999;
+    setFill(av, isSelected ? '#3B82F6' : '#D4D4D8');
+    av.appendChild(text({ characters: 'J', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: fontSize - 2, fill: isSelected ? '#FFFFFF' : '#18181B', align: 'CENTER' }));
+    root.appendChild(av);
+  }
+
+  let tagText = 'Tag';
+  if (sKey === 'default') tagText = 'Default';
+  else if (sKey === 'hover') tagText = 'Hover';
+  else if (sKey === 'selected') tagText = 'Selected';
+  else if (sKey === 'disabled') tagText = 'Disabled';
+
+  root.appendChild(text({ characters: tagText, fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize, fill: textFill }));
+
+  if (isRemovable) {
+    root.appendChild(buildIcon(11, closeColor, 'close'));
+  }
+
   return root;
 };
 
