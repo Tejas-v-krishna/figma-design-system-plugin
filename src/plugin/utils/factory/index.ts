@@ -414,8 +414,8 @@ export async function generateComponents(
         cardBody.primaryAxisSizingMode = 'AUTO';
         cardBody.counterAxisSizingMode = 'FIXED';
         cardBody.resize(CW, 100);
-        cardBody.itemSpacing = 32;
-        cardBody.paddingTop = 40;
+        cardBody.itemSpacing = 20;
+        cardBody.paddingTop = 36;
         cardBody.paddingBottom = 44;
         cardBody.paddingLeft = 40;
         cardBody.paddingRight = 40;
@@ -481,6 +481,8 @@ export async function generateComponents(
               cardBody.appendChild(headerRow);
             }
 
+            const maxNodeH = Math.max(...section.nodes.map((n) => n.height), 40);
+
             // Horizontal row with left label and right state buttons matching the studio style
             const rowLine = figma.createFrame();
             rowLine.name = `Row ${section.title}`;
@@ -492,7 +494,7 @@ export async function generateComponents(
             rowLine.itemSpacing = 24;
             rowLine.fills = [];
             rowLine.clipsContent = false;
-            rowLine.resize(CW - 80, 44);
+            rowLine.resize(CW - 80, maxNodeH);
 
             const rowLabel = figma.createText();
             rowLabel.fontName = await ensureFont(config.fontFamily.body, 600);
@@ -590,7 +592,7 @@ export async function generateComponents(
           rowFrame.resize(CW - 80, 40);
           rowFrame.itemSpacing = 24;
           rowFrame.counterAxisSpacing = 20;
-          rowFrame.counterAxisAlignItems = 'MAX';
+          rowFrame.counterAxisAlignItems = 'MIN';
           rowFrame.fills = [];
           rowFrame.clipsContent = false;
 
@@ -601,7 +603,7 @@ export async function generateComponents(
             cell.layoutMode = 'VERTICAL';
             cell.primaryAxisSizingMode = 'AUTO';
             cell.counterAxisSizingMode = 'AUTO';
-            cell.primaryAxisAlignItems = 'MAX';
+            cell.primaryAxisAlignItems = 'MIN';
             cell.counterAxisAlignItems = 'CENTER';
             cell.itemSpacing = 8;
             cell.paddingTop = 4;
