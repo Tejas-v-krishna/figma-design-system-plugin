@@ -486,7 +486,7 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
     variants: [
       { name: 'Default', properties: { variant: 'default' } },
       { name: 'WithTooltip', properties: { variant: 'withtooltip' } },
-      { name: 'WithMinMaxInputs', properties: { variant: 'withminmaxinputs' } },
+      { name: 'WithMinMax', properties: { variant: 'withminmax' } },
     ],
     states: [
       { name: 'Default', properties: { state: 'default' } },

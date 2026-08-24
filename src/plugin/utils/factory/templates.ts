@@ -1289,44 +1289,105 @@ const Switch: Template = (root, ctx) => {
 const Slider: Template = (root, ctx) => {
   const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 176;
 
   root.layoutMode = 'VERTICAL';
+  root.primaryAxisAlignItems = 'MIN';
+  root.counterAxisAlignItems = 'CENTER';
   root.primaryAxisSizingMode = 'AUTO';
-  root.counterAxisSizingMode = 'AUTO';
-  root.itemSpacing = 6;
+  root.counterAxisSizingMode = 'FIXED';
+  root.resize(fieldWidth, 40);
+  root.itemSpacing = 4;
   root.fills = [];
+  root.strokes = [];
 
-  const withLabels = vKey === 'withlabels' || vKey === 'with-labels';
+  const isHover = sKey === 'hover';
+  const isActive = sKey === 'active';
   const isDisabled = sKey === 'disabled';
 
-  if (withLabels) {
-    const topLabels = hbox('topLabels');
-    topLabels.primaryAxisAlignItems = 'SPACE_BETWEEN';
-    topLabels.resize(220, 16);
-    topLabels.appendChild(text({ characters: 'Min ($0)', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 500) }));
-    topLabels.appendChild(text({ characters: '$120 / mo', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 11, fill: colorShade(ctx.tokens, 'primary', 700) }));
-    topLabels.appendChild(text({ characters: 'Max ($200)', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 500) }));
-    root.appendChild(topLabels);
+  const hasTooltip = vKey.includes('tooltip');
+  const hasLabels = vKey.includes('label');
+  const isStepped = vKey.includes('step');
+
+  const activeColor = isDisabled ? '#94A3B8' : isActive ? '#1D4ED8' : '#3B82F6';
+  const trackBg = isDisabled ? '#E2E8F0' : '#E4E4E7';
+
+  if (isDisabled) {
+    root.opacity = 0.5;
   }
 
+  // Optional Top Elements (Tooltip or Labels)
+  if (hasTooltip) {
+    const tooltipRow = hbox('tooltipRow');
+    tooltipRow.resize(fieldWidth, 18);
+    tooltipRow.primaryAxisAlignItems = 'MIN';
+    tooltipRow.counterAxisAlignItems = 'CENTER';
+
+    // Position tooltip roughly over the knob (at 55%)
+    const spacer = makeFrame('spacer');
+    spacer.resize(Math.round(fieldWidth * 0.45), 18);
+    spacer.fills = [];
+    tooltipRow.appendChild(spacer);
+
+    const tip = makeFrame('tip');
+    tip.layoutMode = 'HORIZONTAL';
+    tip.counterAxisAlignItems = 'CENTER';
+    tip.primaryAxisAlignItems = 'CENTER';
+    pad(tip, 2, 6);
+    tip.cornerRadius = 4;
+    setFill(tip, '#18181B');
+    tip.appendChild(text({ characters: '60%', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: '#FFFFFF' }));
+    tooltipRow.appendChild(tip);
+    root.appendChild(tooltipRow);
+  } else if (hasLabels) {
+    const labelRow = hbox('labelRow');
+    labelRow.resize(fieldWidth, 14);
+    labelRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
+    labelRow.counterAxisAlignItems = 'CENTER';
+    labelRow.appendChild(text({ characters: '$0', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: '#71717A' }));
+    labelRow.appendChild(text({ characters: '$120', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: activeColor }));
+    labelRow.appendChild(text({ characters: '$200', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: '#71717A' }));
+    root.appendChild(labelRow);
+  }
+
+  // Slider Track Bar
   const bar = hbox('bar');
-  bar.resize(220, 20);
+  bar.resize(fieldWidth, 20);
   bar.itemSpacing = 0;
   bar.counterAxisAlignItems = 'CENTER';
+  bar.primaryAxisAlignItems = 'MIN';
 
-  const fill = rect('fillTrack', 110, 6, colorShade(ctx.tokens, 'primary', 500));
-  fill.cornerRadius = 9999;
+  const fillW = Math.round(fieldWidth * 0.55);
+  const emptyW = fieldWidth - fillW - 16;
+
+  const fillTrack = rect('fillTrack', fillW, 6, activeColor);
+  fillTrack.cornerRadius = 9999;
+  bar.appendChild(fillTrack);
+
+  // Knob
   const knob = ellipse('knob', 16, '#FFFFFF');
-  setStroke(knob, colorShade(ctx.tokens, 'primary', 500), 2);
-  const empty = rect('emptyTrack', 94, 6, colorShade(ctx.tokens, 'neutral', 200));
-  empty.cornerRadius = 9999;
-
-  bar.appendChild(fill);
+  setStroke(knob, activeColor, isHover || isActive ? 2.5 : 2);
   bar.appendChild(knob);
-  bar.appendChild(empty);
 
-  if (isDisabled) root.opacity = 0.5;
+  const emptyTrack = rect('emptyTrack', emptyW, 6, trackBg);
+  emptyTrack.cornerRadius = 9999;
+  bar.appendChild(emptyTrack);
+
   root.appendChild(bar);
+
+  if (isStepped) {
+    // Stepped tick dots underneath track
+    const ticksRow = hbox('ticks');
+    ticksRow.resize(fieldWidth - 16, 6);
+    ticksRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
+    ticksRow.counterAxisAlignItems = 'CENTER';
+    for (let i = 0; i < 5; i++) {
+      const dot = ellipse(`tick-${i}`, 4, i <= 2 ? activeColor : '#D4D4D8');
+      ticksRow.appendChild(dot);
+    }
+    root.appendChild(ticksRow);
+  }
+
   return root;
 };
 
@@ -4199,26 +4260,84 @@ const RadioCard: Template = (root, ctx) => {
 };
 
 const RangeSlider: Template = (root, ctx) => {
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const fieldWidth = ctx.showcaseType === 'size' ? 260 : 230;
+
   root.layoutMode = 'VERTICAL';
+  root.primaryAxisAlignItems = 'MIN';
+  root.counterAxisAlignItems = 'CENTER';
   root.primaryAxisSizingMode = 'AUTO';
   root.counterAxisSizingMode = 'FIXED';
-  root.itemSpacing = 6;
-  root.resize(240, 32);
+  root.resize(fieldWidth, 40);
+  root.itemSpacing = 4;
+  root.fills = [];
+  root.strokes = [];
+
+  const isActive = sKey === 'active';
+  const isDisabled = sKey === 'disabled';
+
+  const hasTooltip = vKey.includes('tooltip');
+  const hasMinMax = vKey.includes('minmax') || vKey.includes('input');
+
+  const activeColor = isDisabled ? '#94A3B8' : isActive ? '#1D4ED8' : '#3B82F6';
+  const trackBg = isDisabled ? '#E2E8F0' : '#E4E4E7';
+
+  if (isDisabled) {
+    root.opacity = 0.5;
+  }
+
+  if (hasTooltip) {
+    const tipRow = hbox('tipRow');
+    tipRow.resize(fieldWidth, 18);
+    tipRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
+    tipRow.counterAxisAlignItems = 'CENTER';
+
+    const t1 = makeFrame('t1');
+    t1.layoutMode = 'HORIZONTAL';
+    pad(t1, 2, 6);
+    t1.cornerRadius = 4;
+    setFill(t1, '#18181B');
+    t1.appendChild(text({ characters: '$30', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: '#FFFFFF' }));
+    tipRow.appendChild(t1);
+
+    const t2 = makeFrame('t2');
+    t2.layoutMode = 'HORIZONTAL';
+    pad(t2, 2, 6);
+    t2.cornerRadius = 4;
+    setFill(t2, '#18181B');
+    t2.appendChild(text({ characters: '$150', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: '#FFFFFF' }));
+    tipRow.appendChild(t2);
+
+    root.appendChild(tipRow);
+  } else if (hasMinMax) {
+    const labelRow = hbox('labelRow');
+    labelRow.resize(fieldWidth, 14);
+    labelRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
+    labelRow.counterAxisAlignItems = 'CENTER';
+    labelRow.appendChild(text({ characters: 'Min: $25', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: '#71717A' }));
+    labelRow.appendChild(text({ characters: '$25 - $160', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: activeColor }));
+    labelRow.appendChild(text({ characters: 'Max: $200', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: '#71717A' }));
+    root.appendChild(labelRow);
+  }
 
   const bar = hbox('bar');
-  bar.resize(240, 20);
+  bar.resize(fieldWidth, 20);
   bar.itemSpacing = 0;
   bar.counterAxisAlignItems = 'CENTER';
+  bar.primaryAxisAlignItems = 'MIN';
 
-  const tLeft = rect('tLeft', 40, 6, colorShade(ctx.tokens, 'neutral', 200));
+  const tLeft = rect('tLeft', 35, 6, trackBg);
   tLeft.cornerRadius = 9999;
   const k1 = ellipse('k1', 16, '#FFFFFF');
-  setStroke(k1, colorShade(ctx.tokens, 'primary', 500), 2);
-  const tActive = rect('tActive', 110, 6, colorShade(ctx.tokens, 'primary', 500));
+  setStroke(k1, activeColor, 2);
+
+  const tActive = rect('tActive', 105, 6, activeColor);
   tActive.cornerRadius = 9999;
   const k2 = ellipse('k2', 16, '#FFFFFF');
-  setStroke(k2, colorShade(ctx.tokens, 'primary', 500), 2);
-  const tRight = rect('tRight', 58, 6, colorShade(ctx.tokens, 'neutral', 200));
+  setStroke(k2, activeColor, 2);
+
+  const tRight = rect('tRight', fieldWidth - 35 - 105 - 32, 6, trackBg);
   tRight.cornerRadius = 9999;
 
   bar.appendChild(tLeft);
