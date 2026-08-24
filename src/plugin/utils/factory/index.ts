@@ -435,6 +435,52 @@ export async function generateComponents(
           }
 
           if (isMatrixRow) {
+            if (sIdx === 0 && def.states.length > 0) {
+              const headerRow = figma.createFrame();
+              headerRow.name = 'State Headers';
+              headerRow.layoutMode = 'HORIZONTAL';
+              headerRow.primaryAxisAlignItems = 'MIN';
+              headerRow.counterAxisAlignItems = 'CENTER';
+              headerRow.primaryAxisSizingMode = 'FIXED';
+              headerRow.counterAxisSizingMode = 'AUTO';
+              headerRow.itemSpacing = 24;
+              headerRow.fills = [];
+              headerRow.clipsContent = false;
+              headerRow.resize(CW - 80, 20);
+
+              const spacer = figma.createFrame();
+              spacer.name = 'Spacer';
+              spacer.resize(90, 20);
+              spacer.fills = [];
+              headerRow.appendChild(spacer);
+
+              const colsContainer = figma.createFrame();
+              colsContainer.name = 'Cols';
+              colsContainer.layoutMode = 'HORIZONTAL';
+              colsContainer.primaryAxisAlignItems = 'MIN';
+              colsContainer.counterAxisAlignItems = 'CENTER';
+              colsContainer.primaryAxisSizingMode = 'AUTO';
+              colsContainer.counterAxisSizingMode = 'AUTO';
+              colsContainer.itemSpacing = 16;
+              colsContainer.fills = [];
+
+              for (let i = 0; i < def.states.length; i++) {
+                const st = def.states[i];
+                if (!st) continue;
+                const nodeW = section.nodes[i]?.width ?? 176;
+                const headerText = figma.createText();
+                headerText.fontName = await ensureFont(config.fontFamily.body, 600);
+                headerText.fontSize = 12;
+                headerText.characters = st.name;
+                headerText.fills = [{ type: 'SOLID', color: hexToRgb('#71717A') }];
+                headerText.resize(nodeW, 16);
+                headerText.textAlignHorizontal = 'CENTER';
+                colsContainer.appendChild(headerText);
+              }
+              headerRow.appendChild(colsContainer);
+              cardBody.appendChild(headerRow);
+            }
+
             // Horizontal row with left label and right state buttons matching the studio style
             const rowLine = figma.createFrame();
             rowLine.name = `Row ${section.title}`;
