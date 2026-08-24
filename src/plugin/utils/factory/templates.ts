@@ -955,9 +955,9 @@ const Textarea: Template = (root, ctx) => {
     setStroke(root, '#EF4444', 1);
   }
 
-  let msgStr = isSizeShowcase ? `Sample (${fieldHeight}px)` : 'Write a description or message…';
-  if (isFocus) msgStr = 'Here is my thoughtful feedback so far…|';
-  else if (isError) msgStr = 'Exceeded maximum 500 characters limit…';
+  let msgStr = isSizeShowcase ? `Textarea (${fieldHeight}px)` : 'Write a message…';
+  if (isFocus) msgStr = 'Here is my feedback…|';
+  else if (isError) msgStr = 'Exceeded character limit…';
 
   const ta = text({
     characters: msgStr,
@@ -966,27 +966,29 @@ const Textarea: Template = (root, ctx) => {
     fontSize,
     fill: textFill,
   });
-  ta.textAutoResize = 'HEIGHT';
-  ta.layoutSizingHorizontal = 'FILL';
   root.appendChild(ta);
 
   // Bottom footer indicators (gripper or counter)
   if (vKey.includes('autoresize') || vKey.includes('auto-resize') || vKey.includes('resize')) {
     const bottomRow = hbox('gripperRow');
-    bottomRow.layoutSizingHorizontal = 'FILL';
+    bottomRow.layoutMode = 'HORIZONTAL';
     bottomRow.primaryAxisAlignItems = 'MAX';
+    bottomRow.counterAxisAlignItems = 'CENTER';
+    bottomRow.resize(fieldWidth - 24, 12);
     bottomRow.appendChild(text({
       characters: '◿',
       fontFamily: ctx.config.fontFamily.mono,
       weight: 500,
-      fontSize: 9,
+      fontSize: 10,
       fill: isFocus ? '#3B82F6' : '#71717A',
     }));
     root.appendChild(bottomRow);
   } else if (vKey.includes('counter') || vKey.includes('count')) {
     const bottomRow = hbox('counterRow');
-    bottomRow.layoutSizingHorizontal = 'FILL';
+    bottomRow.layoutMode = 'HORIZONTAL';
     bottomRow.primaryAxisAlignItems = 'MAX';
+    bottomRow.counterAxisAlignItems = 'CENTER';
+    bottomRow.resize(fieldWidth - 24, 12);
     bottomRow.appendChild(text({
       characters: isError ? '512 / 500' : isFocus ? '42 / 500' : '0 / 500',
       fontFamily: ctx.config.fontFamily.mono,
