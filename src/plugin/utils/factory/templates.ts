@@ -4187,7 +4187,7 @@ const RadioCard: Template = (root, ctx) => {
   const copy = vbox('copy');
   copy.itemSpacing = 2;
   copy.appendChild(text({ characters: 'Pro Annual Plan', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 12, fill: textFill }));
-  copy.appendChild(text({ characters: '$192 / billed annually', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 10, fill: descFill }));
+  copy.appendChild(text({ characters: 'Billed annually', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 10, fill: descFill }));
   left.appendChild(copy);
   root.appendChild(left);
 
