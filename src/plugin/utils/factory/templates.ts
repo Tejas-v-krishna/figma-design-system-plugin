@@ -3845,7 +3845,7 @@ const RichTextEditor: Template = (root, ctx) => {
   const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
   const fieldWidth = ctx.showcaseType === 'size' ? 240 : 230;
-  const fieldHeight = 110;
+  const fieldHeight = 88;
 
   root.layoutMode = 'VERTICAL';
   root.primaryAxisSizingMode = 'FIXED';
@@ -3871,7 +3871,7 @@ const RichTextEditor: Template = (root, ctx) => {
     bar.layoutMode = 'HORIZONTAL';
     bar.counterAxisAlignItems = 'CENTER';
     bar.itemSpacing = 8;
-    bar.resize(fieldWidth, 28);
+    bar.resize(fieldWidth, 26);
     pad(bar, 0, 10);
     setFill(bar, isFocus ? '#E0E7FF' : '#E8EAED');
 
@@ -3883,12 +3883,12 @@ const RichTextEditor: Template = (root, ctx) => {
 
     const body = makeFrame('body');
     body.layoutMode = 'VERTICAL';
-    body.itemSpacing = 4;
-    pad(body, 8, 10);
+    body.itemSpacing = 3;
+    pad(body, 6, 10);
 
     if (isFormatted) {
-      body.appendChild(text({ characters: 'Project Overview', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 12, fill: '#18181B' }));
-      body.appendChild(text({ characters: '• Design system tokens & components', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: '#71717A' }));
+      body.appendChild(text({ characters: 'Project Overview', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 11, fill: '#18181B' }));
+      body.appendChild(text({ characters: '• Design system tokens & components', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 10, fill: '#71717A' }));
     } else {
       const bodyStr = isFocus ? 'Designing a modern interface system|' : 'Start drafting your story…';
       body.appendChild(text({ characters: bodyStr, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: isFocus ? '#18181B' : '#71717A' }));
@@ -3898,9 +3898,9 @@ const RichTextEditor: Template = (root, ctx) => {
     // Floating bubble toolbar variant
     const body = makeFrame('body');
     body.layoutMode = 'VERTICAL';
-    body.itemSpacing = 8;
+    body.itemSpacing = 6;
     body.resize(fieldWidth, fieldHeight);
-    pad(body, 10, 10);
+    pad(body, 8, 10);
 
     const bodyStr = isFormatted ? 'Crafting accessible UI components' : isFocus ? 'Active cursor in paragraph|' : 'Highlight text to format…';
     body.appendChild(text({ characters: bodyStr, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: isFocus || isFormatted ? '#18181B' : '#71717A' }));
@@ -3910,7 +3910,7 @@ const RichTextEditor: Template = (root, ctx) => {
     bubble.layoutMode = 'HORIZONTAL';
     bubble.counterAxisAlignItems = 'CENTER';
     bubble.itemSpacing = 8;
-    pad(bubble, 3, 8);
+    pad(bubble, 2, 7);
     bubble.cornerRadius = 6;
     setFill(bubble, '#18181B');
     bubble.appendChild(text({ characters: 'B', fontFamily: ctx.config.fontFamily.body, weight: 700, fontSize: 10, fill: '#FFFFFF' }));

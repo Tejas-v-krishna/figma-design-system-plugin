@@ -342,7 +342,7 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
       { name: 'Formatted', properties: { state: 'formatted' } },
     ],
     sizes: [
-      { name: 'md', properties: { name: 'md', minHeight: 110 } },
+      { name: 'md', properties: { name: 'md', height: 88, minHeight: 88 } },
     ],
     defaultProps: { variant: 'toolbar', state: 'default' },
   },
