@@ -1006,150 +1006,64 @@ const Select: Template = (root, ctx) => {
   const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
   const fieldHeight = Number(ctx.sizeProps.height ?? 40);
-  const fontSize = Number(ctx.sizeProps.fontSize ?? (fieldHeight <= 32 ? 12 : fieldHeight >= 48 ? 15 : 14));
-  const padX = fieldHeight <= 32 ? 10 : fieldHeight >= 48 ? 16 : 12;
-  const isPill = ctx.config.radiusPreset === 'pill';
-  const isSharp = ctx.config.radiusPreset === 'sharp';
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 176;
 
-  root.layoutMode = 'VERTICAL';
-  root.primaryAxisSizingMode = 'AUTO';
-  root.counterAxisSizingMode = 'AUTO';
-  root.itemSpacing = 6;
-  root.fills = [];
+  root.layoutMode = 'HORIZONTAL';
+  root.primaryAxisSizingMode = 'FIXED';
+  root.counterAxisSizingMode = 'FIXED';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.counterAxisAlignItems = 'CENTER';
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 0, 12);
+  root.cornerRadius = 10;
+  root.clipsContent = true;
+  root.strokes = [];
+  root.effects = [];
 
-  let fallbackLabel = 'Country / Region';
-  if (vKey === 'withsearch' || vKey === 'with-search') fallbackLabel = 'Searchable Select';
-  else if (vKey === 'multiselect' || vKey === 'multi-select') fallbackLabel = 'Multi-Select Tags';
-  else if (vKey === 'withgroups' || vKey === 'with-groups') fallbackLabel = 'Grouped Category';
-
-  const labelText = specimenLabel(ctx, fallbackLabel);
-  const lbl = text({
-    characters: labelText,
-    fontFamily: ctx.config.fontFamily.body,
-    weight: 500,
-    fontSize: 12,
-    fill: colorShade(ctx.tokens, 'neutral', 700),
-  });
-  root.appendChild(lbl);
-
-  const control = makeFrame('control');
-  control.layoutMode = 'HORIZONTAL';
-  control.primaryAxisSizingMode = 'FIXED';
-  control.counterAxisSizingMode = 'FIXED';
-  control.primaryAxisAlignItems = 'SPACE_BETWEEN';
-  control.counterAxisAlignItems = 'CENTER';
-  control.itemSpacing = 8;
-  pad(control, 0, padX);
-  control.resize(260, fieldHeight);
-  control.cornerRadius = isPill ? 9999 : isSharp ? 0 : radiusPx(ctx.tokens, 'md');
-  control.clipsContent = true;
-
-  const isError = sKey === 'error';
-  const isFocus = sKey === 'focus';
-  const isOpen = sKey === 'open';
   const isHover = sKey === 'hover';
+  const isFocus = sKey === 'focus' || sKey === 'focused';
   const isDisabled = sKey === 'disabled';
 
+  const bg = isDisabled ? '#F8FAFC' : isFocus ? '#EEF2FF' : isHover ? '#E8EAED' : '#F1F3F5';
+  setFill(root, bg);
+
   if (isDisabled) {
-    setFill(control, colorShade(ctx.tokens, 'neutral', 50));
-    setStroke(control, colorShade(ctx.tokens, 'neutral', 200), 1, colorStyleKey('neutral', 200), ctx.styleMap, ctx.varMap);
     root.opacity = 0.6;
-  } else {
-    setFill(control, '#FFFFFF');
-    if (isError) {
-      setStroke(control, colorShade(ctx.tokens, 'error', 500), 1.5, colorStyleKey('error', 500), ctx.styleMap, ctx.varMap);
-      control.effects = [{
-        type: 'DROP_SHADOW',
-        color: { r: 0.94, g: 0.27, b: 0.27, a: 0.15 },
-        offset: { x: 0, y: 0 },
-        radius: 4,
-        spread: 0,
-        visible: true,
-        blendMode: 'NORMAL',
-      }];
-    } else if (isFocus || isOpen) {
-      setStroke(control, colorShade(ctx.tokens, 'primary', 500), 1.5, colorStyleKey('primary', 500), ctx.styleMap, ctx.varMap);
-      control.effects = [{
-        type: 'DROP_SHADOW',
-        color: { r: 0.23, g: 0.51, b: 0.96, a: 0.18 },
-        offset: { x: 0, y: 0 },
-        radius: 4,
-        spread: 0,
-        visible: true,
-        blendMode: 'NORMAL',
-      }];
-    } else if (isHover) {
-      setStroke(control, colorShade(ctx.tokens, 'neutral', 400), 1, colorStyleKey('neutral', 400), ctx.styleMap, ctx.varMap);
-    } else {
-      setStroke(control, colorShade(ctx.tokens, 'neutral', 300), 1, colorStyleKey('neutral', 300), ctx.styleMap, ctx.varMap);
-    }
   }
+
+  const textFill = isDisabled ? '#A1A1AA' : '#18181B';
+  const chevronFill = isDisabled ? '#CBD5E1' : isFocus ? '#3B82F6' : '#71717A';
 
   const leftBox = makeFrame('left');
   leftBox.layoutMode = 'HORIZONTAL';
-  leftBox.primaryAxisSizingMode = 'AUTO';
-  leftBox.counterAxisSizingMode = 'AUTO';
   leftBox.primaryAxisAlignItems = 'MIN';
   leftBox.counterAxisAlignItems = 'CENTER';
   leftBox.itemSpacing = 6;
   leftBox.fills = [];
 
-  if (vKey === 'withsearch' || vKey === 'with-search') {
-    leftBox.appendChild(buildIcon(14, colorShade(ctx.tokens, 'neutral', 400), 'search'));
-    leftBox.appendChild(text({ characters: 'Search options…', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize, fill: colorShade(ctx.tokens, 'neutral', 400) }));
-  } else if (vKey === 'multiselect' || vKey === 'multi-select') {
-    const tag1 = makeFrame('tag1');
-    tag1.layoutMode = 'HORIZONTAL';
-    tag1.primaryAxisSizingMode = 'AUTO';
-    tag1.counterAxisSizingMode = 'AUTO';
-    tag1.primaryAxisAlignItems = 'CENTER';
-    tag1.counterAxisAlignItems = 'CENTER';
-    tag1.paddingTop = 2; tag1.paddingBottom = 2; tag1.paddingLeft = 6; tag1.paddingRight = 6;
-    tag1.cornerRadius = 4;
-    setFill(tag1, colorShade(ctx.tokens, 'primary', 50));
-    setStroke(tag1, colorShade(ctx.tokens, 'primary', 200), 1);
-    tag1.appendChild(text({ characters: 'Design ✕', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 11, fill: colorShade(ctx.tokens, 'primary', 700) }));
-    leftBox.appendChild(tag1);
-
-    const tag2 = makeFrame('tag2');
-    tag2.layoutMode = 'HORIZONTAL';
-    tag2.primaryAxisSizingMode = 'AUTO';
-    tag2.counterAxisSizingMode = 'AUTO';
-    tag2.primaryAxisAlignItems = 'CENTER';
-    tag2.counterAxisAlignItems = 'CENTER';
-    tag2.paddingTop = 2; tag2.paddingBottom = 2; tag2.paddingLeft = 6; tag2.paddingRight = 6;
-    tag2.cornerRadius = 4;
-    setFill(tag2, colorShade(ctx.tokens, 'neutral', 100));
-    tag2.appendChild(text({ characters: '+2 more', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 600) }));
-    leftBox.appendChild(tag2);
-  } else if (vKey === 'withgroups' || vKey === 'with-groups') {
-    const grp = text({ characters: 'Product /', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: Math.max(11, fontSize - 2), fill: colorShade(ctx.tokens, 'primary', 600) });
-    leftBox.appendChild(grp);
-    leftBox.appendChild(text({ characters: 'Roadmap', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize, fill: colorShade(ctx.tokens, 'neutral', 800) }));
+  if (vKey.includes('icon')) {
+    leftBox.appendChild(buildIcon(13, chevronFill, 'globe'));
+    const valText = ctx.showcaseType === 'size' ? `Select (${fieldHeight}px)` : 'English (US)';
+    leftBox.appendChild(text({ characters: valText, fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 12, fill: textFill }));
+  } else if (vKey.includes('search')) {
+    leftBox.appendChild(buildIcon(13, '#71717A', 'search'));
+    const searchVal = isFocus ? 'United States|' : 'Search options…';
+    leftBox.appendChild(text({ characters: searchVal, fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 12, fill: isFocus ? '#18181B' : '#71717A' }));
   } else {
-    let valText = 'Select an option…';
-    let isVal = false;
-    if (ctx.showcaseType === 'size') {
-      valText = `Select (${fieldHeight}px)`;
-    } else if (isOpen) {
-      valText = 'United States';
-      isVal = true;
-    }
-    leftBox.appendChild(text({ characters: valText, fontFamily: ctx.config.fontFamily.body, weight: isVal ? 500 : 400, fontSize, fill: isVal ? colorShade(ctx.tokens, 'neutral', 900) : colorShade(ctx.tokens, 'neutral', 400) }));
+    const defaultVal = ctx.showcaseType === 'size' ? `Select (${fieldHeight}px)` : isFocus ? 'United States' : 'Select option…';
+    leftBox.appendChild(text({ characters: defaultVal, fontFamily: ctx.config.fontFamily.body, weight: isFocus ? 500 : 400, fontSize: 12, fill: isFocus ? '#18181B' : '#71717A' }));
   }
+  root.appendChild(leftBox);
 
-  control.appendChild(leftBox);
-  control.appendChild(buildIcon(14, colorShade(ctx.tokens, 'neutral', 500), isOpen ? 'chevronUp' : 'chevronDown'));
-  root.appendChild(control);
+  const chevron = text({
+    characters: isFocus ? '⌃' : '⌄',
+    fontFamily: ctx.config.fontFamily.body,
+    weight: 600,
+    fontSize: 14,
+    fill: chevronFill,
+  });
+  root.appendChild(chevron);
 
-  if (isError) {
-    const errRow = hbox('err');
-    errRow.itemSpacing = 4;
-    errRow.counterAxisAlignItems = 'CENTER';
-    errRow.appendChild(buildIcon(12, colorShade(ctx.tokens, 'error', 500), 'warning'));
-    errRow.appendChild(text({ characters: 'Selection is required', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: colorShade(ctx.tokens, 'error', 600) }));
-    root.appendChild(errRow);
-  }
   return root;
 };
 
@@ -4351,31 +4265,94 @@ const RangeSlider: Template = (root, ctx) => {
 };
 
 const MultiSelect: Template = (root, ctx) => {
-  root.layoutMode = 'HORIZONTAL';
-  root.counterAxisAlignItems = 'CENTER';
-  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
-  root.resize(280, 42);
-  pad(root, 6, 10);
-  root.cornerRadius = 8;
-  setFill(root, '#FFFFFF');
-  setStroke(root, colorShade(ctx.tokens, 'neutral', 300), 1);
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const fieldWidth = ctx.showcaseType === 'size' ? 260 : 230;
+  const fieldHeight = 42;
 
-  const pills = hbox('pills');
-  pills.itemSpacing = 4;
-  ['React', 'TypeScript'].forEach((p) => {
+  root.layoutMode = 'HORIZONTAL';
+  root.primaryAxisSizingMode = 'FIXED';
+  root.counterAxisSizingMode = 'FIXED';
+  root.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  root.counterAxisAlignItems = 'CENTER';
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 0, 10);
+  root.cornerRadius = 10;
+  root.clipsContent = true;
+  root.strokes = [];
+  root.effects = [];
+
+  const isOpen = sKey === 'open' || sKey === 'active';
+  const isDisabled = sKey === 'disabled';
+
+  const bg = isDisabled ? '#F8FAFC' : isOpen ? '#EEF2FF' : '#F1F3F5';
+  setFill(root, bg);
+
+  if (isDisabled) {
+    root.opacity = 0.6;
+  }
+
+  const chevronFill = isDisabled ? '#CBD5E1' : isOpen ? '#3B82F6' : '#71717A';
+
+  const leftBox = makeFrame('left');
+  leftBox.layoutMode = 'HORIZONTAL';
+  leftBox.primaryAxisAlignItems = 'MIN';
+  leftBox.counterAxisAlignItems = 'CENTER';
+  leftBox.itemSpacing = 6;
+  leftBox.fills = [];
+
+  if (vKey.includes('checkbox')) {
+    const cb = makeFrame('cb');
+    cb.layoutMode = 'HORIZONTAL';
+    cb.primaryAxisAlignItems = 'CENTER';
+    cb.counterAxisAlignItems = 'CENTER';
+    cb.resize(14, 14);
+    cb.cornerRadius = 3;
+    setFill(cb, isOpen ? '#3B82F6' : '#FFFFFF');
+    if (isOpen) {
+      cb.appendChild(buildIcon(9, '#FFFFFF', 'check'));
+    } else {
+      setStroke(cb, '#D4D4D8', 1.5);
+    }
+    leftBox.appendChild(cb);
+    leftBox.appendChild(text({ characters: '2 categories selected', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 11, fill: isDisabled ? '#A1A1AA' : '#18181B' }));
+  } else if (vKey.includes('count') || vKey.includes('summary')) {
     const chip = makeFrame('chip');
     chip.layoutMode = 'HORIZONTAL';
     chip.counterAxisAlignItems = 'CENTER';
-    chip.itemSpacing = 4;
     pad(chip, 2, 6);
-    chip.cornerRadius = 4;
-    setFill(chip, colorShade(ctx.tokens, 'neutral', 100));
-    chip.appendChild(text({ characters: p, fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 800) }));
-    chip.appendChild(buildIcon(10, colorShade(ctx.tokens, 'neutral', 500), 'close'));
-    pills.appendChild(chip);
+    chip.cornerRadius = 6;
+    setFill(chip, '#FFFFFF');
+    chip.appendChild(text({ characters: 'Design (+3)', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 11, fill: '#18181B' }));
+    leftBox.appendChild(chip);
+    leftBox.appendChild(text({ characters: 'selected', fontFamily: ctx.config.fontFamily.body, weight: 400, fontSize: 11, fill: '#71717A' }));
+  } else {
+    // TagPills (Default)
+    ['UI', 'UX'].forEach((p) => {
+      const chip = makeFrame('chip');
+      chip.layoutMode = 'HORIZONTAL';
+      chip.counterAxisAlignItems = 'CENTER';
+      chip.itemSpacing = 4;
+      pad(chip, 2, 6);
+      chip.cornerRadius = 6;
+      setFill(chip, '#FFFFFF');
+      chip.appendChild(text({ characters: p, fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 11, fill: '#18181B' }));
+      chip.appendChild(text({ characters: '×', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: '#71717A' }));
+      leftBox.appendChild(chip);
+    });
+  }
+
+  root.appendChild(leftBox);
+
+  const chevron = text({
+    characters: isOpen ? '⌃' : '⌄',
+    fontFamily: ctx.config.fontFamily.body,
+    weight: 600,
+    fontSize: 14,
+    fill: chevronFill,
   });
-  root.appendChild(pills);
-  root.appendChild(buildIcon(14, colorShade(ctx.tokens, 'neutral', 500), 'chevronDown'));
+  root.appendChild(chevron);
+
   return root;
 };
 

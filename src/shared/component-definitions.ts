@@ -531,7 +531,6 @@ export const COMPONENT_DEFINITIONS: ComponentDefinition[] = [
       { name: 'Default', properties: { state: 'default' } },
       { name: 'Hover', properties: { state: 'hover' } },
       { name: 'Focus', properties: { state: 'focus' } },
-      { name: 'Open', properties: { state: 'open' } },
       { name: 'Disabled', properties: { state: 'disabled' } },
     ],
     sizes: [
