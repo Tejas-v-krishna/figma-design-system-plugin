@@ -1209,16 +1209,20 @@ const Slider: Template = (root, ctx) => {
   const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
   const fieldWidth = ctx.showcaseType === 'size' ? 240 : 176;
+  const fieldHeight = 52;
 
   root.layoutMode = 'VERTICAL';
-  root.primaryAxisAlignItems = 'MIN';
+  root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
-  root.primaryAxisSizingMode = 'AUTO';
+  root.primaryAxisSizingMode = 'FIXED';
   root.counterAxisSizingMode = 'FIXED';
-  root.resize(fieldWidth, 40);
-  root.itemSpacing = 4;
-  root.fills = [];
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 8, 12);
+  root.cornerRadius = 10;
+  root.itemSpacing = 6;
+  root.clipsContent = true;
   root.strokes = [];
+  root.effects = [];
 
   const isHover = sKey === 'hover';
   const isActive = sKey === 'active';
@@ -1228,85 +1232,72 @@ const Slider: Template = (root, ctx) => {
   const hasLabels = vKey.includes('label');
   const isStepped = vKey.includes('step');
 
-  const activeColor = isDisabled ? '#94A3B8' : isActive ? '#1D4ED8' : '#3B82F6';
-  const trackBg = isDisabled ? '#E2E8F0' : '#E4E4E7';
+  const bg = isDisabled ? '#F8FAFC' : isActive ? '#EEF2FF' : isHover ? '#E8EAED' : '#F1F3F5';
+  setFill(root, bg);
 
   if (isDisabled) {
-    root.opacity = 0.5;
+    root.opacity = 0.6;
   }
 
-  // Optional Top Elements (Tooltip or Labels)
+  const activeColor = isDisabled ? '#CBD5E1' : isActive ? '#2563EB' : '#3B82F6';
+  const trackBg = isDisabled ? '#E2E8F0' : '#D4D4D8';
+  const labelColor = isDisabled ? '#A1A1AA' : '#71717A';
+  const valueColor = isDisabled ? '#A1A1AA' : '#18181B';
+
+  const usableW = fieldWidth - 24;
+
+  // Header Row (Label / Value / Tooltip)
+  const headerRow = hbox('headerRow');
+  headerRow.resize(usableW, 14);
+  headerRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  headerRow.counterAxisAlignItems = 'CENTER';
+
   if (hasTooltip) {
-    const tooltipRow = hbox('tooltipRow');
-    tooltipRow.resize(fieldWidth, 18);
-    tooltipRow.primaryAxisAlignItems = 'MIN';
-    tooltipRow.counterAxisAlignItems = 'CENTER';
-
-    // Position tooltip roughly over the knob (at 55%)
-    const spacer = makeFrame('spacer');
-    spacer.resize(Math.round(fieldWidth * 0.45), 18);
-    spacer.fills = [];
-    tooltipRow.appendChild(spacer);
-
+    headerRow.appendChild(text({ characters: 'Value', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: labelColor }));
     const tip = makeFrame('tip');
     tip.layoutMode = 'HORIZONTAL';
     tip.counterAxisAlignItems = 'CENTER';
-    tip.primaryAxisAlignItems = 'CENTER';
-    pad(tip, 2, 6);
+    pad(tip, 1, 5);
     tip.cornerRadius = 4;
-    setFill(tip, '#18181B');
-    tip.appendChild(text({ characters: '60%', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: '#FFFFFF' }));
-    tooltipRow.appendChild(tip);
-    root.appendChild(tooltipRow);
+    setFill(tip, isDisabled ? '#A1A1AA' : '#18181B');
+    tip.appendChild(text({ characters: '60%', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 9, fill: '#FFFFFF' }));
+    headerRow.appendChild(tip);
   } else if (hasLabels) {
-    const labelRow = hbox('labelRow');
-    labelRow.resize(fieldWidth, 14);
-    labelRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
-    labelRow.counterAxisAlignItems = 'CENTER';
-    labelRow.appendChild(text({ characters: '$0', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: '#71717A' }));
-    labelRow.appendChild(text({ characters: '$120', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: activeColor }));
-    labelRow.appendChild(text({ characters: '$200', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: '#71717A' }));
-    root.appendChild(labelRow);
+    headerRow.appendChild(text({ characters: '$0', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: labelColor }));
+    headerRow.appendChild(text({ characters: '$120', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: isDisabled ? '#A1A1AA' : activeColor }));
+    headerRow.appendChild(text({ characters: '$200', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: labelColor }));
+  } else if (isStepped) {
+    headerRow.appendChild(text({ characters: 'Step', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: labelColor }));
+    headerRow.appendChild(text({ characters: '3 of 5', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: valueColor }));
+  } else {
+    headerRow.appendChild(text({ characters: 'Volume', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: labelColor }));
+    headerRow.appendChild(text({ characters: '60%', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: valueColor }));
   }
+  root.appendChild(headerRow);
 
-  // Slider Track Bar
+  // Track Bar Row
   const bar = hbox('bar');
-  bar.resize(fieldWidth, 20);
+  bar.resize(usableW, 16);
   bar.itemSpacing = 0;
   bar.counterAxisAlignItems = 'CENTER';
   bar.primaryAxisAlignItems = 'MIN';
 
-  const fillW = Math.round(fieldWidth * 0.55);
-  const emptyW = fieldWidth - fillW - 16;
+  const fillW = Math.round(usableW * 0.58);
+  const emptyW = usableW - fillW - 14;
 
-  const fillTrack = rect('fillTrack', fillW, 6, activeColor);
+  const fillTrack = rect('fillTrack', fillW, 5, activeColor);
   fillTrack.cornerRadius = 9999;
   bar.appendChild(fillTrack);
 
-  // Knob
-  const knob = ellipse('knob', 16, '#FFFFFF');
-  setStroke(knob, activeColor, isHover || isActive ? 2.5 : 2);
+  const knob = ellipse('knob', 14, '#FFFFFF');
+  setStroke(knob, activeColor, 2);
   bar.appendChild(knob);
 
-  const emptyTrack = rect('emptyTrack', emptyW, 6, trackBg);
+  const emptyTrack = rect('emptyTrack', emptyW, 5, trackBg);
   emptyTrack.cornerRadius = 9999;
   bar.appendChild(emptyTrack);
 
   root.appendChild(bar);
-
-  if (isStepped) {
-    // Stepped tick dots underneath track
-    const ticksRow = hbox('ticks');
-    ticksRow.resize(fieldWidth - 16, 6);
-    ticksRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
-    ticksRow.counterAxisAlignItems = 'CENTER';
-    for (let i = 0; i < 5; i++) {
-      const dot = ellipse(`tick-${i}`, 4, i <= 2 ? activeColor : '#D4D4D8');
-      ticksRow.appendChild(dot);
-    }
-    root.appendChild(ticksRow);
-  }
-
   return root;
 };
 
@@ -4137,16 +4128,20 @@ const RangeSlider: Template = (root, ctx) => {
   const vKey = variantKey(ctx);
   const sKey = ctx.stateName.toLowerCase();
   const fieldWidth = ctx.showcaseType === 'size' ? 260 : 230;
+  const fieldHeight = 52;
 
   root.layoutMode = 'VERTICAL';
-  root.primaryAxisAlignItems = 'MIN';
+  root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
-  root.primaryAxisSizingMode = 'AUTO';
+  root.primaryAxisSizingMode = 'FIXED';
   root.counterAxisSizingMode = 'FIXED';
-  root.resize(fieldWidth, 40);
-  root.itemSpacing = 4;
-  root.fills = [];
+  root.resize(fieldWidth, fieldHeight);
+  pad(root, 8, 14);
+  root.cornerRadius = 10;
+  root.itemSpacing = 6;
+  root.clipsContent = true;
   root.strokes = [];
+  root.effects = [];
 
   const isActive = sKey === 'active';
   const isDisabled = sKey === 'disabled';
@@ -4154,64 +4149,74 @@ const RangeSlider: Template = (root, ctx) => {
   const hasTooltip = vKey.includes('tooltip');
   const hasMinMax = vKey.includes('minmax') || vKey.includes('input');
 
-  const activeColor = isDisabled ? '#94A3B8' : isActive ? '#1D4ED8' : '#3B82F6';
-  const trackBg = isDisabled ? '#E2E8F0' : '#E4E4E7';
+  const bg = isDisabled ? '#F8FAFC' : isActive ? '#EEF2FF' : '#F1F3F5';
+  setFill(root, bg);
 
   if (isDisabled) {
-    root.opacity = 0.5;
+    root.opacity = 0.6;
   }
+
+  const activeColor = isDisabled ? '#CBD5E1' : isActive ? '#2563EB' : '#3B82F6';
+  const trackBg = isDisabled ? '#E2E8F0' : '#D4D4D8';
+  const labelColor = isDisabled ? '#A1A1AA' : '#71717A';
+  const valueColor = isDisabled ? '#A1A1AA' : '#18181B';
+
+  const usableW = fieldWidth - 28;
+
+  // Header Row
+  const headerRow = hbox('headerRow');
+  headerRow.resize(usableW, 14);
+  headerRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  headerRow.counterAxisAlignItems = 'CENTER';
 
   if (hasTooltip) {
-    const tipRow = hbox('tipRow');
-    tipRow.resize(fieldWidth, 18);
-    tipRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
-    tipRow.counterAxisAlignItems = 'CENTER';
+    const tip1 = makeFrame('tip1');
+    tip1.layoutMode = 'HORIZONTAL';
+    pad(tip1, 1, 5);
+    tip1.cornerRadius = 4;
+    setFill(tip1, isDisabled ? '#A1A1AA' : '#18181B');
+    tip1.appendChild(text({ characters: '$30', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 9, fill: '#FFFFFF' }));
+    headerRow.appendChild(tip1);
 
-    const t1 = makeFrame('t1');
-    t1.layoutMode = 'HORIZONTAL';
-    pad(t1, 2, 6);
-    t1.cornerRadius = 4;
-    setFill(t1, '#18181B');
-    t1.appendChild(text({ characters: '$30', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: '#FFFFFF' }));
-    tipRow.appendChild(t1);
-
-    const t2 = makeFrame('t2');
-    t2.layoutMode = 'HORIZONTAL';
-    pad(t2, 2, 6);
-    t2.cornerRadius = 4;
-    setFill(t2, '#18181B');
-    t2.appendChild(text({ characters: '$150', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: '#FFFFFF' }));
-    tipRow.appendChild(t2);
-
-    root.appendChild(tipRow);
+    const tip2 = makeFrame('tip2');
+    tip2.layoutMode = 'HORIZONTAL';
+    pad(tip2, 1, 5);
+    tip2.cornerRadius = 4;
+    setFill(tip2, isDisabled ? '#A1A1AA' : '#18181B');
+    tip2.appendChild(text({ characters: '$150', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 9, fill: '#FFFFFF' }));
+    headerRow.appendChild(tip2);
   } else if (hasMinMax) {
-    const labelRow = hbox('labelRow');
-    labelRow.resize(fieldWidth, 14);
-    labelRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
-    labelRow.counterAxisAlignItems = 'CENTER';
-    labelRow.appendChild(text({ characters: 'Min: $25', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: '#71717A' }));
-    labelRow.appendChild(text({ characters: '$25 - $160', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: activeColor }));
-    labelRow.appendChild(text({ characters: 'Max: $200', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: '#71717A' }));
-    root.appendChild(labelRow);
+    headerRow.appendChild(text({ characters: 'Min: $25', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: labelColor }));
+    headerRow.appendChild(text({ characters: '$25 - $160', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: isDisabled ? '#A1A1AA' : activeColor }));
+    headerRow.appendChild(text({ characters: 'Max: $200', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: labelColor }));
+  } else {
+    headerRow.appendChild(text({ characters: 'Price Range', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 10, fill: labelColor }));
+    headerRow.appendChild(text({ characters: '$30 – $150', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 10, fill: valueColor }));
   }
+  root.appendChild(headerRow);
 
+  // Track Bar Row
   const bar = hbox('bar');
-  bar.resize(fieldWidth, 20);
+  bar.resize(usableW, 16);
   bar.itemSpacing = 0;
   bar.counterAxisAlignItems = 'CENTER';
   bar.primaryAxisAlignItems = 'MIN';
 
-  const tLeft = rect('tLeft', 35, 6, trackBg);
+  const tLeftW = 28;
+  const tActiveW = 90;
+  const tRightW = usableW - tLeftW - tActiveW - 28;
+
+  const tLeft = rect('tLeft', tLeftW, 5, trackBg);
   tLeft.cornerRadius = 9999;
-  const k1 = ellipse('k1', 16, '#FFFFFF');
+  const k1 = ellipse('k1', 14, '#FFFFFF');
   setStroke(k1, activeColor, 2);
 
-  const tActive = rect('tActive', 105, 6, activeColor);
+  const tActive = rect('tActive', tActiveW, 5, activeColor);
   tActive.cornerRadius = 9999;
-  const k2 = ellipse('k2', 16, '#FFFFFF');
+  const k2 = ellipse('k2', 14, '#FFFFFF');
   setStroke(k2, activeColor, 2);
 
-  const tRight = rect('tRight', fieldWidth - 35 - 105 - 32, 6, trackBg);
+  const tRight = rect('tRight', tRightW, 5, trackBg);
   tRight.cornerRadius = 9999;
 
   bar.appendChild(tLeft);
