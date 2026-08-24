@@ -1746,49 +1746,168 @@ const AvatarStack: Template = (root, ctx) => {
 };
 
 const Progress: Template = (root, ctx) => {
-  const kind = variantKey(ctx);
-  if (kind === 'circular') {
-    const e = ellipse('ring', 64);
-    e.fills = [];
-    e.strokes = [{ type: 'SOLID', color: hexToRgbSafe(colorShade(ctx.tokens, 'neutral', 200)) }];
-    e.strokeWeight = 8;
-    const e2 = ellipse('value', 64);
-    e2.fills = [];
-    e2.strokes = [{ type: 'SOLID', color: hexToRgbSafe(colorShade(ctx.tokens, 'primary', 500)) }];
-    e2.strokeWeight = 8;
-    root.appendChild(e);
-    root.appendChild(e2);
-    root.appendChild(text({ characters: '70%', fontFamily: ctx.config.fontFamily.body, weight: 600, fontSize: 14, fill: colorShade(ctx.tokens, 'neutral', 700), align: 'CENTER' }));
-    return root;
-  }
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const szKey = String(ctx.sizeName || ctx.sizeProps.name || 'md').toLowerCase();
+  const trackH = szKey === 'sm' ? 4 : szKey === 'lg' ? 10 : 6;
+  const fieldWidth = ctx.showcaseType === 'size' ? 240 : 176;
+
   root.layoutMode = 'VERTICAL';
   root.itemSpacing = 6;
-  root.resize(220, 26);
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'FIXED';
+  root.resize(fieldWidth, 32);
+  root.fills = [];
+  root.strokes = [];
+
+  // Color by state: Primary (Obsidian #18181B), Success (#10B981), Warning (#F59E0B), Error (#EF4444)
+  let activeColor = '#18181B';
+  let trackColor = '#E4E4E7';
+  let percentage = '70%';
+
+  if (sKey === 'success') {
+    activeColor = '#10B981';
+    trackColor = '#D1FAE5';
+  } else if (sKey === 'warning') {
+    activeColor = '#F59E0B';
+    trackColor = '#FEF3C7';
+  } else if (sKey === 'error') {
+    activeColor = '#EF4444';
+    trackColor = '#FEE2E2';
+  }
 
   const topRow = hbox('topRow');
   topRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
-  topRow.resize(220, 14);
-  topRow.appendChild(text({ characters: 'Progress', fontFamily: ctx.config.fontFamily.body, weight: 500, fontSize: 11, fill: colorShade(ctx.tokens, 'neutral', 700) }));
-  topRow.appendChild(text({ characters: '70%', fontFamily: ctx.config.fontFamily.mono, weight: 600, fontSize: 11, fill: colorShade(ctx.tokens, 'primary', 600) }));
+  topRow.counterAxisAlignItems = 'CENTER';
+  topRow.resize(fieldWidth, 14);
+  topRow.fills = [];
+
+  let labelText = 'Progress';
+  if (vKey === 'indeterminate') {
+    labelText = 'Loading…';
+    percentage = '';
+  } else if (vKey === 'striped') {
+    labelText = 'Syncing';
+  }
+
+  topRow.appendChild(text({
+    characters: labelText,
+    fontFamily: ctx.config.fontFamily.body,
+    weight: 500,
+    fontSize: 11,
+    fill: '#71717A',
+  }));
+
+  if (percentage) {
+    topRow.appendChild(text({
+      characters: percentage,
+      fontFamily: ctx.config.fontFamily.body,
+      weight: 600,
+      fontSize: 11,
+      fill: activeColor,
+    }));
+  }
   root.appendChild(topRow);
 
   const track = makeFrame('track');
-  track.resize(220, 6);
+  track.resize(fieldWidth, trackH);
   track.cornerRadius = 9999;
-  setFill(track, colorShade(ctx.tokens, 'neutral', 200));
-  const fill = rect('fill', 154, 6, colorShade(ctx.tokens, 'primary', 500));
-  fill.cornerRadius = 9999;
-  track.appendChild(fill);
+  setFill(track, trackColor);
+  track.clipsContent = true;
+
+  if (vKey === 'striped') {
+    // Segmented / striped fill
+    const fillW = Math.round(fieldWidth * 0.7);
+    const fill = hbox('fill');
+    fill.resize(fillW, trackH);
+    fill.cornerRadius = 9999;
+    fill.itemSpacing = 2;
+    fill.fills = [];
+    const segCount = Math.floor(fillW / (trackH + 2));
+    for (let i = 0; i < segCount; i++) {
+      const seg = rect(`seg-${i}`, trackH, trackH, activeColor);
+      seg.cornerRadius = 1;
+      fill.appendChild(seg);
+    }
+    track.appendChild(fill);
+  } else if (vKey === 'indeterminate') {
+    // Indeterminate centered bar
+    const fillW = Math.round(fieldWidth * 0.45);
+    const fill = rect('fill', fillW, trackH, activeColor);
+    fill.cornerRadius = 9999;
+    track.layoutMode = 'HORIZONTAL';
+    track.primaryAxisAlignItems = 'CENTER';
+    track.appendChild(fill);
+  } else {
+    // Linear & WithPercentage
+    const fillW = Math.round(fieldWidth * 0.7);
+    const fill = rect('fill', fillW, trackH, activeColor);
+    fill.cornerRadius = 9999;
+    track.appendChild(fill);
+  }
+
   root.appendChild(track);
   return root;
 };
 
 const Spinner: Template = (root, ctx) => {
-  const e = ellipse('ring', 32);
-  e.fills = [];
-  e.strokes = [{ type: 'SOLID', color: hexToRgbSafe(colorShade(ctx.tokens, 'primary', 500)) }];
-  e.strokeWeight = 4;
-  root.appendChild(e);
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const szKey = String(ctx.sizeName || ctx.sizeProps.name || 'md').toLowerCase();
+  const d = szKey === 'sm' ? 18 : szKey === 'lg' ? 32 : 24;
+
+  root.layoutMode = 'HORIZONTAL';
+  root.primaryAxisAlignItems = 'CENTER';
+  root.counterAxisAlignItems = 'CENTER';
+  root.primaryAxisSizingMode = 'AUTO';
+  root.counterAxisSizingMode = 'AUTO';
+  root.fills = [];
+  root.strokes = [];
+
+  // Color by state: Primary (Obsidian #18181B), Neutral (#71717A), White (#FFFFFF)
+  const isWhite = sKey === 'white';
+  const activeColor = isWhite ? '#FFFFFF' : sKey === 'neutral' ? '#71717A' : '#18181B';
+
+  if (isWhite) {
+    pad(root, 6, 8);
+    root.cornerRadius = 8;
+    setFill(root, '#18181B');
+  }
+
+  if (vKey === 'dotsbounce') {
+    const dots = hbox('dots');
+    dots.itemSpacing = Math.max(3, Math.round(d * 0.15));
+    dots.counterAxisAlignItems = 'CENTER';
+    const dotD = Math.max(4, Math.round(d * 0.28));
+    for (let i = 0; i < 3; i++) {
+      const op = i === 1 ? 1 : i === 0 ? 0.4 : 0.7;
+      const dot = ellipse(`dot-${i}`, dotD, activeColor);
+      dot.opacity = op;
+      dots.appendChild(dot);
+    }
+    root.appendChild(dots);
+  } else if (vKey === 'pulsering') {
+    const pulse = makeFrame('pulse');
+    pulse.resize(d, d);
+    pulse.cornerRadius = 9999;
+    pulse.layoutMode = 'HORIZONTAL';
+    pulse.primaryAxisAlignItems = 'CENTER';
+    pulse.counterAxisAlignItems = 'CENTER';
+    pulse.fills = [];
+    setStroke(pulse, activeColor, 1.5);
+    const innerDot = ellipse('inner', Math.round(d * 0.45), activeColor);
+    pulse.appendChild(innerDot);
+    root.appendChild(pulse);
+  } else {
+    // Circular
+    const ring = makeFrame('ring');
+    ring.resize(d, d);
+    ring.cornerRadius = 9999;
+    ring.fills = [];
+    setStroke(ring, activeColor, Math.max(2, Math.round(d * 0.12)));
+    root.appendChild(ring);
+  }
+
   return root;
 };
 
@@ -4695,13 +4814,70 @@ const Banner: Template = (root, ctx) => {
 };
 
 const ProgressCircle: Template = (root, ctx) => {
-  root.layoutMode = 'HORIZONTAL';
+  const vKey = variantKey(ctx);
+  const sKey = ctx.stateName.toLowerCase();
+  const szKey = String(ctx.sizeName || ctx.sizeProps.name || 'md').toLowerCase();
+  const d = szKey === 'sm' ? 44 : szKey === 'lg' ? 72 : 56;
+  const strokeW = szKey === 'sm' ? 4 : szKey === 'lg' ? 6 : 5;
+  const fontSize = szKey === 'sm' ? 11 : szKey === 'lg' ? 15 : 13;
+
+  root.layoutMode = 'VERTICAL';
   root.primaryAxisAlignItems = 'CENTER';
   root.counterAxisAlignItems = 'CENTER';
-  root.resize(64, 64);
+  root.primaryAxisSizingMode = 'FIXED';
+  root.counterAxisSizingMode = 'FIXED';
+  root.resize(d, d);
   root.cornerRadius = 9999;
-  setStroke(root, colorShade(ctx.tokens, 'primary', 500), 4);
-  root.appendChild(text({ characters: '75%', fontFamily: ctx.config.fontFamily.body, weight: 700, fontSize: 13, fill: colorShade(ctx.tokens, 'neutral', 900) }));
+  root.fills = [];
+  root.strokes = [];
+
+  // Color by state: Default (Obsidian #18181B), Success (#10B981), Warning (#F59E0B)
+  let activeColor = '#18181B';
+  let textFill = '#18181B';
+
+  if (sKey === 'success') {
+    activeColor = '#10B981';
+    textFill = '#047857';
+  } else if (sKey === 'warning') {
+    activeColor = '#F59E0B';
+    textFill = '#B45309';
+  }
+
+  // Circular ring container
+  const ring = makeFrame('ring');
+  ring.resize(d, d);
+  ring.cornerRadius = 9999;
+  ring.layoutMode = 'VERTICAL';
+  ring.primaryAxisAlignItems = 'CENTER';
+  ring.counterAxisAlignItems = 'CENTER';
+  ring.fills = [];
+  setStroke(ring, activeColor, strokeW);
+
+  if (vKey === 'dashboardgauge') {
+    ring.cornerRadius = d;
+  }
+
+  ring.appendChild(text({
+    characters: '75%',
+    fontFamily: ctx.config.fontFamily.body,
+    weight: 700,
+    fontSize,
+    fill: textFill,
+    align: 'CENTER',
+  }));
+
+  if (vKey === 'withmetricinside' && d >= 56) {
+    ring.appendChild(text({
+      characters: 'Target',
+      fontFamily: ctx.config.fontFamily.body,
+      weight: 500,
+      fontSize: 9,
+      fill: '#71717A',
+      align: 'CENTER',
+    }));
+  }
+
+  root.appendChild(ring);
   return root;
 };
 
